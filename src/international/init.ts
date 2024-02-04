@@ -1,14 +1,15 @@
 import { getMe } from 'utils/utils'
-import { playerManager } from './players'
-import { statsManager } from './statsManager'
-import { PlayerMemoryKeys, SegmentIDs } from './constants'
-import { PlayerRelationships } from './constants'
+import { PlayerManager } from './players'
+import { StatsManager } from './stats'
+import { PlayerMemoryKeys, SegmentIDs } from '../constants/general'
+import { PlayerRelationships } from '../constants/general'
+import { RoomNameUtils } from 'room/roomNameUtils'
 
 /**
  * Configures variables to align with the bot's expectations, to ensure proper function
  */
-class InitManager {
-  public run() {
+export class InitManager {
+  public static tryInit() {
     this.initMemory()
     this.initGlobal()
   }
@@ -16,12 +17,11 @@ class InitManager {
   /**
    * Construct Memory if it isn't constructed yet
    */
-  private initMemory() {
-    if (Memory.breakingVersion) return
+  private static initMemory() {
+    if (Memory.breakingVersion !== undefined) return
 
     this.initSegments()
 
-    Memory.breakingVersion = global.settings.breakingVersion
     Memory.me = getMe()
     /* (Object.values(Game.structures)[0] as OwnedStructure)?.owner?.username ||
             Object.values(Game.creeps)[0]?.owner?.username ||
@@ -40,46 +40,39 @@ class InitManager {
     Memory.combatRequests = {}
     Memory.haulRequests = {}
     Memory.nukeRequests = {}
-    statsManager.internationalConfig()
+    StatsManager.internationalConfig()
+
+    Memory.breakingVersion = global.settings.breakingVersion
   }
+
   /**
    * Construct global if it isn't constructed yet
    */
-  private initGlobal() {
+  private static initGlobal() {
     if (global.constructed) return
 
-    global.constructed = true
-
-    global.packedRoomNames = {}
-    global.unpackedRoomNames = {}
-
     this.initPlayers()
+
+    global.constructed = true
   }
 
-  private initPlayers() {
+  private static initPlayers() {
     for (const playerName of global.settings.allies) {
       const playerMemory = Memory.players[playerName]
       if (!playerMemory) {
-        playerManager.initPlayer(playerName)
+        PlayerManager.initPlayer(playerName)
       }
 
       playerMemory[PlayerMemoryKeys.relationship] = PlayerRelationships.ally
     }
   }
 
-  private initSegments() {
-
-    RawMemory.segments[SegmentIDs.basePlans] = JSON.stringify({
-
-    } as BasePlansSegment)
+  private static initSegments() {
+    RawMemory.segments[SegmentIDs.basePlans] = JSON.stringify({} as BasePlansSegment)
 
     RawMemory.segments[SegmentIDs.IDs] = JSON.stringify({
-        constructionSites: {},
-        recordedTransactionIDs: {},
+      constructionSites: {},
+      recordedTransactionIDs: {},
     } as IDsSegment)
-
-
   }
 }
-
-export const initManager = new InitManager()

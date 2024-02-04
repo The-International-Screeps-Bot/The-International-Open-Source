@@ -1,42 +1,47 @@
 import {
-    Result,
-    RoomMemoryKeys,
-    RoomTypes,
-    defaultSwampCost,
-    dynamicScoreRoomRange,
-    maxControllerLevel,
-    preferredCommuneRange,
-    remoteRoles,
-    roomDimensions,
-    roomTypeProperties,
-    roomTypes,
-} from 'international/constants'
-import { collectiveManager } from 'international/collective'
+  Result,
+  RoomMemoryKeys,
+  RoomStatusKeys,
+  RoomTypes,
+  defaultSwampCost,
+  dynamicScoreRoomRange,
+  maxControllerLevel,
+  preferredCommuneRange,
+  remoteRoles,
+  roomDimensions,
+  roomTypeProperties,
+  roomTypes,
+} from '../constants/general'
+import { CollectiveManager } from 'international/collective'
 import {
-    findAdjacentCoordsToCoord,
-    forAdjacentCoords,
-    forRoomNamesAroundRangeXY,
-    getRange,
-    packAsNum,
-    packXYAsNum,
-    roundTo,
+  findAdjacentCoordsToCoord,
+  forAdjacentCoords,
+  forRoomNamesAroundRangeXY,
+  getRange,
+  isAlly,
+  packAsNum,
+  packXYAsNum,
+  roundTo,
 } from 'utils/utils'
 import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from './commune/commune'
 import { customLog } from 'utils/logging'
+import { RoomOps } from './roomOps'
+import { RoomNameOps } from './roomNameOps'
+import { RoomUtils } from './roomUtils'
 
 /**
  * considers a position being flooded
  * @returns Wether or not the position should be flooded next generation
  */
 type FloodForCoordCheck = (
-    coord: Coord,
-    packedCoord: number,
-    generation?: number,
+  coord: Coord,
+  packedCoord: number,
+  generation?: number,
 ) => boolean | Result.stop
 
 export class RoomNameUtils {
-  abandonRemote(roomName: string, time: number) {
+  static abandonRemote(roomName: string, time: number) {
     const roomMemory = Memory.rooms[roomName]
 
     if (roomMemory[RoomMemoryKeys.abandonRemote] >= time) return
@@ -44,7 +49,7 @@ export class RoomNameUtils {
     roomMemory[RoomMemoryKeys.abandonRemote] = time
     delete roomMemory[RoomMemoryKeys.recursedAbandonment]
   }
-  findDynamicScore(roomName: string) {
+  static findDynamicScore(roomName: string) {
     let dynamicScore = 0
 
     let closestEnemy = 0
@@ -104,7 +109,7 @@ export class RoomNameUtils {
     const roomMemory = Memory.rooms[roomName]
     const mineralType = roomMemory[RoomMemoryKeys.mineralType]
     const mineralScore =
-      collectiveManager.mineralNodes[mineralType] - collectiveManager.avgCommunesPerMineral
+      CollectiveManager.mineralNodes[mineralType] - CollectiveManager.avgCommunesPerMineral
     dynamicScore += mineralScore * 40
 
     dynamicScore = roundTo(dynamicScore, 2)
@@ -114,7 +119,7 @@ export class RoomNameUtils {
 
     return dynamicScore
   }
-  floodFillFor(roomName: string, seeds: Coord[], coordCheck: FloodForCoordCheck) {
+  static floodFillFor(roomName: string, seeds: Coord[], coordCheck: FloodForCoordCheck) {
     const visitedCoords = new Uint8Array(2500)
 
     let depth = 0
@@ -153,8 +158,11 @@ export class RoomNameUtils {
 
     return false
   }
-  floodFillCardinalFor() {}
-  isSourceSpawningStructure(roomName: string, structure: StructureExtension | StructureSpawn) {
+  static floodFillCardinalFor() {}
+  static isSourceSpawningStructure(
+    roomName: string,
+    structure: StructureExtension | StructureSpawn,
+  ) {
     const packedSourceHarvestPositions =
       Memory.rooms[roomName][RoomMemoryKeys.communeSourceHarvestPositions]
     for (const i in packedSourceHarvestPositions) {
@@ -165,10 +173,11 @@ export class RoomNameUtils {
 
     return false
   }
+
   /**
    * Removes roomType-based values in the room's memory that don't match its type
    */
-  cleanMemory(roomName: string) {
+  static cleanMemory(roomName: string) {
     const roomMemory = Memory.rooms[roomName]
     for (const key in roomMemory) {
       // Make sure key is a type-specific key
@@ -181,13 +190,14 @@ export class RoomNameUtils {
       delete roomMemory[key as unknown as keyof RoomMemory]
     }
   }
+
   /**
    * Finds the name of the closest commune, exluding the specified roomName
    */
-  findClosestCommuneName(roomName: string) {
+  static findClosestCommuneName(roomName: string) {
     const communesNotThis = []
 
-    for (const communeName of collectiveManager.communes) {
+    for (const communeName of CollectiveManager.communes) {
       if (roomName == communeName) continue
 
       communesNotThis.push(communeName)
@@ -198,13 +208,13 @@ export class RoomNameUtils {
         Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b),
     )[0]
   }
-  findClosestClaimType(roomName: string) {
-    return Array.from(collectiveManager.communes).sort(
+  static findClosestClaimType(roomName: string) {
+    return Array.from(CollectiveManager.communes).sort(
       (a, b) =>
         Game.map.getRoomLinearDistance(roomName, a) - Game.map.getRoomLinearDistance(roomName, b),
     )[0]
   }
-  updateCreepsOfRemoteName(remoteName: string, communeManager: CommuneManager) {
+  static updateCreepsOfRemoteName(remoteName: string, communeManager: CommuneManager) {
     const remoteMemory = Memory.rooms[remoteName]
 
     communeManager.room.creepsOfRemote[remoteName] = {}
@@ -217,7 +227,7 @@ export class RoomNameUtils {
       communeManager.remoteSourceHarvesters[remoteName].push([])
     }
   }
-  diagonalCoords(roomName: string, commune: Room) {
+  static diagonalCoords(roomName: string, commune: Room) {
     const anchor = commune.roomManager.anchor
     if (!anchor) throw Error('no anchor for room: ' + roomName)
 
@@ -248,7 +258,7 @@ export class RoomNameUtils {
 
     return diagonalCoords
   }
-  pack(roomName: string) {
+  static pack(roomName: string) {
     // Find the numbers in the room's name
 
     let [name, cx, x, cy, y] = roomName.match(/^([WE])([0-9]+)([NS])([0-9]+)$/)
@@ -259,19 +269,19 @@ export class RoomNameUtils {
     }
   }
 
-  unpackXY(x: number, y: number) {
+  static unpackXY(x: number, y: number) {
     return (
       (x < 0 ? 'W' + String(~x) : 'E' + String(x)) + (y < 0 ? 'S' + String(~y) : 'N' + String(y))
     )
   }
 
-  unpack(roomCoord: RoomCoord) {
+  static unpack(roomCoord: RoomCoord) {
     return this.unpackXY(roomCoord.x, roomCoord.y)
   }
   /**
    * Finds the distance between two rooms based on walkable exits while avoiding rooms with specified types
    */
-  advancedFindDistance(
+  static advancedFindDistance(
     originRoomName: string,
     goalRoomName: string,
     opts: {
@@ -310,7 +320,7 @@ export class RoomNameUtils {
     return findRouteResult.length
   }
 
-  findClosestRoomName(roomName: string, targetRoomNames: Iterable<string>) {
+  static findClosestRoomName(roomName: string, targetRoomNames: Iterable<string>) {
     let minRange = Infinity
     let closest = undefined
 
@@ -326,36 +336,20 @@ export class RoomNameUtils {
     return closest
   }
 
-  scoutByRoomName(roomName: string) {
-    // Find the numbers in the room's name
-
-    const [EWstring, NSstring] = roomName.match(/\d+/g)
-
-    // Convert he numbers from strings into actual numbers
-
-    const EW = parseInt(EWstring)
-    const NS = parseInt(NSstring)
-
+  /**
+   * get the room status for a room that potentially has no initialized memory
+   */
+  static getStatusForPotentialMemory(roomName: string) {
     const roomMemory = Memory.rooms[roomName]
+    if (roomMemory === undefined) {
+      const roomMemory = (Memory.rooms[roomName] = {} as RoomMemory)
+      RoomNameOps.basicScout(roomName)
 
-    // Use the numbers to deduce some room types - cheaply!
-
-    if (EW % 10 === 0 && NS % 10 === 0) {
-      return (roomMemory[RoomMemoryKeys.type] = RoomTypes.intersection)
+      return roomMemory[RoomMemoryKeys.status]
     }
 
-    if (EW % 10 === 0 || NS % 10 === 0) {
-      return (roomMemory[RoomMemoryKeys.type] = RoomTypes.highway)
-    }
-    if (EW % 5 === 0 && NS % 5 === 0) {
-      return (roomMemory[RoomMemoryKeys.type] = RoomTypes.center)
-    }
-    if (Math.abs(5 - (EW % 10)) <= 1 && Math.abs(5 - (NS % 10)) <= 1) {
-      return (roomMemory[RoomMemoryKeys.type] = RoomTypes.sourceKeeper)
-    }
+    // Otherwise there is room memory
 
-    return false
+    return roomMemory[RoomMemoryKeys.status]
   }
 }
-
-export const roomNameUtils = new RoomNameUtils()

@@ -4,15 +4,6 @@ export interface Settings {
    * Increment to induce migrations which can be controlled with the migration manager
    */
   breakingVersion: number | undefined
-  /**
-   * Wether the bot should generate any room visuals
-   */
-  roomVisuals: boolean
-
-  /**
-   * Wether the bot should generate map visuals
-   */
-  mapVisuals: boolean
 
   /**
    * A list of usernames to treat as allies
@@ -92,14 +83,13 @@ export interface Settings {
    */
   structureMigration: boolean
   /**
-   * Wether or not to generate visuals for room logistics requests
-   */
-  roomLogisticsVisuals: boolean
-  /**
    * Wether or not to generate and display logs for debugging purposes
    */
   debugLogging: boolean
-
+  /**
+   * Wether or not the bot should run season logic
+   */
+  season: boolean
   /* relationships: RelationshipSettings */
 }
 

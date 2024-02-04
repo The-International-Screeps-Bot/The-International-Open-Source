@@ -1,6 +1,7 @@
 import {
   CombatRequestKeys,
   CreepMemoryKeys,
+  FlagNames,
   MovedTypes,
   Result,
   RoomMemoryKeys,
@@ -9,7 +10,7 @@ import {
   customColors,
   packedQuadAttackMemberOffsets,
   quadAttackMemberOffsets,
-} from 'international/constants'
+} from '../../../../constants/general'
 import {
   arePositionsEqual,
   doesCoordExist,
@@ -357,7 +358,7 @@ export class Quad {
 
     // Attack mode
 
-    opts.defaultCostMatrixes = function (roomName) {
+    opts.overrideCostMatrixes = function (roomName) {
       return [RoomManager.roomManagers[roomName].quadCostMatrix]
     }
     moveLeader.createMoveRequest(opts)
@@ -731,7 +732,7 @@ export class Quad {
       this.leader.message = 'EC'
 
       const enemyCreep = findClosestObject(this.leader.pos, enemyCreeps)
-      if (global.settings.roomVisuals)
+      if (Game.flags[FlagNames.roomVisuals])
         this.leader.room.visual.line(this.leader.pos, enemyCreep.pos, {
           color: customColors.green,
           opacity: 0.3,
@@ -766,7 +767,7 @@ export class Quad {
     // Otherwise, get the closest enemyAttacker
 
     const enemyAttacker = findClosestObject(this.leader.pos, enemyCreeps)
-    if (global.settings.roomVisuals)
+    if (Game.flags[FlagNames.roomVisuals])
       this.leader.room.visual.line(this.leader.pos, enemyAttacker.pos, {
         color: customColors.green,
         opacity: 0.3,
@@ -901,7 +902,7 @@ export class Quad {
     if (!structures.length) return false
 
     let structure = findClosestObject(this.leader.pos, structures)
-    if (global.settings.roomVisuals)
+    if (Game.flags[FlagNames.roomVisuals])
       this.leader.room.visual.line(this.leader.pos, structure.pos, {
         color: customColors.green,
         opacity: 0.3,

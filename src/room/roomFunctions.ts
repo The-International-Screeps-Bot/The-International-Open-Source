@@ -1,34 +1,42 @@
 import {
-    CombatRequestKeys, maxRampartGroupSize,
-    maxRemoteRoomDistance,
-    customColors,
-    PlayerMemoryKeys,
-    roomDimensions, constantRoomTypes, defaultStructureTypesByBuildPriority,
-    Result, RoomMemoryKeys,
-    RoomTypes,
-    packedPosLength,
-    maxRemotePathDistance,
-    RoomLogisticsRequestTypes, RemoteResourcePathTypes,
-    FlagNames
-} from 'international/constants'
+  CombatRequestKeys,
+  maxRampartGroupSize,
+  maxRemoteRoomDistance,
+  customColors,
+  PlayerMemoryKeys,
+  roomDimensions,
+  constantRoomTypes,
+  defaultStructureTypesByBuildPriority,
+  Result,
+  RoomMemoryKeys,
+  RoomTypes,
+  packedPosLength,
+  maxRemotePathDistance,
+  RoomLogisticsRequestTypes,
+  RemoteResourcePathTypes,
+  FlagNames,
+  RoomStatusKeys,
+} from '../constants/general'
 import {
-    findAdjacentCoordsToCoord,
-    findCoordsInsideRect,
-    findObjectWithID, packAsNum,
-    packXYAsNum, unpackNumAsCoord, doesCoordExist, findClosestObject,
-    randomIntRange,
-    roundTo
+  findAdjacentCoordsToCoord,
+  findCoordsInsideRect,
+  findObjectWithID,
+  packAsNum,
+  packXYAsNum,
+  unpackNumAsCoord,
+  doesCoordExist,
+  findClosestObject,
+  randomIntRange,
+  roundTo,
 } from 'utils/utils'
-import { collectiveManager } from 'international/collective'
-import {
-    packCoord,
-    packCoordList,
-    packXYAsCoord, unpackPosList
-} from 'other/codec'
-import { playerManager } from 'international/players'
-import { roomNameUtils } from './roomNameUtils'
+import { CollectiveManager } from 'international/collective'
+import { packCoord, packCoordList, packXYAsCoord, unpackPosList } from 'other/codec'
+import { PlayerManager } from 'international/players'
+import { RoomNameUtils } from './roomNameUtils'
 import { customLog } from 'utils/logging'
-import { roomObjectUtils } from './roomObjectUtils'
+import { RoomObjectUtils } from './roomObjectUtils'
+import { RoomNameOps } from './roomNameOps'
+import { RoomOps } from './roomOps'
 
 /**
     @param pos1 pos of the object performing the action
@@ -40,7 +48,7 @@ Room.prototype.actionVisual = function (pos1, pos2, type?) {
 
   // Stop if roomVisuals are disabled
 
-  if (!global.settings.roomVisuals) return
+  if (!Game.flags[FlagNames.roomVisuals]) return
 
   // Construct colors for each type
 
@@ -60,7 +68,11 @@ Room.prototype.actionVisual = function (pos1, pos2, type?) {
   room.visual.line(pos1, pos2, { color })
 }
 
-Room.prototype.targetVisual = function (coord1, coord2, visualize = global.settings.roomVisuals) {
+Room.prototype.targetVisual = function (
+  coord1,
+  coord2,
+  visualize = !!Game.flags[FlagNames.roomVisuals],
+) {
   if (!visualize) return
 
   this.visual.line(coord1.x, coord1.y, coord2.x, coord2.y, {
@@ -167,7 +179,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
   if (
     roomMemory[RoomMemoryKeys.type] === RoomTypes.remote &&
-    !collectiveManager.communes.has(roomMemory[RoomMemoryKeys.commune])
+    !CollectiveManager.communes.has(roomMemory[RoomMemoryKeys.commune])
   )
     roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
 
@@ -186,7 +198,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
   // Find distance from scoutingRoom
 
   if (distance <= maxRemoteRoomDistance)
-    distance = roomNameUtils.advancedFindDistance(scoutingRoom.name, this.name, {
+    distance = RoomNameUtils.advancedFindDistance(scoutingRoom.name, this.name, {
       typeWeights: {
         keeper: Infinity,
         enemy: Infinity,
@@ -211,7 +223,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     // loop through sourceNames
 
     for (const source of this.find(FIND_SOURCES)) {
-        const path = customPathFinder.findPath({
+        const path = CustomPathFinder.findPath({
             origin: source.pos,
             goals: [{ pos: anchor, range: 4 }],
             typeWeights: {
@@ -235,7 +247,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
 
         for (const pos of path) {
             newSourceEfficacy +=
-                collectiveManager.getTerrainBinary(pos.roomName)[packAsNum(pos)] ===
+                CollectiveManager.getTerrainBinary(pos.roomName)[packAsNum(pos)] ===
                 TERRAIN_MASK_SWAMP
                     ? defaultSwampCost
                     : 1
@@ -245,7 +257,7 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
         newSourceEfficaciesTotal += newSourceEfficacy
     }
 
-    const newReservationEfficacy = customPathFinder.findPath({
+    const newReservationEfficacy = CustomPathFinder.findPath({
         origin: this.controller.pos,
         goals: [{ pos: anchor, range: 4 }],
         typeWeights: {
@@ -387,13 +399,13 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
     roomMemory[RoomMemoryKeys.abandonRemote] = 0
 
     // Add the room's name to the scoutingRoom's remotes data
-    roomNameUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
+    RoomNameUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
 
     Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
     roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
     roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
 
-    roomNameUtils.cleanMemory(this.name)
+    RoomNameUtils.cleanMemory(this.name)
 
     return roomMemory[RoomMemoryKeys.type]
   }
@@ -524,13 +536,13 @@ Room.prototype.scoutMyRemote = function (scoutingRoom) {
   roomMemory[RoomMemoryKeys.abandonRemote] = 0
 
   // Add the room's name to the scoutingRoom's remotes data
-  roomNameUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
+  RoomNameUtils.updateCreepsOfRemoteName(this.name, scoutingRoom.communeManager)
 
   Memory.rooms[scoutingRoom.name][RoomMemoryKeys.remotes].push(this.name)
   roomMemory[RoomMemoryKeys.commune] = scoutingRoom.name
   roomMemory[RoomMemoryKeys.type] = RoomTypes.remote
 
-  roomNameUtils.cleanMemory(this.name)
+  RoomNameUtils.cleanMemory(this.name)
 
   return roomMemory[RoomMemoryKeys.type]
 }
@@ -542,7 +554,7 @@ Room.prototype.scoutEnemyRoom = function () {
 
   let player = Memory.players[playerName]
   if (!player) {
-    player = playerManager.initPlayer(playerName)
+    player = PlayerManager.initPlayer(playerName)
   }
 
   // General
@@ -609,109 +621,6 @@ Room.prototype.scoutEnemyRoom = function () {
 
   roomMemory[RoomMemoryKeys.type] = RoomTypes.enemy
   return roomMemory[RoomMemoryKeys.type]
-}
-
-Room.prototype.basicScout = function () {
-  const { controller } = this
-
-  // Record that the room was scouted this tick
-
-  this.memory[RoomMemoryKeys.lastScout] = Game.time
-
-  if (!controller) return this.memory[RoomMemoryKeys.type]
-
-  // If the contoller is owned
-
-  if (controller.owner) {
-    // Stop if the controller is owned by me
-
-    if (controller.my) return this.memory[RoomMemoryKeys.type]
-
-    const owner = controller.owner.username
-    this.memory[RoomMemoryKeys.owner] = owner
-
-    // If the controller is owned by an ally
-
-    if (global.settings.allies.includes(owner))
-      return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
-
-    return this.scoutEnemyRoom()
-  }
-
-  this.createWorkRequest()
-
-  // No controller owner
-
-  if (this.scoutRemote()) return this.memory[RoomMemoryKeys.type]
-
-  return (this.memory[RoomMemoryKeys.type] = RoomTypes.neutral)
-}
-
-Room.prototype.advancedScout = function (scoutingRoom: Room) {
-  const roomMemory = Memory.rooms[this.name]
-
-  // Record that the room was scouted this tick
-  roomMemory[RoomMemoryKeys.lastScout] = Game.time
-
-  // If the room already has a type and its type is constant, no need to go further
-  if (constantRoomTypes.has(roomMemory[RoomMemoryKeys.type])) {
-    return roomMemory[RoomMemoryKeys.type]
-  }
-
-  const { controller } = this
-  if (controller) {
-    roomMemory[RoomMemoryKeys.controllerCoord] = packCoord(controller.pos)
-  }
-
-  const sources = this.find(FIND_SOURCES)
-  if (sources.length) {
-    const packedSourceCoords = packCoordList(sources.map(source => source.pos))
-    roomMemory[RoomMemoryKeys.sourceCoords] = packedSourceCoords
-  }
-
-  const roomNameScoutType = roomNameUtils.scoutByRoomName(this.name)
-  if (roomNameScoutType) {
-    if (roomNameScoutType === RoomTypes.sourceKeeper) {
-      // Record the positions of keeper lairs
-
-      const lairCoords = this.roomManager.structures.keeperLair.map(lair => lair.pos)
-      roomMemory[RoomMemoryKeys.keeperLairCoords] = packCoordList(lairCoords)
-    }
-
-    return roomMemory[RoomMemoryKeys.type]
-  }
-
-  // If there is a controller
-  if (controller) {
-    // If the contoller is owned
-
-    if (controller.owner) {
-      // Stop if the controller is owned by me
-
-      if (controller.my) return this.memory[RoomMemoryKeys.type]
-
-      const owner = controller.owner.username
-
-      this.memory[RoomMemoryKeys.owner] = owner
-
-      // If the controller is owned by an ally
-
-      if (global.settings.allies.includes(owner))
-        return (this.memory[RoomMemoryKeys.type] = RoomTypes.ally)
-
-      return this.scoutEnemyRoom()
-    }
-
-    this.createWorkRequest()
-
-    // No controlller owner
-
-    if (this.scoutRemote(scoutingRoom)) return this.memory[RoomMemoryKeys.type]
-
-    return (this.memory[RoomMemoryKeys.type] = RoomTypes.neutral)
-  }
-
-  return this.memory[RoomMemoryKeys.type]
 }
 
 Room.prototype.createAttackCombatRequest = function (opts) {
@@ -833,8 +742,6 @@ Room.prototype.distanceTransform = function (
 
   const distanceCoords = new Uint8Array(2500)
 
-  if (!initialCoords) initialCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.name))
-
   let x
   let y
   let minX = Math.max(x1 - 1, 0)
@@ -927,8 +834,6 @@ Room.prototype.diagonalDistanceTransform = function (
   // Use a costMatrix to record distances
 
   const distanceCoords = new Uint8Array(2500)
-
-  if (!initialCoords) initialCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.name))
 
   let x
   let y
@@ -1179,7 +1084,7 @@ Room.prototype.findClosestPos = function (opts) {
   return false
 }
 
-Room.prototype.errorVisual = function (coord, visualize = global.settings.roomVisuals) {
+Room.prototype.errorVisual = function (coord, visualize = !!Game.flags[FlagNames.roomVisuals]) {
   if (!visualize) return
 
   this.visual.circle(coord.x, coord.y, {
@@ -1443,15 +1348,16 @@ Room.prototype.createWorkRequest = function () {
   if (this.find(FIND_SOURCES).length < 2) return false
   if (Memory.workRequests[this.name]) return false
 
-  roomNameUtils.findDynamicScore(this.name)
+  RoomNameUtils.findDynamicScore(this.name)
 
-  const communePlanned = Memory.rooms[this.name][RoomMemoryKeys.communePlanned]
-  if (communePlanned === false) return false
+  const roomMemory = Memory.rooms[this.name]
+  const communePlanned = roomMemory[RoomMemoryKeys.communePlanned]
+  if (communePlanned !== undefined) return false
 
-  if (communePlanned !== true) {
+  if (communePlanned !== Result.success) {
     const result = this.roomManager.communePlanner.attemptPlan(this)
     if (result === Result.fail) {
-      this.memory[RoomMemoryKeys.communePlanned] = false
+      roomMemory[RoomMemoryKeys.communePlanned] = Result.fail
       return false
     }
 
@@ -1535,7 +1441,7 @@ Room.prototype.coordHasStructureTypes = function (coord, types) {
   return false
 }
 
-Room.prototype.createPowerTask = function (target, powerType, priority) {
+Room.prototype.createPowerRequest = function (target, powerType, priority) {
   // There is already has a power creep responding to this target with the power
   customLog('MADE POWER TASK FOR', target)
   if (target.reservePowers.has(powerType)) return false
@@ -1545,12 +1451,12 @@ Room.prototype.createPowerTask = function (target, powerType, priority) {
   const effect = target.effectsData.get(powerType)
   const cooldown = effect ? effect.ticksRemaining : 0
 
-  const ID = collectiveManager.newTickID()
+  const ID = CollectiveManager.newTickID()
 
-  return (this.powerTasks[ID] = {
+  return (this.powerRequests[ID] = {
     taskID: ID,
     targetID: target.id,
-    powerType,
+    power: powerType,
     packedCoord: packCoord(target.pos),
     cooldown,
     priority,
@@ -1604,7 +1510,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
     )
       return Result.fail
 
-    amount = roomObjectUtils.freeReserveStoreOf(args.target, args.resourceType)
+    amount = RoomObjectUtils.freeReserveStoreOf(args.target, args.resourceType)
     /* this.visual.text(args.target.reserveStore[args.resourceType].toString(), args.target.pos) */
   }
 
@@ -1622,7 +1528,7 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
   if (args.priority === undefined) args.priority = 1
   else args.priority = roundTo(args.priority / 20, 2)
 
-  const ID = collectiveManager.newTickID()
+  const ID = CollectiveManager.newTickID()
 
   if (Game.flags[FlagNames.debugRoomLogistics]) {
     if (args.type === RoomLogisticsRequestTypes.offer) {

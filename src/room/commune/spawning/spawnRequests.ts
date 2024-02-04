@@ -1,33 +1,20 @@
 import {
   WorkRequestKeys,
   CombatRequestKeys,
-  containerUpkeepCost,
-  customColors,
-  rampartUpkeepCost,
-  roadUpkeepCost,
   packedPosLength,
   decayCosts,
   CreepMemoryKeys,
   RoomMemoryKeys,
   RoomTypes,
-} from 'international/constants'
-import {
-  findCarryPartsRequired,
-  findLinkThroughput,
-  getRangeXY,
-  getRange,
-  randomRange,
-  roundTo,
-} from 'utils/utils'
-import { collectiveManager } from 'international/collective'
-import { packPos, unpackPosList } from 'other/codec'
-import { statsManager } from 'international/statsManager'
+} from '../../../constants/general'
+import { CollectiveManager } from 'international/collective'
 import { CommuneManager } from '../commune'
-import { customLog } from 'utils/logging'
-import { SpawnRequest, SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'
-import { SpawnRequestConstructor, spawnRequestConstructors } from './spawnRequestConstructors'
-import { communeUtils } from '../communeUtils'
-import { structureUtils } from 'room/structureUtils'
+import { SpawnRequestArgs, SpawnRequestTypes } from 'types/spawnRequest'
+import { CommuneUtils } from '../communeUtils'
+import { StructureUtils } from 'room/structureUtils'
+import { CommuneOps } from '../communeOps'
+import { Utils } from 'utils/utils'
+import { RoomUtils } from 'room/roomUtils'
 
 export class SpawnRequestsManager {
   communeManager: CommuneManager
@@ -362,7 +349,8 @@ export class SpawnRequestsManager {
         if (
           (!this.communeManager.room.roomManager.hubLink ||
             this.communeManager.room.roomManager.structures.link.length < 2) &&
-          (!this.communeManager.room.terminal || !structureUtils.isRCLActionable(this.communeManager.room.terminal))
+          (!this.communeManager.room.terminal ||
+            !StructureUtils.isRCLActionable(this.communeManager.room.terminal))
         )
           return false
 
@@ -386,9 +374,8 @@ export class SpawnRequestsManager {
       ((): SpawnRequestArgs | false => {
         // Get the fastFiller positions, if there are none, inform false
 
-        const fastFillerPositionsCount =
-          this.communeManager.room.roomManager.fastFillerPositions.length
-        if (!fastFillerPositionsCount) return false
+        const fastFillerCoordsCount = RoomUtils.getFastFillerCoords(this.communeManager.room).length
+        if (!fastFillerCoordsCount) return false
 
         const anchor = this.communeManager.room.roomManager.anchor
         if (!anchor) throw Error('no anchor for room ' + this.communeManager.room.name)
@@ -415,7 +402,7 @@ export class SpawnRequestsManager {
           defaultParts,
           extraParts: [],
           partsMultiplier: 1,
-          creepsQuota: fastFillerPositionsCount,
+          creepsQuota: fastFillerCoordsCount,
           minCostPerCreep: 150,
           priority,
           spawnTarget: anchor,
@@ -566,7 +553,7 @@ export class SpawnRequestsManager {
   private maintainers() {
     this.rawSpawnRequestsArgs.push(
       ((): SpawnRequestArgs | false => {
-        const generalRepairStructures = communeUtils.getGeneralRepairStructures(
+        const generalRepairStructures = CommuneUtils.getGeneralRepairStructures(
           this.communeManager.room,
         )
         const repairTargets = generalRepairStructures.filter(
@@ -575,9 +562,9 @@ export class SpawnRequestsManager {
 
         // Get ramparts below their max hits
 
-        const repairRamparts = communeUtils
-          .getRampartRepairTargets(this.communeManager.room)
-          .filter(rampart => rampart.hits < this.communeManager.room.communeManager.minRampartHits)
+        const repairRamparts = CommuneUtils.getRampartRepairTargets(
+          this.communeManager.room,
+        ).filter(rampart => rampart.hits < this.communeManager.room.communeManager.minRampartHits)
 
         // If there are no ramparts or repair targets
 
@@ -588,7 +575,7 @@ export class SpawnRequestsManager {
         if (
           repairTargets.length ||
           this.communeManager.room.towerInferiority ||
-          !this.communeManager.storingStructures.length
+          !CommuneUtils.storingStructures(this.communeManager.room).length
         ) {
           priority = Math.min(
             6 + this.communeManager.room.creepsFromRoom.maintainer.length * 0.5,
@@ -684,7 +671,7 @@ export class SpawnRequestsManager {
         if (!this.communeManager.room.find(FIND_MY_CONSTRUCTION_SITES).length) return false
 
         let priority: number
-        if (this.communeManager.storingStructures.length) {
+        if (CommuneUtils.storingStructures(this.communeManager.room).length) {
           priority = this.activeRemotePriority + 0.1
         } else {
           priority = this.minRemotePriority - 0.5
@@ -846,7 +833,9 @@ export class SpawnRequestsManager {
               creepsQuota: 1,
               minCostPerCreep: 200,
               priority,
-              memoryAdditions: {},
+              memoryAdditions: {
+                [CreepMemoryKeys.preferRoads]: true,
+              },
             }
           }
 
@@ -866,10 +855,8 @@ export class SpawnRequestsManager {
 
         // If there is a terminal and it is sufficient RCL, and there's a funnel target and we aren't it, then don't allow upgraders to spawn
         if (this.communeManager.room.terminal && this.communeManager.room.controller.level >= 6) {
-          const funnelingRoomNames = collectiveManager.funnelingRoomNames
-          if (
-            !funnelingRoomNames.has(this.communeManager.room.name)
-          ) {
+          const funnelingRoomNames = CollectiveManager.getFunnelingRoomNames()
+          if (!funnelingRoomNames.has(this.communeManager.room.name)) {
             return false
           }
         }
@@ -883,7 +870,7 @@ export class SpawnRequestsManager {
         }
 
         let priority: number
-        if (this.communeManager.storingStructures.length) {
+        if (CommuneUtils.storingStructures(this.communeManager.room).length) {
           priority = this.activeRemotePriority + 0.2
         } else {
           priority = this.minRemotePriority - 1
@@ -901,11 +888,11 @@ export class SpawnRequestsManager {
 
           if (
             this.communeManager.room.roomManager.resourcesInStoringStructures.energy <
-            this.communeManager.room.communeManager.storedEnergyUpgradeThreshold
+            CommuneUtils.storedEnergyUpgradeThreshold(this.communeManager.room)
           ) {
             return false
           }
-          partsMultiplier = communeUtils.getDesiredUpgraderStrength(this.communeManager.room)
+          partsMultiplier = CommuneUtils.getDesiredUpgraderStrength(this.communeManager.room)
         }
 
         // Otherwise if there is no storing structure
@@ -915,7 +902,7 @@ export class SpawnRequestsManager {
 
         partsMultiplier = Math.min(
           partsMultiplier,
-          communeUtils.getMaxUpgradeStrength(this.communeManager.room),
+          CommuneUtils.getMaxUpgradeStrength(this.communeManager.room),
         )
         if (partsMultiplier <= 0) return false
 
@@ -970,11 +957,14 @@ export class SpawnRequestsManager {
             }
           }
 
-          const controllerLink = this.communeManager.controllerLink
-          const maxCreeps =
-            controllerLink && structureUtils.isRCLActionable(controllerLink)
-              ? this.communeManager.room.roomManager.upgradePositions.length
-              : this.communeManager.room.roomManager.upgradePositions.length - 1
+          const upgradePositions = this.communeManager.room.roomManager.upgradePositions
+          let maxCreeps = upgradePositions.length
+
+          // If the upgrade structure is a link, then it's the controllerLink
+          if (upgradeStructure instanceof StructureLink) {
+            // Reduce max upgrader count by 1 to account for the tile the link takes up
+            maxCreeps -= 1
+          }
 
           if (this.spawnEnergyCapacity >= 1400) {
             partsMultiplier = Math.round(partsMultiplier / 12)
@@ -1494,7 +1484,7 @@ export class SpawnRequestsManager {
             /* minCreeps: 1, */
             maxCreeps: 3,
             minCostPerCreep: cost * extraParts.length,
-            priority: this.minRemotePriority - 2,
+            priority: this.minRemotePriority,
             memoryAdditions: {
               [CreepMemoryKeys.remote]: remoteName,
             },
@@ -1524,7 +1514,7 @@ export class SpawnRequestsManager {
             spawnGroup: this.communeManager.room.creepsOfRemote[remoteName].remoteDismantler,
             creepsQuota: 1,
             minCostPerCreep: cost * 2,
-            priority: this.minRemotePriority - 1,
+            priority: this.minRemotePriority,
             memoryAdditions: {
               [CreepMemoryKeys.remote]: remoteName,
             },
@@ -1689,26 +1679,24 @@ export class SpawnRequestsManager {
 
       //
 
-      const minRangedAttackCost = this.communeManager.room.communeManager.findMinRangedAttackCost(
+      const minRangedAttackCost = Utils.findMinRangedAttackCost(
         request[CombatRequestKeys.minDamage],
       )
       const rangedAttackAmount = Math.floor(
         minRangedAttackCost / (BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]),
       )
 
-      const minAttackCost = this.communeManager.room.communeManager.findMinMeleeAttackCost(
-        request[CombatRequestKeys.minDamage],
-      )
+      const minAttackCost = Utils.findMinMeleeAttackCost(request[CombatRequestKeys.minDamage])
       const attackAmount = Math.floor(minAttackCost / (BODYPART_COST[ATTACK] + BODYPART_COST[MOVE]))
 
-      const minMeleeHealCost = this.communeManager.room.communeManager.findMinHealCost(
+      const minMeleeHealCost = Utils.findMinHealCost(
         request[CombatRequestKeys.minMeleeHeal] + (request[CombatRequestKeys.maxTowerDamage] || 0),
       )
       const meleeHealAmount = Math.floor(
         minMeleeHealCost / (BODYPART_COST[HEAL] + BODYPART_COST[MOVE]),
       )
 
-      const minRangedHealCost = this.communeManager.room.communeManager.findMinHealCost(
+      const minRangedHealCost = Utils.findMinHealCost(
         request[CombatRequestKeys.minRangedHeal] + (request[CombatRequestKeys.maxTowerDamage] || 0),
       )
       const rangedHealAmount = Math.floor(
@@ -1730,7 +1718,7 @@ export class SpawnRequestsManager {
           (rangedAttackAmount + rangedHealAmount) * 2 > 50 ||
           attackAmount * 2 > 50
         ) {
-          this.communeManager.room.communeManager.deleteCombatRequest(requestName, i)
+          CommuneOps.deleteCombatRequest(this.communeManager.room, requestName, i)
           continue
         }
 
@@ -1747,8 +1735,8 @@ export class SpawnRequestsManager {
 
             let spawnGroup: string[]
 
-            if (collectiveManager.creepsByCombatRequest[requestName]) {
-              spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
+            if (CollectiveManager.creepsByCombatRequest[requestName]) {
+              spawnGroup = CollectiveManager.creepsByCombatRequest[requestName][role]
             }
             spawnGroup = []
 
@@ -1857,7 +1845,7 @@ export class SpawnRequestsManager {
         minAttackCost + minMeleeHealCost > this.communeManager.room.energyCapacityAvailable ||
         minAttackCost > this.communeManager.room.energyCapacityAvailable
       ) {
-        this.communeManager.room.communeManager.deleteCombatRequest(requestName, i)
+        CommuneOps.deleteCombatRequest(this.communeManager.room, requestName, i)
         continue
       }
 
@@ -1867,7 +1855,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaRangedAttacker'
-                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = CollectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minRangedAttackCost + minRangedHealCost
                     const extraParts: BodyPartConstant[] = []
 
@@ -1902,7 +1890,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaDismantler'
-                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = CollectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minDismantleCost
                     let extraParts: BodyPartConstant[] = []
 
@@ -1935,7 +1923,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaAttacker'
-                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = CollectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minAttackCost
                     let extraParts: BodyPartConstant[] = []
 
@@ -1965,7 +1953,7 @@ export class SpawnRequestsManager {
             this.rawSpawnRequestsArgs.push(
                 ((): SpawnRequestArgs | false => {
                     role = 'antifaHealer'
-                    spawnGroup = collectiveManager.creepsByCombatRequest[requestName][role]
+                    spawnGroup = CollectiveManager.creepsByCombatRequest[requestName][role]
                     const minCost = minMeleeHealCost
                     let extraParts: BodyPartConstant[] = []
 

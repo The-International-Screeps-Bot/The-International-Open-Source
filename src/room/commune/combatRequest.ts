@@ -1,8 +1,9 @@
-import { CombatRequestKeys, RoomMemoryKeys, customColors } from 'international/constants'
+import { CombatRequestKeys, RoomMemoryKeys, customColors } from '../../constants/general'
 import { CommuneManager } from './commune'
-import { statsManager } from 'international/statsManager'
-import { randomIntRange, utils } from 'utils/utils'
+import { StatsManager } from 'international/stats'
+import { randomIntRange, Utils } from 'utils/utils'
 import { CombatRequest } from 'types/internationalRequests'
+import { CommuneOps } from './communeOps'
 
 const checkRoomStatusInverval = randomIntRange(200, 500)
 
@@ -64,8 +65,9 @@ export class CombatRequestManager {
 
     // If the room is closed or is now a respawn or novice zone
     if (
-      utils.isTickInterval(checkRoomStatusInverval) &&
-      Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status
+      Utils.isTickInterval(checkRoomStatusInverval) &&
+      Memory.rooms[room.name][RoomMemoryKeys.status] !==
+        Memory.rooms[requestName][RoomMemoryKeys.status]
     ) {
       return false
     }
@@ -174,7 +176,7 @@ export class CombatRequestManager {
     if (threateningAttacker) {
       request[CombatRequestKeys.abandon] = 1500
 
-      this.communeManager.deleteCombatRequest(requestName, index)
+      CommuneOps.deleteCombatRequest(room, requestName, index)
       return
     }
 
@@ -184,7 +186,7 @@ export class CombatRequestManager {
       this.manageInaction(requestName, index)
     } else {
       if (!request[CombatRequestKeys.inactionTimerMax]) {
-        this.communeManager.deleteCombatRequest(requestName, index)
+        CommuneOps.deleteCombatRequest(room, requestName, index)
         return
       }
 
@@ -241,7 +243,7 @@ export class CombatRequestManager {
       this.manageInaction(requestName, index)
     } else {
       if (!request[CombatRequestKeys.inactionTimerMax]) {
-        this.communeManager.deleteCombatRequest(requestName, index)
+        CommuneOps.deleteCombatRequest(room, requestName, index)
         return
       }
 
@@ -253,7 +255,7 @@ export class CombatRequestManager {
     const request = Memory.combatRequests[requestName]
 
     if (request[CombatRequestKeys.inactionTimer] <= 0) {
-      this.communeManager.deleteCombatRequest(requestName, index)
+      CommuneOps.deleteCombatRequest(this.communeManager.room, requestName, index)
       return
     }
   }
@@ -264,7 +266,7 @@ export class CombatRequestManager {
     if (request[CombatRequestKeys.abandonments] >= 3) {
       // Delete the request
 
-      this.communeManager.deleteCombatRequest(requestName, index)
+      CommuneOps.deleteCombatRequest(this.communeManager.room, requestName, index)
       return
     }
 

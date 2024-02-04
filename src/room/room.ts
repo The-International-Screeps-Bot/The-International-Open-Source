@@ -1,51 +1,51 @@
 import {
-    CreepMemoryKeys,
-    PlayerMemoryKeys,
-    ReservedCoordTypes,
-    Result,
-    RoomLogisticsRequestTypes,
-    RoomMemoryKeys,
-    RoomTypes,
-    adjacentOffsets,
-    allStructureTypes,
-    combatTargetStructureTypes,
-    creepRoles,
-    customColors,
-    defaultRoadPlanningPlainCost,
-    defaultStructureTypesByBuildPriority,
-    defaultSwampCost,
-    dynamicScoreRoomRange,
-    impassibleStructureTypes,
-    maxControllerLevel,
-    packedPosLength,
-    powerCreepClassNames,
-    preferredCommuneRange,
-    quadAttackMemberOffsets,
-    remoteTypeWeights,
-    roomDimensions,
-    roomTypesUsedForStats,
-} from 'international/constants'
+  CreepMemoryKeys,
+  PlayerMemoryKeys,
+  ReservedCoordTypes,
+  Result,
+  RoomLogisticsRequestTypes,
+  RoomMemoryKeys,
+  RoomTypes,
+  adjacentOffsets,
+  allStructureTypes,
+  combatTargetStructureTypes,
+  creepRoles,
+  customColors,
+  defaultRoadPlanningPlainCost,
+  defaultStructureTypesByBuildPriority,
+  defaultSwampCost,
+  dynamicScoreRoomRange,
+  impassibleStructureTypes,
+  maxControllerLevel,
+  packedPosLength,
+  powerCreepClassNames,
+  preferredCommuneRange,
+  quadAttackMemberOffsets,
+  remoteTypeWeights,
+  roomDimensions,
+  roomTypesUsedForStats,
+} from '../constants/general'
 import {
-    findClosestObject,
-    findHighestScore,
-    findObjectWithID,
-    forAdjacentCoords,
-    forCoordsInRange,
-    forRoomNamesAroundRangeXY,
-    getRange,
-    getRangeXY,
-    isAlly,
-    packAsNum,
-    packXYAsNum,
-    randomTick,
-    sortBy,
+  findClosestObject,
+  findHighestScore,
+  findObjectWithID,
+  forAdjacentCoords,
+  forCoordsInRange,
+  forRoomNamesAroundRangeXY,
+  getRange,
+  getRangeXY,
+  isAlly,
+  packAsNum,
+  packXYAsNum,
+  randomTick,
+  sortBy,
 } from 'utils/utils'
 import { CommuneManager } from './commune/commune'
 import { CreepRoleManager } from './creeps/creepRoleManager'
 import { EndTickCreepManager } from './creeps/endTickCreepManager'
 import { PowerCreepRoleManager } from './creeps/powerCreepRoleManager'
 import { RoomVisualsManager } from './roomVisuals'
-import { statsManager } from 'international/statsManager'
+import { StatsManager } from 'international/stats'
 import { CommunePlanner } from './construction/communePlanner'
 import {
   packCoord,
@@ -59,35 +59,38 @@ import {
 } from 'other/codec'
 import { BasePlans } from './construction/basePlans'
 import { RampartPlans } from './construction/rampartPlans'
-import { PathGoal, customPathFinder } from 'international/customPathFinder'
-import { roomNameUtils } from './roomNameUtils'
-import { collectiveManager } from 'international/collective'
+import { PathGoal, CustomPathFinder } from 'international/customPathFinder'
+import { RoomNameUtils } from './roomNameUtils'
+import { CollectiveManager } from 'international/collective'
 import { customLog } from 'utils/logging'
-import { structureUtils } from './structureUtils'
-import { remoteProcs } from './remoteProcs'
-import { logisticsProcs } from './logisticsProcs'
+import { StructureUtils } from './structureUtils'
+import { LogisticsProcs } from './logisticsProcs'
+import { CommuneOps } from './commune/communeOps'
+import { roomData } from './roomData'
+import { RoomOps } from './roomOps'
 
 export interface InterpretedRoomEvent {
-    eventType: EventConstant
-    actionType?: EventAttackType | EventHealType
-    amount?: number
-    target?: Id<Creep | PowerCreep | Structure | Resource | Ruin | Tombstone>
+  eventType: EventConstant
+  actionType?: EventAttackType | EventHealType
+  amount?: number
+  target?: Id<Creep | PowerCreep | Structure | Resource | Ruin | Tombstone>
 }
 
 export interface DeadCreepNames {
-    my: Set<string>
-    enemy: Set<string>
-    ally: Set<string>
+  my: Set<string>
+  enemy: Set<string>
+  ally: Set<string>
 }
 
 export interface NotMyCreeps {
-    ally: Creep[]
-    enemy: Creep[]
+  ally: Creep[]
+  enemy: Creep[]
+  invader: Creep[]
 }
 
 export interface NotMyConstructionSites {
-    ally: ConstructionSite[]
-    enemy: ConstructionSite[]
+  ally: ConstructionSite[]
+  enemy: ConstructionSite[]
 }
 
 export class RoomManager {
@@ -126,189 +129,6 @@ export class RoomManager {
   reservedCoords: Map<string, ReservedCoordTypes>
   roomLogisticsBlacklistCoords: Set<string> = new Set()
 
-  update(room: Room) {
-    delete this._structureUpdate
-    delete this.checkedCSiteUpdate
-    delete this._communeSources
-    delete this._remoteSources
-    delete this._mineral
-    delete this.checkedCSiteUpdate
-    delete this._structures
-    delete this._cSites
-    delete this._notMyCreeps
-    delete this._enemyAttackers
-    delete this._myDamagedCreeps
-    delete this._myDamagedPowerCreeps
-    delete this._allyDamagedCreeps
-    this._enemyCreepPositions = undefined
-    delete this._notMyConstructionSites
-    delete this._allyConstructionSitesByType
-    delete this._dismantleTargets
-    delete this._destructibleStructures
-    delete this._combatStructureTargets
-    delete this._remoteNamesByEfficacy
-    delete this._remoteSourceIndexesByEfficacy
-
-    this._sourceContainers = undefined
-    this._fastFillerContainers = undefined
-    this._controllerContainer = undefined
-    this._mineralContainer = undefined
-    this._fastFillerLink = undefined
-    this._hubLink = undefined
-    this._droppedEnergy = undefined
-    this._droppedResources = undefined
-    this._actionableWalls = undefined
-    this._quadCostMatrix = undefined
-    this._quadBulldozeCostMatrix = undefined
-    this._enemyDamageThreat = undefined
-    this._enemyThreatCoords = undefined
-    this._enemyThreatGoals = undefined
-    /* this._flags = undefined */
-    this._resourcesInStoringStructures = undefined
-    this._unprotectedEnemyCreeps = undefined
-    this._exitCoords = undefined
-    this._advancedLogistics = undefined
-    this._defaultCostMatrix = undefined
-    this._totalEnemyCombatStrength = undefined
-    this._factory = undefined
-    this._powerSpawn = undefined
-    this._nuker = undefined
-    this._observer = undefined
-
-    if (randomTick()) {
-      delete this._nukeTargetCoords
-      this.roomLogisticsBlacklistCoords = new Set()
-    }
-
-    this.reservedCoords = new Map()
-
-    this.room = room
-    const roomMemory = room.memory
-
-    // If it hasn't been scouted for 100~ ticks
-    if (Game.time - roomMemory[RoomMemoryKeys.lastScout] > Math.floor(Math.random() * 200)) {
-      room.basicScout()
-      roomNameUtils.cleanMemory(room.name)
-    }
-
-    const roomType = roomMemory[RoomMemoryKeys.type]
-    if (roomTypesUsedForStats.includes(roomType)) {
-      statsManager.roomInitialRun(room.name, roomType)
-    }
-
-    room.moveRequests = {}
-    room.creepPositions = {}
-    room.powerCreepPositions = {}
-
-    // Single tick properties
-
-    room.myCreeps = []
-    room.myPowerCreeps = []
-
-    room.myCreepsByRole = {}
-    for (const role of creepRoles) room.myCreepsByRole[role] = []
-
-    room.myPowerCreepsByRole = {}
-    for (const className of powerCreepClassNames) room.myPowerCreepsByRole[className] = []
-
-    room.powerTasks = {}
-
-    room.creepsOfSource = []
-    for (const index in room.find(FIND_SOURCES)) room.creepsOfSource.push([])
-
-    room.squadRequests = new Set()
-
-    room.roomLogisticsRequests = {
-      [RoomLogisticsRequestTypes.transfer]: {},
-      [RoomLogisticsRequestTypes.withdraw]: {},
-      [RoomLogisticsRequestTypes.offer]: {},
-      [RoomLogisticsRequestTypes.pickup]: {},
-    }
-
-    if (!room.controller) return
-
-    // There is a controller
-
-    if (this.updatePotentialCommune(room) === true) return
-
-    // The room isn't a commune
-  }
-
-  /**
-   *
-   * @returns wether or not the room is a commune
-   */
-  private updatePotentialCommune(room: Room): boolean {
-    const roomMemory = Memory.rooms[room.name]
-
-    if (!this.room.controller.my) {
-      if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
-        roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral
-        roomNameUtils.cleanMemory(room.name)
-      }
-      return false
-    }
-
-    // If the type isn't a commune, make it so and clean its memory
-
-    if (roomMemory[RoomMemoryKeys.type] !== RoomTypes.commune) {
-      roomMemory[RoomMemoryKeys.type] = RoomTypes.commune
-      roomNameUtils.cleanMemory(room.name)
-    }
-
-    // If there is no communeManager for the room yet, make one and assign them together
-
-    room.communeManager = CommuneManager.communeManagers[room.name]
-    if (!room.communeManager) {
-      room.communeManager = new CommuneManager()
-      CommuneManager.communeManagers[room.name] = room.communeManager
-    }
-
-    room.communeManager.update(room)
-    return true
-  }
-
-  initRun() {
-    if (this.room.communeManager) {
-      this.room.communeManager.initRun()
-      return
-    }
-  }
-
-  run() {
-    this.test()
-
-    if (this.room.communeManager) {
-      this.room.communeManager.run()
-      return
-    }
-
-    if (this.room.memory[RoomMemoryKeys.type] === RoomTypes.remote) {
-      logisticsProcs.createRemoteContainerLogisticsRequests(this.room)
-      logisticsProcs.createRemoteDroppedResourceLogisticsRequests(this.room)
-      logisticsProcs.createRemoteTombstoneLogisticsRequests(this.room)
-      logisticsProcs.createRemoteRuinLogisticsRequests(this.room)
-    }
-
-    this.creepRoleManager.run()
-    this.powerCreepRoleManager.run()
-    this.endTickCreepManager.run()
-    this.roomVisualsManager.run()
-  }
-
-  private test() {}
-
-  /**
-   * Debug
-   */
-  private visualizeReservedCoords() {
-    customLog('reservedCoords', JSON.stringify([...this.reservedCoords]))
-    for (const [packedCoord, reserveType] of this.reservedCoords) {
-      const coord = unpackCoord(packedCoord)
-      this.room.coordVisual(coord.x, coord.y, `hsl(${200}${reserveType * 50}, 100%, 60%)`)
-    }
-  }
-
   findRemoteSources(commune: Room) {
     const anchor = commune.roomManager.anchor
     if (!anchor) throw Error('No anchor for remote source harvest positions ' + this.room.name)
@@ -318,7 +138,7 @@ export class RoomManager {
     sortBy(
       sources,
       ({ pos }) =>
-        customPathFinder.findPath({
+        CustomPathFinder.findPath({
           origin: pos,
           goals: [{ pos: anchor, range: 3 }],
         }).length,
@@ -353,7 +173,7 @@ export class RoomManager {
       sortBy(
         positions,
         origin =>
-          customPathFinder.findPath({
+          CustomPathFinder.findPath({
             origin,
             goals: [{ pos: anchor, range: 3 }],
           }).length,
@@ -378,7 +198,7 @@ export class RoomManager {
 
     for (const positions of packedRemoteSourceHarvestPositions) {
       const origin = unpackPosAt(positions, 0)
-      const path = customPathFinder.findPath({
+      const path = CustomPathFinder.findPath({
         origin,
         goals: [{ pos: anchor, range: 3 }],
         typeWeights: remoteTypeWeights,
@@ -387,7 +207,7 @@ export class RoomManager {
           [this.room.name]: weightCoords,
         },
         weightCoordMapsForRoomName(roomName) {
-          return roomNameUtils.diagonalCoords(roomName, commune)
+          return RoomNameUtils.diagonalCoords(roomName, commune)
         },
         weightCommuneStructurePlans: true,
         weightRemoteStructurePlans: {
@@ -442,7 +262,7 @@ export class RoomManager {
 
     for (const positions of packedRemoteSourceHarvestPositions) {
       const origin = unpackPosAt(positions, 0)
-      const path = customPathFinder.findPath({
+      const path = CustomPathFinder.findPath({
         origin,
         goals: [{ pos: goalPos, range: 1 }],
         typeWeights: remoteTypeWeights,
@@ -451,7 +271,7 @@ export class RoomManager {
           [this.room.name]: weightCoords,
         },
         weightCoordMapsForRoomName(roomName) {
-          return roomNameUtils.diagonalCoords(roomName, commune)
+          return RoomNameUtils.diagonalCoords(roomName, commune)
         },
         weightCommuneStructurePlans: true,
         weightRemoteStructurePlans: {
@@ -497,7 +317,7 @@ export class RoomManager {
     sortBy(
       positions,
       origin =>
-        customPathFinder.findPath({
+        CustomPathFinder.findPath({
           origin,
           goals: [{ pos: anchor, range: 3 }],
         }).length,
@@ -516,7 +336,7 @@ export class RoomManager {
     if (!anchor) throw Error('No anchor for remote controller path' + this.room.name)
 
     const origin = unpackPosAt(packedRemoteControllerPositions, 0)
-    const path = customPathFinder.findPath({
+    const path = CustomPathFinder.findPath({
       origin,
       goals: [{ pos: anchor, range: 3 }],
       typeWeights: remoteTypeWeights,
@@ -525,7 +345,7 @@ export class RoomManager {
         [this.room.name]: weightCoords,
       },
       weightCoordMapsForRoomName(roomName) {
-        return roomNameUtils.diagonalCoords(roomName, commune)
+        return RoomNameUtils.diagonalCoords(roomName, commune)
       },
       weightCommuneStructurePlans: true,
       weightRemoteStructurePlans: {
@@ -542,10 +362,10 @@ export class RoomManager {
 
   isStartRoom() {
     return (
-      collectiveManager.communes.size === 1 &&
+      CollectiveManager.communes.size === 1 &&
       this.room.controller.my &&
       this.room.controller.safeMode &&
-      collectiveManager.communes.has(this.room.name)
+      CollectiveManager.communes.has(this.room.name)
     )
   }
 
@@ -769,7 +589,7 @@ export class RoomManager {
     sortBy(
       positions,
       origin =>
-        customPathFinder.findPath({
+        CustomPathFinder.findPath({
           origin,
           goals: [{ pos: anchor, range: 4 }],
         }).length,
@@ -923,6 +743,9 @@ export class RoomManager {
     this._structureCoords = undefined
     this.sourceContainerIDs = undefined
 
+    const data = roomData[this.room.name]
+    data.fastFillerCoords = undefined
+
     const communeManager = this.room.communeManager
     if (communeManager) {
       communeManager.actionableSpawningStructuresIDs = undefined
@@ -932,7 +755,6 @@ export class RoomManager {
 
       this.fastFillerContainerIDs = undefined
       this._upgradePositions = undefined
-      this._fastFillerPositions = undefined
     }
 
     if (!newAllStructures) newAllStructures = this.room.find(FIND_STRUCTURES)
@@ -941,13 +763,13 @@ export class RoomManager {
     return (this._structureUpdate = true)
   }
 
-  _structureCoords: Map<string, Id<Structure<StructureConstant>>[]>
+  _structureCoords: StructureCoords
   get structureCoords() {
     if (this._structureCoords && !this.structureUpdate) return this._structureCoords
 
     // Construct storage of structures based on structureType
 
-    const structureCoords: Map<string, Id<Structure<StructureConstant>>[]> = new Map()
+    const structureCoords: StructureCoords = new Map()
 
     // Group structures by structureType
 
@@ -1071,12 +893,21 @@ export class RoomManager {
     const notMyCreeps: NotMyCreeps = {
       ally: [],
       enemy: [],
+      invader: [],
     }
 
     for (const creep of this.room.find(FIND_HOSTILE_CREEPS)) {
       if (isAlly(creep.owner.username)) {
         notMyCreeps.ally.push(creep)
         continue
+      }
+
+      if (creep.owner.username == 'Invader') {
+        notMyCreeps.invader.push(creep)
+
+        // TODO: Clean up invader checks on notMyCreeps.enemy(attackers) references
+
+        // continue // Remove once TODO is completed
       }
 
       // The creep isn't of an ally, so it's of an enemy!
@@ -1356,64 +1187,6 @@ export class RoomManager {
       filter: structure => combatTargetStructureTypes.has(structure.structureType),
     })
     return (this._combatStructureTargets = combatStructureTargets)
-  }
-
-  _fastFillerPositions: RoomPosition[]
-  get fastFillerPositions() {
-    if (this._fastFillerPositions && !this.structureUpdate) return this._fastFillerPositions
-
-    const anchor = this.anchor
-    if (!anchor) throw Error('no anchor')
-
-    const fastFillerPositions: RoomPosition[] = []
-    let rawFastFillerPositions = [
-      new RoomPosition(anchor.x - 1, anchor.y - 1, this.room.name),
-      new RoomPosition(anchor.x - 1, anchor.y + 1, this.room.name),
-      new RoomPosition(anchor.x + 1, anchor.y - 1, this.room.name),
-      new RoomPosition(anchor.x + 1, anchor.y + 1, this.room.name),
-    ]
-    const structureCoords = this.structureCoords
-
-    const fastFillerLink = this.fastFillerLink
-    const sufficientLink = fastFillerLink && structureUtils.isRCLActionable(fastFillerLink)
-
-    for (const pos of rawFastFillerPositions) {
-      const adjacentStructuresOfTypes: Partial<Record<StructureConstant, number>> = {
-        [STRUCTURE_SPAWN]: 0,
-        [STRUCTURE_EXTENSION]: 0,
-        [STRUCTURE_CONTAINER]: 0,
-      }
-
-      forAdjacentCoords(pos, adjacentCoord => {
-        const structuresAtCoord = structureCoords.get(packCoord(adjacentCoord))
-        if (!structuresAtCoord) return
-
-        for (const ID of structuresAtCoord) {
-          const structure = findObjectWithID(ID)
-
-          if (adjacentStructuresOfTypes[structure.structureType] === undefined) continue
-
-          // Increase structure amount for this structureType on the adjacentPos
-
-          adjacentStructuresOfTypes[structure.structureType] += 1
-        }
-      })
-
-      // If there is containers and spawning structures, make it an offial fastFillerPosition
-
-      if (!sufficientLink && adjacentStructuresOfTypes[STRUCTURE_CONTAINER] === 0) continue
-
-      if (
-        adjacentStructuresOfTypes[STRUCTURE_SPAWN] +
-          adjacentStructuresOfTypes[STRUCTURE_EXTENSION] ===
-        0
-      )
-        continue
-
-      fastFillerPositions.push(pos)
-    }
-
-    return (this._fastFillerPositions = fastFillerPositions)
   }
 
   _remoteNamesByEfficacy: string[]
@@ -1724,7 +1497,7 @@ export class RoomManager {
     if (this._quadCostMatrix) return this._quadCostMatrix
 
     const quadCostMatrix = new PathFinder.CostMatrix()
-    const terrainCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.room.name))
+    const terrainCoords = new Uint8Array(RoomOps.getTerrainBinary(this.room.name))
 
     const roadCoords = new Set()
     for (const road of this.structures.road) roadCoords.add(packCoord(road.pos))
@@ -1877,7 +1650,7 @@ export class RoomManager {
     if (this._quadBulldozeCostMatrix) return this._quadBulldozeCostMatrix
 
     const quadBulldozeCostMatrix = new PathFinder.CostMatrix()
-    const terrainCoords = new Uint8Array(collectiveManager.getTerrainBinary(this.room.name))
+    const terrainCoords = new Uint8Array(RoomOps.getTerrainBinary(this.room.name))
 
     const roadCoords = new Set()
     for (const road of this.structures.road) roadCoords.add(packCoord(road.pos))
@@ -2174,7 +1947,7 @@ export class RoomManager {
 
     for (const structure of storingStructures) {
       if (!structure) continue
-      if (!structureUtils.isRCLActionable(structure)) continue
+      if (!StructureUtils.isRCLActionable(structure)) continue
 
       for (const key in structure.store) {
         const resourceType = key as ResourceConstant
@@ -2417,3 +2190,5 @@ export class RoomManager {
     }
   }
 }
+
+export type StructureCoords = Map<string, Id<Structure<StructureConstant>>[]>

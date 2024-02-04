@@ -4,12 +4,13 @@ import {
   RoomMemoryKeys,
   RoomTypes,
   customColors,
-} from 'international/constants'
-import { randomIntRange, randomTick, utils } from 'utils/utils'
-import { collectiveManager } from 'international/collective'
+} from '../../constants/general'
+import { randomIntRange, randomTick, Utils } from 'utils/utils'
+import { CollectiveManager } from 'international/collective'
 import { CommuneManager } from './commune'
-import { statsManager } from 'international/statsManager'
+import { StatsManager } from 'international/stats'
 import { WorkRequest } from 'types/internationalRequests'
+import { CommuneOps } from './communeOps'
 
 const checkRoomStatusInverval = randomIntRange(200, 500)
 
@@ -73,8 +74,9 @@ export class WorkRequestManager {
 
     // If the room is closed or is now a respawn or novice zone
     if (
-      utils.isTickInterval(checkRoomStatusInverval) &&
-      Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status
+      Utils.isTickInterval(checkRoomStatusInverval) &&
+      Memory.rooms[room.name][RoomMemoryKeys.status] !==
+        Memory.rooms[requestName][RoomMemoryKeys.status]
     ) {
       this.delete(requestName, request)
       return
@@ -190,7 +192,8 @@ export class WorkRequestManager {
 
     if (combatRequest[CombatRequestKeys.responder]) {
       const combatRequestResponder = Game.rooms[combatRequest[CombatRequestKeys.responder]]
-      combatRequestResponder.communeManager.deleteCombatRequest(
+      CommuneOps.deleteCombatRequest(
+        combatRequestResponder,
         combatRequest[CombatRequestKeys.responder],
         combatRequestResponder.memory[RoomMemoryKeys.combatRequests].indexOf(workRequestName),
       )

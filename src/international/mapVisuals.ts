@@ -1,25 +1,32 @@
 import { unpackPosAt, unpackPosList } from 'other/codec'
 import {
-    customColors,
-    WorkRequestKeys,
-    RoomMemoryKeys,
-    RoomTypes,
-    roomDimensions,
-    packedPosLength,
-} from './constants'
+  customColors,
+  WorkRequestKeys,
+  RoomMemoryKeys,
+  RoomTypes,
+  roomDimensions,
+  packedPosLength,
+  FlagNames,
+  Result,
+} from '../constants/general'
+import { CommuneUtils } from 'room/commune/communeUtils'
 
 /**
  * Adds colours and annotations to the map if mapVisuals are enabled
  */
 export class MapVisualsManager {
-    run() {
-        if (!global.settings.mapVisuals) return
+    static run() {
+        if (!Game.flags[FlagNames.mapVisuals]) return
 
         for (const roomName in Memory.rooms) {
             const roomMemory = Memory.rooms[roomName]
 
             const type = roomMemory[RoomMemoryKeys.type]
             if (!type) continue
+
+            if (roomMemory[RoomMemoryKeys.type] === RoomTypes.commune) {
+                this.visualizeCommune(roomName, roomMemory)
+            }
 
             // Room type
 
@@ -42,7 +49,7 @@ export class MapVisualsManager {
                 if (!anchor) throw Error('No anchor for mapVisuals commune ' + roomName)
 
                 Game.map.visual.text(
-                    `⚡${room.roomManager.resourcesInStoringStructures.energy} / ${room.communeManager.minStoredEnergy}`,
+                    `⚡${room.roomManager.resourcesInStoringStructures.energy} / ${CommuneUtils.minStoredEnergy(room)}`,
                     new RoomPosition(2, 8, roomName),
                     {
                         align: 'left',
@@ -182,7 +189,7 @@ export class MapVisualsManager {
                 continue
             }
 
-            if (roomMemory[RoomMemoryKeys.communePlanned] === false) {
+            if (roomMemory[RoomMemoryKeys.communePlanned] === Result.fail) {
                 Game.map.visual.circle(new RoomPosition(25, 25, roomName), {
                     stroke: customColors.red,
                     strokeWidth: 2,
@@ -194,7 +201,13 @@ export class MapVisualsManager {
 
         this.workRequests()
     }
-    private workRequests() {
+
+    private static visualizeCommune(roomName: string, roomMemory: RoomMemory) {
+
+
+    }
+
+    private static workRequests() {
         for (const roomName in Memory.workRequests) {
             const priority = Memory.workRequests[roomName][WorkRequestKeys.priority]
             const preference =
@@ -221,15 +234,15 @@ export class MapVisualsManager {
             }
         }
     }
-    private test(roomName: string, roomMemory: RoomMemory) {
-        /*
+    private static test(roomName: string, roomMemory: RoomMemory) {
+      /*
         Game.map.visual.text((Game.time - roomMemory[RoomMemoryKeys.lastScout]).toString(), new RoomPosition(2, 40, roomName), {
             align: 'left',
             fontSize: 5,
         })
         */
-        /*
-        const roomCoord = roomNameUtils.pack(roomName)
+      /*
+        const roomCoord = RoomNameUtils.pack(roomName)
         Game.map.visual.text(('x: ' + roomCoord.x + ', y: ' + roomCoord.y).toString(), new RoomPosition(2, 40, roomName), {
             align: 'left',
             fontSize: 5,
@@ -237,5 +250,3 @@ export class MapVisualsManager {
         */
     }
 }
-
-export const mapVisualsManager = new MapVisualsManager()

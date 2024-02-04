@@ -1,5 +1,6 @@
-import { collectiveManager } from "international/collective";
-import { utils } from "utils/utils";
+import { CollectiveManager } from 'international/collective'
+import { Utils } from 'utils/utils'
+import { ResourceTargets } from './commune'
 
 interface CommuneData {
   /**
@@ -10,36 +11,49 @@ interface CommuneData {
   maxUpgradeStrength: number
   estimatedCommuneSourceIncome: number[]
   towerRampartRepairTreshold: number
+  rampartDamageCoords: number
+  /**
+   * The amount of hits for each rampart the previous tick, if exists
+   */
+  previousRampartHits: number
+  resourceTargets: ResourceTargets
+  minStoredEnergy: number
 }
+
+/**
+ * Inter-tick data for communes
+ */
+export const communeData: { [roomName: string]: Partial<CommuneData> } = {}
 
 /**
  * Handles cached data for communes
  */
-export class CommuneDataManager {
-  data: { [roomName: string]: Partial<CommuneData> } = {}
-
+export class CommuneDataOps {
   /**
    * Called by the room's RoomManager
    */
-  initCommune(room: Room) {
-    this.data[room.name] ??= {}
+  static initCommune(room: Room) {
+    communeData[room.name] ??= {}
   }
 
-  updateCommunes() {
-    for (const roomName in this.data) {
+  static updateCommunes() {
+    for (const roomName in communeData) {
       this.updateCommune(roomName)
     }
   }
 
-  private updateCommune(roomName: string) {
-    const data = this.data[roomName]
+  private static updateCommune(roomName: string) {
+    const data = communeData[roomName]
 
-    if (utils.isTickInterval(10)) {
-
+    if (Utils.isTickInterval(10)) {
       delete data.estimatedCommuneSourceIncome
       delete data.towerRampartRepairTreshold
+      delete data.minStoredEnergy
+    }
+
+    if (Utils.isTickInterval(100)) {
+      delete data.resourceTargets
+      delete communeData[roomName]
     }
   }
 }
-
-export const communeDataManager = new CommuneDataManager()

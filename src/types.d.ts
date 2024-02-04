@@ -12,7 +12,7 @@ import {
   NukeRequestKeys,
   PlayerMemoryKeys,
   PowerCreepMemoryKeys,
-  PowerRequestKeys,
+  PowerTaskKeys,
   RoomMemoryKeys,
   RoomTypes,
   SleepFor,
@@ -21,12 +21,12 @@ import {
   ReservedCoordTypes,
   WorkTypes,
   creepRoles,
-  PowerCreepTasks,
+  CreepPowerTaskNames,
   RoomLogisticsRequestTypes,
   MovedTypes,
   RoomStatsKeys,
   RoomStatusKeys,
-} from 'international/constants'
+} from './constants/general'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
 import { Settings } from 'international/settingsDefault'
@@ -37,15 +37,15 @@ import { CombatRequest, HaulRequest, NukeRequest, WorkRequest } from 'types/inte
 import { PlayerMemory } from 'types/players'
 import {
   CreepLogisticsRequest,
-  PowerTask,
   RoomLogisticsRequest,
   FindNewRoomLogisticsRequestArgs,
   CreateRoomLogisticsRequestArgs,
-} from 'types/roomRequests'
+} from 'types/roomLogistics'
 import { UserScriptTemplate } from 'other/userScript/userScript.example'
 import { StatsMemory } from 'types/stats'
 import { WeightLayers, WeightsByID } from 'room/construction/neuralNetwork/network'
-import { OrganizedSpawns } from 'room/commune/spawning/spawningStructureProcs'
+import { OrganizedSpawns } from 'room/commune/spawning/spawningStructureOps'
+import { CreepTask, CreepPowerTask, PowerRequest } from 'types/creepTasks'
 
 declare global {
   interface ProfilerData {
@@ -332,7 +332,7 @@ declare global {
     chantIndex: number
 
     /**
-     * the tick of the last holistic configuration opperation
+     * the tick of the last holistic configuration operation
      */
     lastConfig: number
 
@@ -506,7 +506,7 @@ declare global {
     roomLogisticsRequests: {
       [key in RoomLogisticsRequestTypes]: { [ID: string]: RoomLogisticsRequest }
     }
-    powerTasks: { [ID: string]: PowerTask }
+    powerRequests: { [ID: string]: PowerRequest }
 
     attackingDefenderIDs: Set<Id<Creep>>
     defenderEnemyTargetsWithDamage: Map<Id<Creep>, number>
@@ -517,9 +517,13 @@ declare global {
     generalRepairStructures: (StructureRoad | StructureContainer)[]
     rampartRepairStructures: StructureRampart[]
 
-    considerFunneled: boolean
-
     organizedSpawns: OrganizedSpawns | false
+
+    fastFillerCoords: Coord[]
+    storingStructuresCapacity: number
+    storingStructures: (StructureStorage | StructureTerminal)[]
+
+    structures: OrganizedStructures
 
     // Commune
 
@@ -547,14 +551,6 @@ declare global {
 
     scoutEnemyRoom(): number
 
-    basicScout(): number
-
-    /**
-     * Finds the type of a room and initializes its custom properties
-     * @param scoutingRoom The room that is performing the scout operation
-     */
-    advancedScout(scoutingRoom: Room): number
-
     makeRemote(scoutingRoom: Room): boolean
 
     createAttackCombatRequest(opts?: Partial<CombatRequest>): void
@@ -572,7 +568,7 @@ declare global {
      * Finds open spaces in a room and records them in a cost matrix
      */
     distanceTransform(
-      initialCoords?: CoordMap,
+      initialCoords: CoordMap,
       visuals?: boolean,
       /**
        * The smallest number to convert into an avoid value
@@ -588,7 +584,7 @@ declare global {
      * Finds open spaces in a room without adding depth to diagonals, and records the depth results in a cost matrix
      */
     diagonalDistanceTransform(
-      initialCoords?: CoordMap,
+      initialCoords: CoordMap,
       visuals?: boolean,
       /**
        * The smallest number to convert into an avoid value
@@ -660,11 +656,11 @@ declare global {
 
     coordHasStructureTypes(coord: Coord, types: Set<StructureConstant>): boolean
 
-    createPowerTask(
+    createPowerRequest(
       target: Structure | Source,
       powerType: PowerConstant,
       priority: number,
-    ): PowerTask | false
+    ): PowerRequest | false
 
     highestWeightedStoringStructures(resourceType: ResourceConstant): AnyStoreStructure | false
 
@@ -957,18 +953,19 @@ declare global {
 
     // Creep Getters
 
-    _nameData: string[]
-    nameData: string[]
-
     _role: CreepRoles
     /**
      * The lifetime designation that broadly describes what the creep should do
      */
     readonly role: CreepRoles
 
+    /**
+     * @deprecated
+     */
     _commune: Room | undefined
     /**
      * The name of the room the creep is from
+     * @deprecated
      */
     readonly commune: Room | undefined
 
@@ -1030,7 +1027,7 @@ declare global {
 
     /**
      * Wether the structure is disabled or not by the room's downgraded controller level
-     * @method structureUtils.isRCLActionable(structure)
+     * @method StructureUtils.isRCLActionable(structure)
      */
     isRCLActionable: boolean
   }
@@ -1065,12 +1062,6 @@ declare global {
   interface RoomObject {
     // Functions
 
-    /**
-     * Finds the total free store capacity of a specific resource for this RoomObject
-     * @deprecated either create a util without a prototype or use your brain to do the math yourself
-     */
-    freeSpecificStore(resourceType?: ResourceConstant): number
-
     // RoomObject getters
 
     _effectsData: Map<PowerConstant | EffectConstant, RoomObjectEffect>
@@ -1078,11 +1069,13 @@ declare global {
     readonly effectsData: Map<PowerConstant | EffectConstant, RoomObjectEffect>
 
     _nextHits: number
-
     /**
      * The estimated hits amount next tick
      */
     nextHits: number
+
+    _reserveHits: number
+    reserveHits: number
 
     // _nextStore: Partial<StoreDefinition>
 
@@ -1183,7 +1176,7 @@ declare global {
     [RoomMemoryKeys.score]: number
     [RoomMemoryKeys.dynamicScore]: number
     [RoomMemoryKeys.dynamicScoreUpdate]: number
-    [RoomMemoryKeys.communePlanned]: boolean
+    [RoomMemoryKeys.communePlanned]: Result.success | Result.fail
 
     // Commune
 
@@ -1268,6 +1261,7 @@ declare global {
   }
 
   interface CreepMemory {
+    [CreepMemoryKeys.commune]: string
     [CreepMemoryKeys.preferRoads]: boolean
     [CreepMemoryKeys.sourceIndex]: number
     [CreepMemoryKeys.dying]: boolean
@@ -1316,15 +1310,14 @@ declare global {
     [CreepMemoryKeys.stationary]: boolean
     [CreepMemoryKeys.defaultParts]: number
     [CreepMemoryKeys.cost]: number
+    [CreepMemoryKeys.task]: CreepTask
+
+    // Power Creep
+
+    [CreepMemoryKeys.powerTask]: CreepPowerTask
   }
 
-  interface PowerCreepMemory extends CreepMemory {
-    [PowerCreepMemoryKeys.commune]: string
-    [PowerCreepMemoryKeys.task]: PowerCreepTasks
-    [PowerCreepMemoryKeys.taskTarget]: Id<Structure | Source>
-    [PowerCreepMemoryKeys.taskPower]: PowerConstant
-    [PowerCreepMemoryKeys.taskRoom]: string
-  }
+  interface PowerCreepMemory extends CreepMemory {}
 
   interface UserScriptTemplate {
     /**
@@ -1366,17 +1359,14 @@ declare global {
        */
       constructed: true | undefined
 
-      packedRoomNames: { [roomName: string]: string }
-
-      unpackedRoomNames: { [roomName: string]: string }
-
       lastReset: number
 
-      debugUtils: DebugUtils
+      DebugUtils: DebugUtils
 
       // Command functions
 
       stringify(v: any, maxDepth: number): void
+      roughSizeOfObject(object: any): void
 
       /**
        * Deletes all properties of global

@@ -7,7 +7,7 @@ import {
   RoomMemoryKeys,
   RoomTypes,
   WorkTypes,
-} from 'international/constants'
+} from '../../../../constants/general'
 import {
   findCarryPartsRequired,
   findObjectWithID,
@@ -16,13 +16,14 @@ import {
   randomTick,
   scalePriority,
   areCoordsEqual,
-  utils,
+  Utils,
 } from 'utils/utils'
 import { packCoord, reversePosList, unpackPosAt } from 'other/codec'
 import { indexOf } from 'lodash'
-import { creepUtils } from 'room/creeps/creepUtils'
-import { myCreepUtils } from 'room/creeps/myCreepUtils'
-import { creepProcs } from 'room/creeps/creepProcs'
+import { CreepUtils } from 'room/creeps/creepUtils'
+import { MyCreepUtils } from 'room/creeps/myCreepUtils'
+import { CreepProcs } from 'room/creeps/creepProcs'
+import { CommuneUtils } from 'room/commune/communeUtils'
 
 export class RemoteHarvester extends Creep {
   constructor(creepID: Id<Creep>) {
@@ -63,7 +64,7 @@ export class RemoteHarvester extends Creep {
   }
 
   initRun(): void {
-    if (utils.isTickInterval(10) && this.getActiveBodyparts(MOVE) === 0) {
+    if (Utils.isTickInterval(10) && this.getActiveBodyparts(MOVE) === 0) {
       this.suicide()
       return
     }
@@ -185,7 +186,7 @@ export class RemoteHarvester extends Creep {
   applyRemote?() {
     const creepMemory = Memory.creeps[this.name]
     const sourceIndex = creepMemory[CreepMemoryKeys.sourceIndex]
-    const workParts = myCreepUtils.parts(this).work
+    const workParts = MyCreepUtils.parts(this).work
     const remoteMemory = Memory.rooms[creepMemory[CreepMemoryKeys.remote]]
     /*
         if (!this.spawning) {
@@ -290,13 +291,13 @@ export class RemoteHarvester extends Creep {
       if (this.maintainContainer(container) === Result.action) return Result.success
 
       const source = this.room.roomManager.remoteSources[sourceIndex]
-      creepUtils.harvestSource(this, source)
+      CreepUtils.harvestSource(this, source)
 
       // Give our energy to the container so it doesn't drop on the ground
 
       if (
         getRange(this.pos, container.pos) === 1 &&
-        this.store.getFreeCapacity() <= myCreepUtils.parts(this).work
+        this.store.getFreeCapacity() <= MyCreepUtils.parts(this).work
       ) {
         this.transfer(container, RESOURCE_ENERGY)
       }
@@ -309,7 +310,7 @@ export class RemoteHarvester extends Creep {
     if (this.buildContainer() === Result.action) return Result.success
 
     const source = this.room.roomManager.remoteSources[sourceIndex]
-    creepUtils.harvestSource(this, source)
+    CreepUtils.harvestSource(this, source)
 
     // Stop, we don't have enough energy to justify a request
 
@@ -327,10 +328,10 @@ export class RemoteHarvester extends Creep {
   }
 
   private obtainEnergyIfNeeded() {
-    if (this.nextStore.energy >= myCreepUtils.parts(this).work) return Result.success
+    if (this.nextStore.energy >= MyCreepUtils.parts(this).work) return Result.success
     if (this.movedResource) return Result.fail
 
-    return creepProcs.runRoomLogisticsRequestAdvanced(this, {
+    return CreepProcs.runRoomLogisticsRequestAdvanced(this, {
       resourceTypes: new Set([RESOURCE_ENERGY]),
       types: new Set<RoomLogisticsRequestTypes>([
         RoomLogisticsRequestTypes.withdraw,
@@ -355,7 +356,7 @@ export class RemoteHarvester extends Creep {
 
     // Ensure we have enough energy to use all work parts
 
-    if (this.store.energy < myCreepUtils.parts(this).work) return Result.noAction
+    if (this.store.energy < MyCreepUtils.parts(this).work) return Result.noAction
 
     // Make sure the contianer is sufficiently needy of repair
 
@@ -370,7 +371,7 @@ export class RemoteHarvester extends Creep {
 
   buildContainer(): number {
     // Don't build new remote containers until we can reserve the room
-    if (!this.commune.communeManager.shouldRemoteContainers) return Result.noAction
+    if (!CommuneUtils.shouldRemoteContainers(this.room)) return Result.noAction
 
     // Make sure we're a bit ahead source regen time
 

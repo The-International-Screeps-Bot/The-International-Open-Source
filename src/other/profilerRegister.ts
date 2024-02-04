@@ -4,7 +4,7 @@ import { RoomManager } from 'room/room'
 import { SpawnRequestsManager } from 'room/commune/spawning/spawnRequests'
 import { LabManager } from 'room/commune/labs'
 import { FactoryManager } from 'room/commune/factory'
-import { StatsManager } from 'international/statsManager'
+import { StatsManager } from 'international/stats'
 import { ConstructionManager } from 'room/construction/construction'
 import { RemotesManager } from 'room/commune/remotesManager'
 import { HaulRequestManager } from 'room/commune/haulRequestManager'
@@ -19,7 +19,7 @@ import { CreepOrganizer } from 'international/creepOrganizer'
 import { RequestsManager } from 'international/requests'
 import { SimpleAllies } from 'international/simpleAllies/simpleAllies'
 import { PlayerManager } from 'international/players'
-import { FlagManager } from 'international/flags'
+import { FlagManager } from 'international/flags/flags'
 import { RoomNameUtils } from 'room/roomNameUtils'
 import { CreepUtils } from 'room/creeps/creepUtils'
 import { TradingUtils } from 'room/commune/terminal/tradingUtils'
@@ -29,22 +29,20 @@ import { GarbageCollector } from 'international/garbageCollector'
 import { EndTickManager } from 'international/endTick'
 import { EndTickCreepManager } from 'room/creeps/endTickCreepManager'
 import { PowerCreepOrganizer } from 'international/powerCreepOrganizer'
-import { HaulerNeedManager } from 'room/commune/haulerNeed'
 import { LinkManager } from 'room/commune/links'
-import { DefenceManager } from 'room/commune/defence'
 import { CombatRequestManager } from 'room/commune/combatRequest'
 import { MapVisualsManager } from 'international/mapVisuals'
 import { MigrationManager } from 'international/migration'
 import { RoomPruningManager } from 'international/roomPruning'
 import { RoomVisualsManager } from 'room/roomVisuals'
-import { ErrorExporter } from './ErrorExporter'
+import { ErrorExporter } from './errorExporter'
 import { RespawnManager } from 'international/respawn'
 import { BasePlans } from 'room/construction/basePlans'
 import { RampartPlans } from 'room/construction/rampartPlans'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { minCutToExit } from 'room/construction/minCut'
-import { FeatureFlagManager } from 'international/featureFlags'
-import { ConstructionSiteManager } from 'international/constructionSiteManager'
+import { FeatureFlagManager } from 'international/flags/featureFlags'
+import { ConstructionSiteManager } from 'international/constructionSites'
 import { TransactionsManager } from 'international/transactions'
 import { CommunePlanner } from 'room/construction/communePlanner'
 import {
@@ -78,11 +76,11 @@ import {
 import { CustomPathFinder } from 'international/customPathFinder'
 import { RoomUtils } from 'room/roomUtils'
 import { CommuneUtils } from 'room/commune/communeUtils'
-import { RoomDataManager } from 'room/roomData'
-import { CommuneDataManager } from 'room/commune/communeData'
+import { RoomDataOps } from 'room/roomData'
+import { CommuneDataOps } from 'room/commune/communeData'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 import { CreepMoveProcs } from 'room/creeps/creepMoveProcs'
-import { CommuneProcs } from 'room/commune/communeProcs'
+import { CommuneOps } from 'room/commune/communeOps'
 import { PowerCreepProcs } from 'room/creeps/powerCreeps/powerCreepProcs'
 import { PowerCreepUtils } from 'room/creeps/powerCreeps/powerCreepUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
@@ -98,15 +96,33 @@ import { TowerUtils } from 'room/commune/towerUtils'
 import { SourceProcs } from 'room/sourceProcs'
 import { SourceUtils } from 'room/sourceUtils'
 import { TerminalProcs } from 'room/commune/terminal/terminalProcs'
-import { SpawningStructureProcs } from 'room/commune/spawning/spawningStructureProcs'
-import { SpawningStructureUtils } from 'room/commune/spawning/spawningStructureUtils'
+import { SpawningStructureOps } from 'room/commune/spawning/spawningStructureOps'
 import { NukerProcs } from 'room/commune/nukerProcs'
 import { ObserverProcs } from 'room/commune/observerProcs'
 import { PowerSpawnProcs } from 'room/commune/powerSpawnProcs'
+import { RoomOps } from 'room/roomOps'
+import { RoomNameOps } from 'room/roomNameOps'
+import { SegmentsManager } from 'international/segments'
+import { wasm } from './wasmInit'
+import { initSync } from '../wasm/pkg/commiebot_wasm.js'
+import { InitManager } from 'international/init'
+import { TickInit } from 'international/tickInit'
+import { DebugUtils } from 'debug/debugUtils'
+import { DefenceProcs } from 'room/commune/defenceProcs'
+import { DefenceUtils } from 'room/commune/defenceUtils'
+import { HaulerOps } from 'room/creeps/roles/haulerOps'
+import { HaulerServices } from 'room/creeps/roles/haulerServices'
+import { MyCreepProcs } from 'room/creeps/myCreepProcs'
+import { RoomServices } from 'room/roomServices'
+import { HaulerNeedOps } from 'room/commune/haulerNeedOps'
+import { MyCreepServices } from 'room/creeps/myCreepServices'
+import { MyPowerCreepServices } from 'room/creeps/myPowerCreepServices'
 
 export function profilerRegister() {
   // Classes
 
+  profiler.registerClass(InitManager, 'InitManager')
+  profiler.registerClass(TickInit, 'TickInit')
   profiler.registerClass(CollectiveManager, 'CollectiveManager')
   profiler.registerClass(StatsManager, 'StatsManager')
   profiler.registerClass(PlayerManager, 'PlayerManager')
@@ -131,10 +147,13 @@ export function profilerRegister() {
   profiler.registerClass(CustomPathFinder, 'CustomPathFinder')
   profiler.registerClass(TradingUtils, 'MarketUtils')
   profiler.registerClass(Utils, 'Utils')
+  profiler.registerClass(DebugUtils, 'DebugUtils')
   profiler.registerClass(Procs, 'Procs')
+  profiler.registerClass(SegmentsManager, 'SegmentsManager')
 
   // Room classes
 
+  profiler.registerClass(RoomServices, 'RoomServices')
   profiler.registerClass(CommuneManager, 'CommuneManager')
   profiler.registerClass(RoomManager, 'RoomManager')
   profiler.registerClass(SpawnRequestsManager, 'SpawnRequestsManager')
@@ -146,18 +165,20 @@ export function profilerRegister() {
   profiler.registerClass(HaulRequestManager, 'HaulRequestManager')
   profiler.registerClass(WorkRequestManager, 'WorkRequestManager')
   profiler.registerClass(EndTickCreepManager, 'EndTickCreepManager')
-  profiler.registerClass(HaulerNeedManager, 'HaulerNeedManager')
   profiler.registerClass(LinkManager, 'LinkManager')
-  profiler.registerClass(DefenceManager, 'DefenceManager')
+  profiler.registerClass(DefenceProcs, 'DefenceProcs')
+  profiler.registerClass(DefenceUtils, 'DefenceUtils')
   profiler.registerClass(CombatRequestManager, 'CombatRequestManager')
   profiler.registerClass(RoomVisualsManager, 'RoomVisualsManager')
   profiler.registerClass(Operator, 'Operator')
   profiler.registerClass(RoomNameUtils, 'RoomNameUtils')
+  profiler.registerClass(RoomNameOps, 'RoomNameOps')
   profiler.registerClass(RoomUtils, 'RoomUtils')
+  profiler.registerClass(RoomOps, 'RoomProcs')
   profiler.registerClass(CommuneUtils, 'CommuneUtils')
-  profiler.registerClass(RoomDataManager, 'RoomDataManager')
-  profiler.registerClass(CommuneDataManager, 'CommuneDataManager')
-  profiler.registerClass(CommuneProcs, 'CommuneProc')
+  profiler.registerClass(RoomDataOps, 'RoomDataProcs')
+  profiler.registerClass(CommuneDataOps, 'CommuneDataProcs')
+  profiler.registerClass(CommuneOps, 'CommuneProc')
   profiler.registerClass(RoomObjectUtils, 'RoomObjectUtils')
   profiler.registerClass(StructureUtils, 'StructureUtils')
   profiler.registerClass(RemoteProcs, 'RemoteProcs')
@@ -169,35 +190,45 @@ export function profilerRegister() {
   profiler.registerClass(SourceProcs, 'SourceProcs')
   profiler.registerClass(SourceUtils, 'SourceUtils')
   profiler.registerClass(TerminalProcs, 'TerminalProcs')
-  profiler.registerClass(SpawningStructureProcs, 'SpawningStructureProcs')
-  profiler.registerClass(SpawningStructureUtils, 'SpawningStructureUtils')
+  profiler.registerClass(SpawningStructureOps, 'SpawningStructureOps')
   profiler.registerClass(NukerProcs, 'NukerProcs')
   profiler.registerClass(ObserverProcs, 'ObserverProcs')
   profiler.registerClass(PowerSpawnProcs, 'PowerSpawnProcs')
+  profiler.registerClass(HaulerNeedOps, 'HaulerNeedOps')
 
   // Creep classes
 
-  profiler.registerClass(PowerCreepProcs, 'PowerCreepProcs')
-  profiler.registerClass(PowerCreepUtils, 'PowerCreepUtils')
-
+  profiler.registerClass(MyCreepServices, 'MyCreepServices')
   profiler.registerClass(CreepProcs, 'CreepProcs')
   profiler.registerClass(CreepMoveProcs, 'CreepMoveProcs')
   profiler.registerClass(CreepUtils, 'CreepUtils')
+  profiler.registerClass(MyCreepProcs, 'MyCreepProcs')
   profiler.registerClass(MyCreepUtils, 'MyCreepUtils')
 
   profiler.registerClass(Quad, 'Quad')
   profiler.registerClass(DynamicSquad, 'DynamicSquad')
   profiler.registerClass(Duo, 'Duo')
 
+  profiler.registerClass(MyPowerCreepServices, 'MyPowerCreepServices')
+  profiler.registerClass(PowerCreepProcs, 'PowerCreepProcs')
+  profiler.registerClass(PowerCreepUtils, 'PowerCreepUtils')
+
+  // Creep Roles
+
+  profiler.registerClass(HaulerServices, 'HaulerServices')
+  profiler.registerClass(HaulerOps, 'HaulerOps')
+
   // Objects
 
-  profiler.registerObject(global.debugUtils, 'debugUtils')
+  profiler.registerObject(DebugUtils, 'DebugUtils')
 
   // Room objects
 
   // Functions
 
   profiler.registerFN(originalLoop, 'loop')
+  profiler.registerFN(wasm.collaborator, 'wasm.collaborator')
+  profiler.registerFN(initSync, 'wasm.initSync')
 
   // codec functions
 

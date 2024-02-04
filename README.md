@@ -47,7 +47,7 @@ First you'll want to download or fork the repository. Start by selecting a branc
 
 Ensure you have downloaded [Node](https://nodejs.org/en/)
 
-**Consider using Node version is 20.10.0 if you have issues**
+**Consider using Node version if 20.10.0 if you have issues**
 
 You can check your node version with:
 

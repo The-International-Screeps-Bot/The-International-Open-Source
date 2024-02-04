@@ -1,26 +1,35 @@
 import {
-  impassibleStructureTypes, quadAttackMemberOffsets,
-  roomDimensions, Result, CreepMemoryKeys, RoomMemoryKeys,
+  impassibleStructureTypes,
+  quadAttackMemberOffsets,
+  roomDimensions,
+  Result,
+  CreepMemoryKeys,
+  RoomMemoryKeys,
   ReservedCoordTypes,
   WorkTypes,
-  RoomLogisticsRequestTypes
-} from 'international/constants'
+  RoomLogisticsRequestTypes,
+  RoomStatsKeys,
+} from '../../../constants/general'
 import {
-  findClosestObject, findObjectWithID, getRangeXY,
-  findClosestObjectInRange, getRange, findWithLowestScore
+  findClosestObject,
+  findObjectWithID,
+  getRangeXY,
+  findClosestObjectInRange,
+  getRange,
+  findWithLowestScore,
 } from 'utils/utils'
 import {
   packCoord, unpackCoordAsPos
 } from 'other/codec'
-import { statsManager } from 'international/statsManager'
-import { creepUtils } from '../creepUtils'
+import { StatsManager } from 'international/stats'
+import { CreepUtils } from '../creepUtils'
 import { RoomManager } from 'room/room'
-import { RoomLogisticsRequest } from 'types/roomRequests'
-import { customPathFinder } from 'international/customPathFinder'
-import { communeUtils } from 'room/commune/communeUtils'
-import { myCreepUtils } from '../myCreepUtils'
-import { structureUtils } from 'room/structureUtils'
-import { creepProcs } from '../creepProcs'
+import { RoomLogisticsRequest } from 'types/roomLogistics'
+import { CustomPathFinder } from 'international/customPathFinder'
+import { CommuneUtils } from 'room/commune/communeUtils'
+import { MyCreepUtils } from '../myCreepUtils'
+import { StructureUtils } from 'room/structureUtils'
+import { CreepProcs } from '../creepProcs'
 
 Creep.prototype.update = function () {}
 
@@ -172,12 +181,12 @@ Creep.prototype.builderGetEnergy = function () {
   if (this.room.communeManager.buildersMakeRequests) return Result.noAction
   if (!this.needsResources()) return Result.noAction
 
-  if (this.room.communeManager && this.room.communeManager.storingStructures.length) {
+  if (this.room.communeManager && CommuneUtils.storingStructures(this.room).length) {
     if (this.room.roomManager.resourcesInStoringStructures.energy < 1000) {
       return Result.noAction
     }
 
-    creepProcs.runRoomLogisticsRequestAdvanced(this, {
+    CreepProcs.runRoomLogisticsRequestAdvanced(this, {
       types: new Set<RoomLogisticsRequestTypes>([
         RoomLogisticsRequestTypes.withdraw,
         RoomLogisticsRequestTypes.pickup,
@@ -194,7 +203,7 @@ Creep.prototype.builderGetEnergy = function () {
 
   // We don't have a storage or terminal, don't allow use of sourceContainers
 
-  creepProcs.runRoomLogisticsRequestAdvanced(this, {
+  CreepProcs.runRoomLogisticsRequestAdvanced(this, {
     types: new Set<RoomLogisticsRequestTypes>([
       RoomLogisticsRequestTypes.withdraw,
       RoomLogisticsRequestTypes.pickup,
@@ -251,17 +260,17 @@ Creep.prototype.advancedBuildCSite = function (cSite) {
 
   // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
 
-  const energySpentOnConstruction = creepUtils.findEnergySpentOnConstruction(
+  const energySpentOnConstruction = CreepUtils.findEnergySpentOnConstruction(
     this,
     cSite,
-    myCreepUtils.parts(this).work,
+    MyCreepUtils.parts(this).work,
   )
 
   this.nextStore.energy -= energySpentOnConstruction
 
   // Add control points to total controlPoints counter and say the success
 
-  statsManager.updateStat(this.room.name, 'eob', energySpentOnConstruction)
+  StatsManager.updateStat(this.room.name, RoomStatsKeys.EnergyOutputBuild, energySpentOnConstruction)
   this.message = `🚧 ` + energySpentOnConstruction
 
   return Result.success
@@ -333,17 +342,17 @@ Creep.prototype.advancedBuildAllyCSite = function () {
   if (buildResult === OK) {
     // Find the build amount by finding the smaller of the creep's work and the progress left for the cSite divided by build power
 
-    const energySpentOnConstruction = creepUtils.findEnergySpentOnConstruction(
+    const energySpentOnConstruction = CreepUtils.findEnergySpentOnConstruction(
       this,
       cSiteTarget,
-      myCreepUtils.parts(this).work,
+      MyCreepUtils.parts(this).work,
     )
 
     this.nextStore.energy -= energySpentOnConstruction
 
     // Add control points to total controlPoints counter and say the success
 
-    statsManager.updateStat(this.room.name, 'eob', energySpentOnConstruction)
+    StatsManager.updateStat(this.room.name, RoomStatsKeys.EnergyOutputBuild, energySpentOnConstruction)
     this.message = `🚧${energySpentOnConstruction}`
 
     // Inform true
@@ -642,7 +651,9 @@ Creep.prototype.hasNonEnergyResource = function () {
 Creep.prototype.findRecycleTarget = function () {
   const { room } = this
 
-  const spawns = room.roomManager.structures.spawn.filter(spawn => structureUtils.isRCLActionable(spawn))
+  const spawns = room.roomManager.structures.spawn.filter(spawn =>
+    StructureUtils.isRCLActionable(spawn),
+  )
 
   if (!spawns.length) return false
 
@@ -909,7 +920,7 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
   )
     return this.memory[CreepMemoryKeys.quadBulldozeTargets]
 
-  const path = customPathFinder.findPath({
+  const path = CustomPathFinder.findPath({
     origin: this.pos,
     goals: [
       {
@@ -917,7 +928,7 @@ Creep.prototype.findQuadBulldozeTargets = function (goalPos) {
         range: 0,
       },
     ],
-    defaultCostMatrixes(roomName) {
+    overrideCostMatrixes(roomName) {
       return [RoomManager.roomManagers[roomName].quadBulldozeCostMatrix]
     },
   })

@@ -1,59 +1,61 @@
-import { CreepMemoryKeys, ReservedCoordTypes, RoomMemoryKeys, packedPosLength } from 'international/constants'
-import { creepProcs } from 'room/creeps/creepProcs'
-import { creepUtils } from 'room/creeps/creepUtils'
-import { myCreepUtils } from 'room/creeps/myCreepUtils'
+import {
+  CreepMemoryKeys,
+  ReservedCoordTypes,
+  RoomMemoryKeys,
+  packedPosLength,
+} from '../../../../constants/general'
+import { CreepProcs } from 'room/creeps/creepProcs'
+import { CreepUtils } from 'room/creeps/creepUtils'
+import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 
 export class ControllerUpgrader extends Creep {
-    constructor(creepID: Id<Creep>) {
-        super(creepID)
+  constructor(creepID: Id<Creep>) {
+    super(creepID)
+  }
+
+  public isDying() {
+    // Stop if creep is spawning
+
+    if (this.spawning) return false
+
+    // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
+
+    if (
+      this.ticksToLive >
+      this.body.length * CREEP_SPAWN_TIME +
+        this.room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength
+    )
+      return false
+
+    // Record creep as isDying
+
+    return true
+  }
+
+  update() {
+    const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
+    if (packedCoord) {
+      if (this.isDying()) {
+        this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
+      } else {
+        this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
+      }
     }
+  }
 
-    public isDying() {
-        // Stop if creep is spawning
+  initRun() {
+    this.room.communeManager.upgradeStrength += MyCreepUtils.upgradeStrength(this)
+  }
 
-        if (this.spawning) return false
+  public static roleManager(room: Room, creepsOfRole: string[]) {
+    // Loop through creepNames
 
-        // If the creep's remaining ticks are more than the estimated spawn time plus travel time, inform false
+    for (const creepName of creepsOfRole) {
+      // Get the creep using its creepName
 
-        if (
-            this.ticksToLive >
-            this.body.length * CREEP_SPAWN_TIME +
-                this.room.memory[RoomMemoryKeys.upgradePath].length / packedPosLength
-        )
-            return false
-
-        // Record creep as isDying
-
-        return true
-    }
-
-    update() {
-
-        const packedCoord = Memory.creeps[this.name][CreepMemoryKeys.packedCoord]
-        if (packedCoord) {
-
-            if (this.isDying()) {
-                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.dying)
-            }
-            else {
-                this.room.roomManager.reserveCoord(packedCoord, ReservedCoordTypes.important)
-            }
-        }
-    }
-
-    initRun() {
-        this.room.communeManager.upgradeStrength += myCreepUtils.upgradeStrength(this)
-    }
-
-    public static roleManager(room: Room, creepsOfRole: string[]) {
-        // Loop through creepNames
-
-        for (const creepName of creepsOfRole) {
-            // Get the creep using its creepName
-
-            const creep: ControllerUpgrader = Game.creeps[creepName]
-            const creepMemory = Memory.creeps[creep.name]
-/*
+      const creep: ControllerUpgrader = Game.creeps[creepName]
+      const creepMemory = Memory.creeps[creep.name]
+      /*
             if (
                 creepMemory[CreepMemoryKeys.targetID] === room.controller.id ||
                 room.controller.ticksToDowngrade <
@@ -72,7 +74,7 @@ export class ControllerUpgrader extends Creep {
                 }
             }
  */
-            creepProcs.advancedUpgradeController(creep)
-        }
+      CreepProcs.advancedUpgradeController(creep)
     }
+  }
 }

@@ -1,8 +1,8 @@
-import { towerPowers } from "international/constants"
-import { findWithLowestScore, getRange } from "utils/utils"
-import { communeDataManager } from "./communeData"
-import { communeUtils } from "./communeUtils"
-import { packCoord } from "other/codec"
+import { towerPowers } from '../../constants/general'
+import { findWithLowestScore, getRange } from 'utils/utils'
+import { CommuneDataOps, communeData } from './communeData'
+import { CommuneUtils } from './communeUtils'
+import { packCoord } from 'other/codec'
 
 const minTowerRampartRepairTreshold = RAMPART_DECAY_AMOUNT * 1.5
 
@@ -10,7 +10,7 @@ export class TowerUtils {
   /**
    * Estimate the damage a normal tower would do over a given distance. Does not account for effects
    */
-  estimateRangeDamage(origin: Coord, goal: Coord) {
+  static estimateRangeDamage(origin: Coord, goal: Coord) {
     let damage = TOWER_POWER_ATTACK
 
     let range = getRange(origin, goal)
@@ -26,7 +26,7 @@ export class TowerUtils {
     return Math.floor(damage)
   }
 
-  estimateDamageGross(tower: StructureTower, targetCoord: Coord) {
+  static estimateDamageGross(tower: StructureTower, targetCoord: Coord) {
     let damage = this.estimateRangeDamage(tower.pos, targetCoord)
 
     for (const powerType of towerPowers) {
@@ -39,7 +39,7 @@ export class TowerUtils {
     return Math.floor(damage)
   }
 
-  estimateDamageNet(tower: StructureTower, target: Creep) {
+  static estimateDamageNet(tower: StructureTower, target: Creep) {
     let damage = this.estimateDamageGross(tower, target.pos)
     damage *= target.defenceStrength
 
@@ -47,23 +47,22 @@ export class TowerUtils {
     return Math.floor(damage)
   }
 
-  getRampartRepairTreshold(room: Room) {
-    const data = communeDataManager.data[room.name]
-      if (data.towerRampartRepairTreshold !== undefined) return data.towerRampartRepairTreshold
+  static getRampartRepairTreshold(room: Room) {
+    const data = communeData[room.name]
+    if (data.towerRampartRepairTreshold !== undefined) return data.towerRampartRepairTreshold
 
-      let rampartRepairTreshold = minTowerRampartRepairTreshold
+    let rampartRepairTreshold = minTowerRampartRepairTreshold
 
-      const enemySquadData = room.roomManager.enemySquadData
-      rampartRepairTreshold += enemySquadData.highestDismantle
-      // Melee damage includes ranged
-      rampartRepairTreshold += enemySquadData.highestMeleeDamage
+    const enemySquadData = room.roomManager.enemySquadData
+    rampartRepairTreshold += enemySquadData.highestDismantle
+    // Melee damage includes ranged
+    rampartRepairTreshold += enemySquadData.highestMeleeDamage
 
-      data.towerRampartRepairTreshold = rampartRepairTreshold
-      return rampartRepairTreshold
+    data.towerRampartRepairTreshold = rampartRepairTreshold
+    return rampartRepairTreshold
   }
 
-  findHealTarget(room: Room) {
-
+  static findHealTarget(room: Room) {
     if (room.roomManager.enemyAttackers.length) {
       return room.roomManager.myDamagedCreeps.find(creep => {
         return !creep.isOnExit && !room.roomManager.enemyThreatCoords.has(packCoord(creep.pos))
@@ -80,10 +79,10 @@ export class TowerUtils {
     return healTargets.find(creep => !creep.isOnExit)
   }
 
-  findRampartRepairTarget(room: Room) {
+  static findRampartRepairTarget(room: Room) {
     const ramparts = room.roomManager.enemyAttackers.length
       ? room.communeManager.defensiveRamparts
-      : communeUtils.getRampartRepairTargets(room)
+      : CommuneUtils.getRampartRepairTargets(room)
 
     const [score, rampart] = findWithLowestScore(ramparts, rampart => {
       let score = rampart.hits
@@ -95,19 +94,17 @@ export class TowerUtils {
       return score
     })
 
-    const rampartRepairThreshold = towerUtils.getRampartRepairTreshold(room)
+    const rampartRepairThreshold = TowerUtils.getRampartRepairTreshold(room)
 
     // Make sure the rampart is below the treshold
     if (score > rampartRepairThreshold) return false
     return rampart
   }
 
-  findGeneralRepairTargets(room: Room) {
+  static findGeneralRepairTargets(room: Room) {
     let structures: Structure[] = room.roomManager.structures.spawn
     structures = structures.concat(room.roomManager.structures.tower)
 
     return structures
   }
 }
-
-export const towerUtils = new TowerUtils()

@@ -1,4 +1,4 @@
-import { CommuneStats } from "international/statsManager"
+import { CommuneStats } from "international/stats"
 
 export interface StatsMemory {
     lastReset: number

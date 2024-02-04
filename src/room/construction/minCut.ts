@@ -64,8 +64,8 @@
  * each round of bfs. See the comments in the code for details.
  */
 
-import { customColors, roomDimensions } from 'international/constants'
-import { collectiveManager } from 'international/collective'
+import { customColors, roomDimensions } from '../../constants/general'
+import { CollectiveManager } from 'international/collective'
 import { findCoordsInRangeXY, isXYInBorder, packXYAsNum, unpackNumAsCoord } from 'utils/utils'
 
 // the eight surrounding points of a tile

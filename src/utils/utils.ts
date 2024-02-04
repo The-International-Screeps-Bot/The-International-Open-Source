@@ -1,10 +1,15 @@
 import { ErrorMapper } from 'other/ErrorMapper'
 import {
-  customColors, roomDimensions, PlayerMemoryKeys, Result
-} from '../international/constants'
+  customColors,
+  roomDimensions,
+  PlayerMemoryKeys,
+  Result,
+  FlagNames,
+} from '../constants/general'
 import { customLog } from './logging'
-import { PlayerRelationships } from 'international/constants'
-import { roomNameUtils } from 'room/roomNameUtils'
+import { PlayerRelationships } from '../constants/general'
+import { RoomNameUtils } from 'room/roomNameUtils'
+import { Dashboard, Rectangle, Table } from 'screeps-viz'
 
 /**
  * Uses a provided ID to find an object associated with it
@@ -692,7 +697,7 @@ export function randomOf<T>(array: T[]): T {
 export function visualizePath(
   path: RoomPosition[],
   color: string = customColors.yellow,
-  visualize: boolean = global.settings.roomVisuals,
+  visualize: boolean = !!Game.flags[FlagNames.roomVisuals],
 ) {
   if (!visualize) return
 
@@ -741,14 +746,14 @@ export function getMe() {
 }
 
 export class Utils {
-  isTickInterval(interval: number) {
+  static isTickInterval(interval: number) {
     return Game.time % interval === 0
   }
   /**
    *
    * @returns [score, index]
    */
-  findIndexWithLowestScore<T>(iter: T[], f: (val: T) => number | false): [number, number] {
+  static findIndexWithLowestScore<T>(iter: T[], f: (val: T) => number | false): [number, number] {
     let lowestScore = Infinity
     let bestIndex: number
 
@@ -766,7 +771,7 @@ export class Utils {
     return [lowestScore, bestIndex]
   }
 
-  getInterRangeXY(
+  static getInterRangeXY(
     x1: number,
     y1: number,
     roomName1: string,
@@ -778,8 +783,8 @@ export class Utils {
       return getRangeXY(x1, x2, y1, y2)
     }
 
-    const roomCoord1 = roomNameUtils.pack(roomName1)
-    const roomCoord2 = roomNameUtils.pack(roomName2)
+    const roomCoord1 = RoomNameUtils.pack(roomName1)
+    const roomCoord2 = RoomNameUtils.pack(roomName2)
 
     const worldCoord1 = {
       x:
@@ -801,9 +806,43 @@ export class Utils {
     return range
   }
 
-  getInterRange(coord1: Coord, roomName1: string, coord2: Coord, roomName2: string) {
+  static getInterRange(coord1: Coord, roomName1: string, coord2: Coord, roomName2: string) {
     return this.getInterRangeXY(coord1.x, coord1.y, roomName1, coord2.x, coord2.y, roomName2)
   }
-}
 
-export const utils = new Utils()
+  static findMinRangedAttackCost(minDamage: number = 10) {
+    const rawCost =
+      (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[RANGED_ATTACK] +
+      (minDamage / RANGED_ATTACK_POWER) * BODYPART_COST[MOVE]
+    const combinedCost = BODYPART_COST[RANGED_ATTACK] + BODYPART_COST[MOVE]
+
+    return Math.ceil(rawCost / combinedCost) * combinedCost
+  }
+
+  static findMinMeleeAttackCost(minDamage: number = 30) {
+    const rawCost =
+      (minDamage / ATTACK_POWER) * BODYPART_COST[ATTACK] +
+      (minDamage / ATTACK_POWER) * BODYPART_COST[MOVE]
+    const combinedCost = BODYPART_COST[ATTACK] + BODYPART_COST[MOVE]
+
+    return Math.ceil(rawCost / combinedCost) * combinedCost
+  }
+
+  /**
+   * Finds how expensive it will be to provide enough heal parts to withstand attacks
+   */
+  static findMinHealCost(minHeal: number = 12) {
+    const rawCost =
+      (minHeal / HEAL_POWER) * BODYPART_COST[HEAL] + (minHeal / HEAL_POWER) * BODYPART_COST[MOVE]
+    const combinedCost = BODYPART_COST[HEAL] + BODYPART_COST[MOVE]
+
+    return Math.ceil(rawCost / combinedCost) * combinedCost
+  }
+
+  static findMinDismantleCost(minDismantle: number = 0) {
+    const rawCost = minDismantle * BODYPART_COST[WORK] + minDismantle * BODYPART_COST[MOVE]
+    const combinedCost = BODYPART_COST[WORK] + BODYPART_COST[MOVE]
+
+    return Math.ceil(rawCost / combinedCost) * combinedCost
+  }
+}

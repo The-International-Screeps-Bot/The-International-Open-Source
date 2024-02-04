@@ -1,10 +1,10 @@
-import { time } from "console"
+import { time } from 'console'
 
-class DebugUtils {
+export class DebugUtils {
   /**
    * Deeply stringifies values with some added benefits
    */
-  stringify(v: any) {
+  static stringify(v: any) {
     let alreadyReferencedObjects: any[] = []
     const recStringify = (value: any, depth: number): string => {
       switch (typeof value) {
@@ -60,10 +60,11 @@ class DebugUtils {
 
     return recStringify(v, 0)
   }
+
   /**
    * I don't fully understand what this does or what it is meant to do
    */
-  findGlobalLength() {
+  static findGlobalLength() {
     const dict: { [key: number]: string } = {
       0: '',
       3: 'K',
@@ -114,62 +115,96 @@ class DebugUtils {
   }
 }
 
-global.debugUtils = new DebugUtils()
-
 global.stringify = function stringify(v: any, maxDepth = 3) {
-    let alreadyReferencedObjects: any[] = [];
-    const recStringify = (value: any, depth: number): string => {
-      switch (typeof value) {
-        case 'undefined':
-          return 'undefined';
-        case 'boolean':
-        case 'number':
-          return value.toString();
-        case 'string':
-          return '"' + value.toString() + '"';
-        case 'function':
-          return 'function';
-        case 'object':
-          if (value === null)
-            return "null";
-          else if (value instanceof RoomPosition) {
-            return value.x+','+value.y+','+value.roomName;
-          }
-          else if (alreadyReferencedObjects.includes(value))
-            return "*";
-          else {
-            alreadyReferencedObjects.push(value);
-            if (value instanceof Array) {
-              if (value.length === 0)
-                return "[]";
-              else if (depth > maxDepth)
-                return "[ ... ]";
-              else {
-                let leftPad = new Array(depth).fill("  ").join("");
-                let itemLeftPad = new Array(depth + 1).fill("  ").join("");
-                return "[<br/>"
-                  + value.map(item => itemLeftPad + recStringify(item, depth + 1)).join(',<br/>') + "<br/>"
-                  + leftPad + "]";
-              }
-            }
+  let alreadyReferencedObjects: any[] = []
+  const recStringify = (value: any, depth: number): string => {
+    switch (typeof value) {
+      case 'undefined':
+        return 'undefined'
+      case 'boolean':
+      case 'number':
+        return value.toString()
+      case 'string':
+        return '"' + value.toString() + '"'
+      case 'function':
+        return 'function'
+      case 'object':
+        if (value === null) return 'null'
+        else if (value instanceof RoomPosition) {
+          return value.x + ',' + value.y + ',' + value.roomName
+        } else if (alreadyReferencedObjects.includes(value)) return '*'
+        else {
+          alreadyReferencedObjects.push(value)
+          if (value instanceof Array) {
+            if (value.length === 0) return '[]'
+            else if (depth > maxDepth) return '[ ... ]'
             else {
-              let props = Object.getOwnPropertyNames(value);
-              if (props.length === 0)
-                return "{}";
-              else if (depth > maxDepth)
-                return "{ ... }";
-              else {
-                let leftPad = new Array(depth).fill("  ").join("");
-                let itemLeftPad = new Array(depth + 1).fill("  ").join("");
-                return "{<br/>"
-                  + props.map(name => itemLeftPad + name + ': ' + recStringify(value[name], depth + 1)).join(',<br/>') + "<br/>"
-                  + leftPad + "}";
-              }
+              let leftPad = new Array(depth).fill('  ').join('')
+              let itemLeftPad = new Array(depth + 1).fill('  ').join('')
+              return (
+                '[<br/>' +
+                value.map(item => itemLeftPad + recStringify(item, depth + 1)).join(',<br/>') +
+                '<br/>' +
+                leftPad +
+                ']'
+              )
+            }
+          } else {
+            let props = Object.getOwnPropertyNames(value)
+            if (props.length === 0) return '{}'
+            else if (depth > maxDepth) return '{ ... }'
+            else {
+              let leftPad = new Array(depth).fill('  ').join('')
+              let itemLeftPad = new Array(depth + 1).fill('  ').join('')
+              return (
+                '{<br/>' +
+                props
+                  .map(name => itemLeftPad + name + ': ' + recStringify(value[name], depth + 1))
+                  .join(',<br/>') +
+                '<br/>' +
+                leftPad +
+                '}'
+              )
             }
           }
-        default:
-          return '';
-      }
-    };
-    return recStringify(v, 0);
+        }
+      default:
+        return ''
+    }
   }
+  return recStringify(v, 0)
+}
+
+global.roughSizeOfObject = function (object) {
+  const objectList: any = []
+  const stack = [object]
+  let bytes = 0
+
+  while (stack.length) {
+    const value = stack.pop()
+
+    switch (typeof value) {
+      case 'boolean':
+        bytes += 4
+        break
+      case 'string':
+        bytes += value.length * 2
+        break
+      case 'number':
+        bytes += 8
+        break
+      case 'object':
+        if (!objectList.includes(value)) {
+          objectList.push(value)
+          for (const prop in value) {
+            if (value.hasOwnProperty(prop)) {
+              stack.push(value[prop])
+            }
+          }
+        }
+        break
+    }
+  }
+
+  return bytes
+}

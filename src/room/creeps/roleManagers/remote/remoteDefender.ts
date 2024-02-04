@@ -1,10 +1,10 @@
 import {
-    CreepMemoryKeys,
-    Result,
-    RoomMemoryKeys,
-    RoomTypes,
-    remoteTypeWeights,
-} from 'international/constants'
+  CreepMemoryKeys,
+  Result,
+  RoomMemoryKeys,
+  RoomTypes,
+  remoteTypeWeights,
+} from '../../../../constants/general'
 import { findClosestObject, getRangeXY, randomIntRange } from 'utils/utils'
 import { packCoord } from 'other/codec'
 

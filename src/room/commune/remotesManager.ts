@@ -7,7 +7,7 @@ import {
   RoomTypes,
   defaultDataDecay,
   maxRemotePathDistance,
-} from 'international/constants'
+} from '../../constants/general'
 import {
   findCarryPartsRequired,
   findLowestScore,
@@ -15,12 +15,13 @@ import {
   randomIntRange,
   randomRange,
   randomTick,
-  utils,
+  Utils,
 } from 'utils/utils'
 import { unpackPosList } from 'other/codec'
 import { CommuneManager } from './commune'
-import { roomNameUtils } from 'room/roomNameUtils'
-import { structureUtils } from 'room/structureUtils'
+import { RoomNameUtils } from 'room/roomNameUtils'
+import { StructureUtils } from 'room/structureUtils'
+import { CommuneOps } from './communeOps'
 
 type RemoteSourcePathTypes =
   | RoomMemoryKeys.remoteSourceFastFillerPaths
@@ -44,7 +45,7 @@ export class RemotesManager {
     const roomMemory = Memory.rooms[this.communeManager.room.name]
 
     for (const remoteName of roomMemory[RoomMemoryKeys.remotes]) {
-      roomNameUtils.updateCreepsOfRemoteName(remoteName, this.communeManager)
+      RoomNameUtils.updateCreepsOfRemoteName(remoteName, this.communeManager)
     }
 
     this.updateRemoteResourcePathType()
@@ -55,7 +56,7 @@ export class RemotesManager {
 
     if (
       this.communeManager.room.storage &&
-      structureUtils.isRCLActionable(this.communeManager.room.storage)
+      StructureUtils.isRCLActionable(this.communeManager.room.storage)
     ) {
       this.communeManager.remoteResourcePathType = RoomMemoryKeys.remoteSourceHubPaths
       return
@@ -92,7 +93,7 @@ export class RemotesManager {
         remoteMemory[RoomMemoryKeys.type] !== RoomTypes.remote ||
         remoteMemory[RoomMemoryKeys.commune] !== room.name
       ) {
-        this.communeManager.removeRemote(remoteName, index)
+        CommuneOps.removeRemote(room, remoteName, index)
         continue
       }
 
@@ -102,10 +103,10 @@ export class RemotesManager {
       // The room is closed or is now a respawn or novice zone
 
       if (
-        utils.isTickInterval(checkRoomStatusInterval) &&
-        Game.map.getRoomStatus(remoteName).status !== Game.map.getRoomStatus(room.name).status
+        Utils.isTickInterval(checkRoomStatusInterval) &&
+        Memory.rooms[room.name][RoomMemoryKeys.status] !== remoteMemory[RoomMemoryKeys.status]
       ) {
-        this.communeManager.removeRemote(remoteName, index)
+        CommuneOps.removeRemote(room, remoteName, index)
         continue
       }
 
@@ -207,7 +208,7 @@ export class RemotesManager {
             return creep.ticksToLive
           })
           remoteMemory[RoomMemoryKeys.danger] = Game.time + randomIntRange(score, score + 100)
-          roomNameUtils.abandonRemote(remoteName, randomIntRange(score, score + 100))
+          RoomNameUtils.abandonRemote(remoteName, randomIntRange(score, score + 100))
           continue
         }
 
@@ -360,7 +361,7 @@ export class RemotesManager {
   private manageUse(remoteName: string): boolean {
     const roomMemory = Memory.rooms[remoteName]
     // If we aren't on the inverval to check for use
-    if (!utils.isTickInterval(manageUseInterval)) {
+    if (!Utils.isTickInterval(manageUseInterval)) {
       // Inform the current state of things
       return !roomMemory[RoomMemoryKeys.disable]
     }
@@ -384,7 +385,7 @@ export class RemotesManager {
   }
 
   private isRemoteBlocked(remoteName: string) {
-    const safeDistance = roomNameUtils.advancedFindDistance(
+    const safeDistance = RoomNameUtils.advancedFindDistance(
       this.communeManager.room.name,
       remoteName,
       {
@@ -394,7 +395,7 @@ export class RemotesManager {
     )
     if (safeDistance > maxRemoteRoomDistance) return true
 
-    const distance = roomNameUtils.advancedFindDistance(this.communeManager.room.name, remoteName, {
+    const distance = RoomNameUtils.advancedFindDistance(this.communeManager.room.name, remoteName, {
       typeWeights: remoteTypeWeights,
     })
     if (Math.round(safeDistance * 0.75) > distance) return true
@@ -415,7 +416,7 @@ export class RemotesManager {
       // We want to abandon if the remote paths through the specified remote
       if (!remoteMemory2[RoomMemoryKeys.pathsThrough].includes(remoteName)) continue
 
-      roomNameUtils.abandonRemote(remoteName2, remoteMemory[RoomMemoryKeys.abandonRemote])
+      RoomNameUtils.abandonRemote(remoteName2, remoteMemory[RoomMemoryKeys.abandonRemote])
     }
 
     remoteMemory[RoomMemoryKeys.recursedAbandonment] = true

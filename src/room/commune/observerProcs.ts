@@ -1,11 +1,11 @@
-import { RoomMemoryKeys } from "international/constants"
-import { roomNameUtils } from "room/roomNameUtils"
-import { forRoomNamesAroundRangeXY, utils } from "utils/utils"
+import { RoomMemoryKeys } from '../../constants/general'
+import { RoomNameUtils } from 'room/roomNameUtils'
+import { forRoomNamesAroundRangeXY, Utils } from 'utils/utils'
 
 export class ObserverProcs {
-  preTickRun(room: Room) {
+  static preTickRun(room: Room) {
     // Run only every so often
-    if (!utils.isTickInterval(10)) return
+    if (!Utils.isTickInterval(10)) return
 
     const observer = room.roomManager.structures.observer[0]
     if (!observer) return
@@ -16,14 +16,14 @@ export class ObserverProcs {
     observer.observeRoom(scoutTarget)
   }
 
-  findScoutTarget(room: Room) {
-    const roomCoord = roomNameUtils.pack(room.name)
+  static findScoutTarget(room: Room) {
+    const roomCoord = RoomNameUtils.pack(room.name)
 
     let scoutTarget: string | undefined
     let highestScore = 0
 
     forRoomNamesAroundRangeXY(roomCoord.x, roomCoord.y, OBSERVER_RANGE, (x, y) => {
-      const scoutRoomName = roomNameUtils.unpackXY(x, y)
+      const scoutRoomName = RoomNameUtils.unpackXY(x, y)
 
       const score = this.findRoomNameScore(room, scoutRoomName)
       if (score <= highestScore) return
@@ -35,9 +35,8 @@ export class ObserverProcs {
     return scoutTarget
   }
 
-  private findRoomNameScore(room: Room, scoutRoomName: string) {
-    const roomsDistance =
-      OBSERVER_RANGE - Game.map.getRoomLinearDistance(room.name, scoutRoomName)
+  private static findRoomNameScore(room: Room, scoutRoomName: string) {
+    const roomsDistance = OBSERVER_RANGE - Game.map.getRoomLinearDistance(room.name, scoutRoomName)
 
     const scoutRoomMemory = Memory.rooms[scoutRoomName]
     if (!scoutRoomMemory) {
@@ -54,5 +53,3 @@ export class ObserverProcs {
     return score
   }
 }
-
-export const observerProcs = new ObserverProcs()

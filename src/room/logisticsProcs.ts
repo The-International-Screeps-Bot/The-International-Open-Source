@@ -1,19 +1,19 @@
-import { RoomLogisticsRequestTypes } from 'international/constants'
+import { RoomLogisticsRequestTypes } from '../constants/general'
 import { scalePriority } from 'utils/utils'
 
 export class LogisticsProcs {
-  createCommuneContainerLogisticsRequests(room: Room) {
+  static createCommuneContainerLogisticsRequests(room: Room) {
     this.createSourceContainerRequests(room)
     this.createFastFillerContainerRequests(room)
     this.createControllerContainerRequests(room)
     this.createMineralContainerRequests(room)
   }
 
-  createRemoteContainerLogisticsRequests(room: Room) {
+  static createRemoteContainerLogisticsRequests(room: Room) {
     this.createSourceContainerRequests(room)
   }
 
-  private createFastFillerContainerRequests(room: Room) {
+  private static createFastFillerContainerRequests(room: Room) {
     const fastFillerContainers = room.roomManager.fastFillerContainers
     if (!fastFillerContainers.length) return
 
@@ -43,7 +43,7 @@ export class LogisticsProcs {
     }
   }
 
-  private createSourceContainerRequests(room: Room) {
+  private static createSourceContainerRequests(room: Room) {
     for (const container of room.roomManager.sourceContainers) {
       if (!container) continue
 
@@ -61,7 +61,7 @@ export class LogisticsProcs {
     }
   }
 
-  private createControllerContainerRequests(room: Room) {
+  private static createControllerContainerRequests(room: Room) {
     const container = room.roomManager.controllerContainer
     if (!container) return
 
@@ -81,7 +81,7 @@ export class LogisticsProcs {
     })
   }
 
-  private createMineralContainerRequests(room: Room) {
+  private static createMineralContainerRequests(room: Room) {
     const container = room.roomManager.mineralContainer
     if (!container) return
 
@@ -103,7 +103,7 @@ export class LogisticsProcs {
     })
   }
 
-  createCommuneRuinLogisticsRequests(room: Room) {
+  static createCommuneRuinLogisticsRequests(room: Room) {
     for (const ruin of room.find(FIND_RUINS)) {
       for (const key in ruin.reserveStore) {
         const resourceType = key as ResourceConstant
@@ -120,7 +120,7 @@ export class LogisticsProcs {
     }
   }
 
-  createCommuneTombstoneLogisticsRequests(room: Room) {
+  static createCommuneTombstoneLogisticsRequests(room: Room) {
     for (const tombstone of room.find(FIND_TOMBSTONES)) {
       for (const key in tombstone.reserveStore) {
         const resourceType = key as ResourceConstant
@@ -137,7 +137,7 @@ export class LogisticsProcs {
     }
   }
 
-  createCommuneDroppedResourceLogisticsRequests(room: Room) {
+  static createCommuneDroppedResourceLogisticsRequests(room: Room) {
     for (const resource of room.roomManager.droppedResources) {
       if (resource.amount < 50) continue
 
@@ -151,7 +151,7 @@ export class LogisticsProcs {
     }
   }
 
-  createRemoteRuinLogisticsRequests(room: Room) {
+  static createRemoteRuinLogisticsRequests(room: Room) {
     const resourceType = RESOURCE_ENERGY
 
     for (const ruin of room.find(FIND_RUINS)) {
@@ -167,7 +167,7 @@ export class LogisticsProcs {
     }
   }
 
-  createRemoteTombstoneLogisticsRequests(room: Room) {
+  static createRemoteTombstoneLogisticsRequests(room: Room) {
     const resourceType = RESOURCE_ENERGY
 
     for (const tombstone of room.find(FIND_TOMBSTONES)) {
@@ -183,7 +183,7 @@ export class LogisticsProcs {
     }
   }
 
-  createRemoteDroppedResourceLogisticsRequests(room: Room) {
+  static createRemoteDroppedResourceLogisticsRequests(room: Room) {
     for (const resource of room.roomManager.droppedResources) {
       if (resource.resourceType !== RESOURCE_ENERGY) continue
       if (resource.amount < 50) continue
@@ -196,8 +196,7 @@ export class LogisticsProcs {
     }
   }
 
-  createCommuneStoringStructureLogisticsRequests(room: Room) {
-
+  static createCommuneStoringStructureLogisticsRequests(room: Room) {
     const storingStructures: AnyStoreStructure[] = []
 
     const storage = room.storage
@@ -205,27 +204,25 @@ export class LogisticsProcs {
 
     const terminal = room.terminal
     if (terminal && !terminal.effectsData.get(PWR_DISRUPT_TERMINAL))
-        storingStructures.push(terminal)
+      storingStructures.push(terminal)
 
     for (const structure of storingStructures) {
-        room.createRoomLogisticsRequest({
-            target: structure,
-            onlyFull: true,
-            type: RoomLogisticsRequestTypes.offer,
-            priority: 0,
-        })
+      room.createRoomLogisticsRequest({
+        target: structure,
+        onlyFull: true,
+        type: RoomLogisticsRequestTypes.offer,
+        priority: 0,
+      })
 
-        // We are close to full
+      // We are close to full
 
-        if (structure.usedReserveStore > structure.store.getCapacity() * 0.9) continue
+      if (structure.usedReserveStore > structure.store.getCapacity() * 0.9) continue
 
-        room.createRoomLogisticsRequest({
-            target: structure,
-            type: RoomLogisticsRequestTypes.transfer,
-            priority: 100,
-        })
+      room.createRoomLogisticsRequest({
+        target: structure,
+        type: RoomLogisticsRequestTypes.transfer,
+        priority: 100,
+      })
     }
   }
 }
-
-export const logisticsProcs = new LogisticsProcs()

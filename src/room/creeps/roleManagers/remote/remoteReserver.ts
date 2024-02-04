@@ -5,7 +5,7 @@ import {
   RoomMemoryKeys,
   RoomTypes,
   packedPosLength,
-} from 'international/constants'
+} from '../../../../constants/general'
 import { getRange, randomTick } from 'utils/utils'
 import {
   packCoord,
@@ -14,7 +14,7 @@ import {
   unpackPosAt,
   unpackPosList,
 } from 'other/codec'
-import { myCreepUtils } from 'room/creeps/myCreepUtils'
+import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 
 export class RemoteReserver extends Creep {
   constructor(creepID: Id<Creep>) {
@@ -123,7 +123,7 @@ export class RemoteReserver extends Creep {
     if (this.isDying()) return
 
     Memory.rooms[creepMemory[CreepMemoryKeys.remote]][RoomMemoryKeys.remoteReservers] -=
-      myCreepUtils.parts(this).claim
+      MyCreepUtils.parts(this).claim
   }
 
   removeRemote?() {

@@ -4,9 +4,7 @@ import { Settings } from 'types/settings'
  * Default global.settings. DO NOT MODIFY for personal use; instead, include your preferences in global.settings.ts
  */
 export const defaultSettings: Settings = {
-  breakingVersion: 126,
-  roomVisuals: false,
-  mapVisuals: false,
+  breakingVersion: 128,
   allies: ['MarvinTMB'],
   nonAggressionPlayers: [],
   tradeBlacklist: [],
@@ -45,8 +43,8 @@ export const defaultSettings: Settings = {
   allySegmentID: 90,
   errorExporting: true,
   structureMigration: true,
-  roomLogisticsVisuals: false,
   debugLogging: false,
+  season: false,
   /*   relationships: {
     MarvinTMB: PlayerRelationships.ally,
   }, */

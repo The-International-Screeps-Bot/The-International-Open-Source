@@ -1,7 +1,7 @@
 import { SpawnRequest } from 'types/spawnRequest'
 import { LogTypes, customLog } from 'utils/logging'
 import { SpawnRequestArgs } from 'types/spawnRequest'
-import { CreepMemoryKeys, FlagNames } from 'international/constants'
+import { CreepMemoryKeys, FlagNames } from '../../../constants/general'
 
 export type SpawnRequestConstructor = (room: Room, args: SpawnRequestArgs) => SpawnRequest[]
 
@@ -9,7 +9,7 @@ export class SpawnRequestConstructors {
     /**
      * Generally, all creeps will have the same bodies
      */
-    spawnRequestIndividualUniform(room: Room, args: SpawnRequestArgs) {
+    static spawnRequestIndividualUniform(room: Room, args: SpawnRequestArgs) {
         const spawnRequests: SpawnRequest[] = []
 
         const maxCostPerCreep = Math.max(
@@ -157,7 +157,8 @@ export class SpawnRequestConstructors {
 
         return spawnRequests
     }
-    spawnRequestGroupDiverse(room: Room, args: SpawnRequestArgs) {
+
+    static spawnRequestGroupDiverse(room: Room, args: SpawnRequestArgs) {
 
         const spawnRequests: SpawnRequest[] = []
 
@@ -170,7 +171,7 @@ export class SpawnRequestConstructors {
         }
 
         const maxCostPerCreep = Math.max(
-            args.maxCostPerCreep ?? room.energyCapacityAvailable,
+            Math.min(args.maxCostPerCreep ?? room.energyCapacityAvailable, room.energyCapacityAvailable),
             args.minCostPerCreep,
         )
 
@@ -205,6 +206,11 @@ export class SpawnRequestConstructors {
             args.maxCreeps -= args.spawnGroup
                 ? args.spawnGroup.length
                 : room.creepsFromRoom[args.role].length
+        }
+
+        let extraPartsCost = 0
+        for (const part of args.extraParts) {
+            extraPartsCost += BODYPART_COST[part]
         }
 
         // So long as there are totalExtraParts left to assign
@@ -249,6 +255,21 @@ export class SpawnRequestConstructors {
                 }
             }
 
+            // Apply extraParts once without restrictions
+
+            tier += 1
+
+            for (const part of args.extraParts) {
+
+                cost += BODYPART_COST[part]
+                bodyPartCounts[part] += 1
+
+                remainingAllowedParts -= 1
+                totalExtraParts -= 1
+            }
+
+            // Apply additional extraParts with restrictions
+
             let stop = false
 
             // So long as the cost is less than the maxCostPerCreep and the size is below max size
@@ -265,7 +286,7 @@ export class SpawnRequestConstructors {
                         break
                     }
 
-                    cost += BODYPART_COST[part]
+                    cost += partCost
                     bodyPartCounts[part] += 1
 
                     remainingAllowedParts -= 1
@@ -295,7 +316,8 @@ export class SpawnRequestConstructors {
 
         return spawnRequests
     }
-    spawnRequestGroupUniform(room: Room, args: SpawnRequestArgs) {
+
+    static spawnRequestGroupUniform(room: Room, args: SpawnRequestArgs) {
         const spawnRequests: SpawnRequest[] = []
 
         if (Game.flags[FlagNames.debugSpawning]) {
@@ -307,15 +329,16 @@ export class SpawnRequestConstructors {
             throw Error('extraParts of length 0 for ' + room.name + ' and role ' + args.role)
         }
 
-        const maxCostPerCreep = Math.max(
-            args.maxCostPerCreep ?? room.energyCapacityAvailable,
-            args.minCostPerCreep,
-        )
-        if (maxCostPerCreep < args.minCostPerCreep) {
+        if (args.maxCostPerCreep < args.minCostPerCreep) {
 
             customLog('maxCostPerCreep is less than minCostPerCreep, unable to continue spawn request for role: ' + args.role)
             return spawnRequests
         }
+
+        const maxCostPerCreep = Math.max(
+            Math.min(args.maxCostPerCreep ?? room.energyCapacityAvailable, room.energyCapacityAvailable),
+            args.minCostPerCreep,
+        )
 
         if (args.maxCreeps === undefined) {
             args.maxCreeps = Number.MAX_SAFE_INTEGER
@@ -374,7 +397,7 @@ export class SpawnRequestConstructors {
                         break
                     }
 
-                    cost += BODYPART_COST[part]
+                    cost += partCost
                     bodyPartCounts[part] += 1
                     partsCount += 1
                 }
@@ -405,5 +428,3 @@ export class SpawnRequestConstructors {
         return spawnRequests
     }
 }
-
-export const spawnRequestConstructors = new SpawnRequestConstructors()

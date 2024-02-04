@@ -1,47 +1,47 @@
 import { packXYAsNum } from 'utils/utils'
 import { packCoord, packRampartPlanCoord, packXYAsCoord } from 'other/codec'
 import { encode, decode } from 'base32768'
-import { allStructureTypes } from 'international/constants'
+import { allStructureTypes } from '../../constants/general'
 
 export class RampartPlans {
-    /**
-     * doesn't cover the entire room grid, only coords that have plans
-     */
-    map: { [packedCoord: string]: RampartPlanCoord }
+  /**
+   * doesn't cover the entire room grid, only coords that have plans
+   */
+  map: { [packedCoord: string]: RampartPlanCoord }
 
-    constructor(map?: { [packedCoord: string]: RampartPlanCoord }) {
-        this.map = map || {}
+  constructor(map?: { [packedCoord: string]: RampartPlanCoord }) {
+    this.map = map || {}
+  }
+  get(packedCoord: string) {
+    return this.map[packedCoord]
+  }
+  getXY(x: number, y: number) {
+    return this.get(packXYAsCoord(x, y))
+  }
+  pack() {
+    let str = ''
+
+    for (const packedCoord in this.map) {
+      str += packedCoord + packRampartPlanCoord(this.map[packedCoord])
     }
-    get(packedCoord: string) {
-        return this.map[packedCoord]
+
+    return str
+  }
+  static unpack(packedMap: string) {
+    const plans = new RampartPlans()
+
+    for (let i = 0; i < packedMap.length; i += 5) {
+      const data = decode(packedMap[i + 2] + packedMap[i + 3] + packedMap[i + 4])
+
+      plans.map[packedMap[i] + packedMap[i + 1]] = {
+        minRCL: data[0],
+        coversStructure: data[1],
+        buildForNuke: data[2],
+        buildForThreat: data[3],
+        needsStoringStructure: data[4],
+      }
     }
-    getXY(x: number, y: number) {
-        return this.get(packXYAsCoord(x, y))
-    }
-    pack() {
-        let str = ''
 
-        for (const packedCoord in this.map) {
-            str += packedCoord + packRampartPlanCoord(this.map[packedCoord])
-        }
-
-        return str
-    }
-    static unpack(packedMap: string) {
-        const plans = new RampartPlans()
-
-        for (let i = 0; i < packedMap.length; i += 5) {
-            const data = decode(packedMap[i + 2] + packedMap[i + 3] + packedMap[i + 4])
-
-            plans.map[packedMap[i] + packedMap[i + 1]] = {
-                minRCL: data[0],
-                coversStructure: data[1],
-                buildForNuke: data[2],
-                buildForThreat: data[3],
-                needsStoringStructure: data[4],
-            }
-        }
-
-        return plans
-    }
+    return plans
+  }
 }

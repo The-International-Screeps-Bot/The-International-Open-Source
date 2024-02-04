@@ -1,325 +1,324 @@
 import {
-    buildableStructuresSet,
-    buildableStructureTypes,
-    customColors,
-    impassibleStructureTypesSet,
-    Result,
-    RoomMemoryKeys,
-    structureTypesToProtectSet,
-} from 'international/constants'
+  buildableStructuresSet,
+  buildableStructureTypes,
+  customColors,
+  impassibleStructureTypesSet,
+  Result,
+  RoomMemoryKeys,
+  structureTypesToProtectSet,
+} from '../../constants/general'
 import { customLog } from 'utils/logging'
-import { findObjectWithID, packAsNum, randomIntRange, randomTick, utils } from 'utils/utils'
+import { findObjectWithID, packAsNum, randomIntRange, randomTick, Utils } from 'utils/utils'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneManager } from 'room/commune/commune'
 import { BasePlans } from './basePlans'
 import { RampartPlans } from './rampartPlans'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import { Sleepable } from 'utils/sleepable'
+import { CommuneUtils } from 'room/commune/communeUtils'
 
 const generalMigrationStructures: BuildableStructureConstant[] = [
-    STRUCTURE_EXTENSION,
-    STRUCTURE_LINK,
-    STRUCTURE_STORAGE,
-    STRUCTURE_TOWER,
-    STRUCTURE_OBSERVER,
-    STRUCTURE_POWER_SPAWN,
-    STRUCTURE_EXTRACTOR,
-    STRUCTURE_LAB,
-    STRUCTURE_TERMINAL,
-    STRUCTURE_CONTAINER,
-    STRUCTURE_NUKER,
-    STRUCTURE_FACTORY,
-    STRUCTURE_WALL,
+  STRUCTURE_EXTENSION,
+  STRUCTURE_LINK,
+  STRUCTURE_STORAGE,
+  STRUCTURE_TOWER,
+  STRUCTURE_OBSERVER,
+  STRUCTURE_POWER_SPAWN,
+  STRUCTURE_EXTRACTOR,
+  STRUCTURE_LAB,
+  STRUCTURE_TERMINAL,
+  STRUCTURE_CONTAINER,
+  STRUCTURE_NUKER,
+  STRUCTURE_FACTORY,
+  STRUCTURE_WALL,
 ]
 const noOverlapDestroyStructures: Set<StructureConstant> = new Set([
-    STRUCTURE_SPAWN,
-    STRUCTURE_RAMPART,
+  STRUCTURE_SPAWN,
+  STRUCTURE_RAMPART,
 ])
 const constructionInterval = randomIntRange(70, 90)
 
 export class ConstructionManager {
-    communeManager: CommuneManager
-    room: Room
-    placedSites: number
+  communeManager: CommuneManager
+  room: Room
+  placedSites: number
 
-    constructor(communeManager: CommuneManager) {
+  constructor(communeManager: CommuneManager) {
+    this.communeManager = communeManager
+  }
 
-        this.communeManager = communeManager
+  preTickRun() {
+    this.room = this.communeManager.room
+
+    this.manageConstructionSites()
+
+    if (Memory.rooms[this.room.name][RoomMemoryKeys.communePlanned] !== Result.success) return
+    // If it's not our first room, wait until RCL 2 before begining construction efforts
+    if (!this.room.roomManager.isStartRoom() && this.room.controller.level < 2) return
+
+    if (this.clearEnemyStructures() === Result.action) return
+
+    this.place()
+    this.migrate()
+  }
+  /**
+   * Try to shove creeps off of impassible construction sites so they can be built on
+   */
+  private manageConstructionSites() {
+    const constructionSites = this.room.find(FIND_MY_CONSTRUCTION_SITES)
+    for (const cSite of constructionSites) {
+      if (!impassibleStructureTypesSet.has(cSite.structureType)) continue
+
+      const creepName = this.room.creepPositions[packCoord(cSite.pos)]
+      if (!creepName) continue
+
+      const creep = Game.creeps[creepName]
+      creep.shove()
+    }
+  }
+  private shouldPlace() {
+    // If the construction site count is at its limit, stop
+    if (CollectiveManager.constructionSiteCount >= MAX_CONSTRUCTION_SITES) return false
+
+    // If there are builders and enough cSites, stop
+    if (this.room.myCreepsByRole.builder.length) {
+      if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return false
+
+      return true
     }
 
-    preTickRun() {
-        this.room = this.communeManager.room
+    // If there are no builders
 
-        this.manageConstructionSites()
+    // Only run every so often
+    else if (this.room.controller.level !== 1 && !Utils.isTickInterval(constructionInterval))
+      return false
 
-        if (!this.room.memory[RoomMemoryKeys.communePlanned]) return
-        // If it's not our first room, wait until RCL 2 before begining construction efforts
-        if (!this.room.roomManager.isStartRoom() && this.room.controller.level < 2) return
+    // If there are too many construction sites
+    if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length >= CollectiveManager.maxCSitesPerRoom)
+      return false
 
-        if (this.clearEnemyStructures() === Result.action) return
+    return true
+  }
+  private place() {
+    if (!this.shouldPlace()) return
 
-        this.place()
-        this.migrate()
-    }
-    /**
-     * Try to shove creeps off of impassible construction sites so they can be built on
-     */
-    private manageConstructionSites() {
+    this.placedSites = 0
 
-        const constructionSites = this.room.find(FIND_MY_CONSTRUCTION_SITES)
-        for (const cSite of constructionSites) {
+    const RCL = this.room.controller.level
+    const maxCSites = Math.min(
+      CollectiveManager.maxCSitesPerRoom,
+      MAX_CONSTRUCTION_SITES - CollectiveManager.constructionSiteCount,
+    )
 
-            if (!impassibleStructureTypesSet.has(cSite.structureType)) continue
+    this.placeRamparts(RCL, maxCSites)
+    this.placeBase(RCL, maxCSites)
+  }
+  private placeRamparts(RCL: number, maxCSites: number) {
+    const rampartPlans = this.communeManager.room.roomManager.rampartPlans
+    const hasStoringStructure = !!CommuneUtils.storingStructures(this.communeManager.room).length
 
-            const creepName = this.room.creepPositions[packCoord(cSite.pos)]
-            if (!creepName) continue
+    for (const packedCoord in rampartPlans.map) {
+      const coord = unpackCoord(packedCoord)
+      const data = rampartPlans.map[packedCoord]
+      if (data.minRCL > RCL) continue
+      // Ensure we have a storing structure if it is a requirement
+      if (data.needsStoringStructure && !hasStoringStructure) continue
 
-            const creep = Game.creeps[creepName]
-            creep.shove()
-        }
-    }
-    private shouldPlace() {
-        // If the construction site count is at its limit, stop
-        if (collectiveManager.constructionSiteCount >= MAX_CONSTRUCTION_SITES) return false
-
-        // If there are builders and enough cSites, stop
-        if (this.room.myCreepsByRole.builder.length) {
-            if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length > 2) return false
-
-            return true
-        }
-
-        // If there are no builders
-
-        // Only run every so often
-        else if (this.room.controller.level !== 1 && !utils.isTickInterval(constructionInterval)) return false
-
-        // If there are too many construction sites
-        if (this.room.find(FIND_MY_CONSTRUCTION_SITES).length >= collectiveManager.maxCSitesPerRoom)
-            return false
-
-        return true
-    }
-    private place() {
-        if (!this.shouldPlace()) return
-
-        this.placedSites = 0
-
-        const RCL = this.room.controller.level
-        const maxCSites = Math.min(
-            collectiveManager.maxCSitesPerRoom,
-            MAX_CONSTRUCTION_SITES - collectiveManager.constructionSiteCount,
+      if (
+        this.room.findStructureAtCoord(
+          coord,
+          structure => structure.structureType === STRUCTURE_RAMPART,
         )
+      ) {
+        continue
+      }
 
-        this.placeRamparts(RCL, maxCSites)
-        this.placeBase(RCL, maxCSites)
+      if (
+        data.coversStructure &&
+        !this.room.coordHasStructureTypes(coord, structureTypesToProtectSet)
+      ) {
+        continue
+      }
+
+      if (data.buildForNuke) {
+        if (this.room.roomManager.nukeTargetCoords[packAsNum(coord)] === 0) continue
+
+        this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
+        this.placedSites += 1
+        continue
+      }
+
+      if (data.buildForThreat) {
+        if (!this.communeManager.buildSecondMincutLayer) continue
+
+        this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
+        this.placedSites += 1
+        continue
+      }
+
+      this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
+      this.placedSites += 1
+      if (this.placedSites >= maxCSites) return
     }
-    private placeRamparts(RCL: number, maxCSites: number) {
-        const rampartPlans = this.communeManager.room.roomManager.rampartPlans
-        const hasStoringStructure = !!this.room.communeManager.storingStructures.length
 
-        for (const packedCoord in rampartPlans.map) {
-            const coord = unpackCoord(packedCoord)
-            const data = rampartPlans.map[packedCoord]
-            if (data.minRCL > RCL) continue
-            // Ensure we have a storing structure if it is a requirement
-            if (data.needsStoringStructure && !hasStoringStructure) continue
+    if (this.placedSites >= maxCSites) return
+  }
+  private placeBase(RCL: number, maxCSites: number) {
+    if (this.placedSites >= maxCSites) return
 
-            if (
-                this.room.findStructureAtCoord(
-                    coord,
-                    structure => structure.structureType === STRUCTURE_RAMPART,
-                )
-            ) {
-                continue
+    const basePlans = this.communeManager.room.roomManager.basePlans
+
+    for (let placeRCL = 1; placeRCL <= RCL; placeRCL++) {
+      for (const packedCoord in basePlans.map) {
+        const coord = unpackCoord(packedCoord)
+        const coordData = basePlans.map[packedCoord]
+
+        for (let i = 0; i < coordData.length; i++) {
+          const data = coordData[i]
+          if (data.minRCL > RCL) continue
+          if (data.minRCL > placeRCL) break
+
+          const structureIDs = this.room.roomManager.structureCoords.get(packCoord(coord))
+          if (structureIDs) {
+            let skip = false
+
+            for (const ID of structureIDs) {
+              const structure = findObjectWithID(ID)
+
+              if (structure.structureType === data.structureType) {
+                skip = true
+                break
+              }
+              if (noOverlapDestroyStructures.has(structure.structureType)) continue
+
+              structure.destroy()
+
+              skip = true
+              break
             }
 
-            if (
-                data.coversStructure &&
-                !this.room.coordHasStructureTypes(coord, structureTypesToProtectSet)
-            ) {
-                continue
-            }
+            if (skip) break
+          }
 
-            if (data.buildForNuke) {
-                if (this.room.roomManager.nukeTargetCoords[packAsNum(coord)] === 0) continue
-
-                this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
-                this.placedSites += 1
-                continue
-            }
-
-            if (data.buildForThreat) {
-                if (!this.communeManager.buildSecondMincutLayer) continue
-
-                this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
-                this.placedSites += 1
-                continue
-            }
-
-            this.room.createConstructionSite(coord.x, coord.y, STRUCTURE_RAMPART)
-            this.placedSites += 1
-            if (this.placedSites >= maxCSites) return
+          this.room.createConstructionSite(coord.x, coord.y, data.structureType)
+          this.placedSites += 1
+          if (this.placedSites >= maxCSites) return
+          break
         }
-
-        if (this.placedSites >= maxCSites) return
+      }
     }
-    private placeBase(RCL: number, maxCSites: number) {
-        if (this.placedSites >= maxCSites) return
+  }
+  public visualize() {
+    const RCL = /* this.room.controller.level */ /* Game.time % 8 */ 8
+    const basePlans = this.room.roomManager.basePlans
 
-        const basePlans = this.communeManager.room.roomManager.basePlans
+    for (let placeRCL = 1; placeRCL <= RCL; placeRCL++) {
+      for (const packedCoord in basePlans.map) {
+        const coord = unpackCoord(packedCoord)
+        const coordData = basePlans.map[packedCoord]
 
-        for (let placeRCL = 1; placeRCL <= RCL; placeRCL++) {
-            for (const packedCoord in basePlans.map) {
-                const coord = unpackCoord(packedCoord)
-                const coordData = basePlans.map[packedCoord]
+        for (let i = 0; i < coordData.length; i++) {
+          const data = coordData[i]
+          if (data.minRCL > RCL) continue
+          if (data.minRCL > placeRCL) break
 
-                for (let i = 0; i < coordData.length; i++) {
-                    const data = coordData[i]
-                    if (data.minRCL > RCL) continue
-                    if (data.minRCL > placeRCL) break
-
-                    const structureIDs = this.room.roomManager.structureCoords.get(packCoord(coord))
-                    if (structureIDs) {
-                        let skip = false
-
-                        for (const ID of structureIDs) {
-                            const structure = findObjectWithID(ID)
-
-                            if (structure.structureType === data.structureType) {
-                                skip = true
-                                break
-                            }
-                            if (noOverlapDestroyStructures.has(structure.structureType)) continue
-
-                            structure.destroy()
-
-                            skip = true
-                            break
-                        }
-
-                        if (skip) break
-                    }
-
-                    this.room.createConstructionSite(coord.x, coord.y, data.structureType)
-                    this.placedSites += 1
-                    if (this.placedSites >= maxCSites) return
-                    break
-                }
-            }
+          this.room.visual.structure(coord.x, coord.y, data.structureType)
+          this.room.visual.text(data.minRCL.toString(), coord.x, coord.y - 0.25, {
+            font: 0.4,
+          })
+          break
         }
+      }
     }
-    public visualize() {
-        const RCL = /* this.room.controller.level */ /* Game.time % 8 */ 8
-        const basePlans = this.room.roomManager.basePlans
 
-        for (let placeRCL = 1; placeRCL <= RCL; placeRCL++) {
-            for (const packedCoord in basePlans.map) {
-                const coord = unpackCoord(packedCoord)
-                const coordData = basePlans.map[packedCoord]
+    const rampartPlans = this.communeManager.room.roomManager.rampartPlans
 
-                for (let i = 0; i < coordData.length; i++) {
-                    const data = coordData[i]
-                    if (data.minRCL > RCL) continue
-                    if (data.minRCL > placeRCL) break
+    for (const packedCoord in rampartPlans.map) {
+      const coord = unpackCoord(packedCoord)
+      const data = rampartPlans.map[packedCoord]
+      if (data.minRCL > RCL) continue
 
-                    this.room.visual.structure(coord.x, coord.y, data.structureType)
-                    this.room.visual.text(data.minRCL.toString(), coord.x, coord.y - 0.25, {
-                        font: 0.4,
-                    })
-                    break
-                }
-            }
-        }
+      this.room.visual.text(data.minRCL.toString(), coord.x, coord.y + 0.25, { font: 0.4 })
 
-        const rampartPlans = this.communeManager.room.roomManager.rampartPlans
+      if (data.buildForNuke) {
+        this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, {
+          opacity: 0.2,
+          fill: 'yellow',
+        })
+        continue
+      }
 
-        for (const packedCoord in rampartPlans.map) {
-            const coord = unpackCoord(packedCoord)
-            const data = rampartPlans.map[packedCoord]
-            if (data.minRCL > RCL) continue
+      if (data.buildForThreat) {
+        this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.2 })
+        continue
+      }
 
-            this.room.visual.text(data.minRCL.toString(), coord.x, coord.y + 0.25, { font: 0.4 })
+      if (data.coversStructure) {
+        this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, {
+          opacity: 0.2,
+          fill: customColors.lightBlue,
+        })
+        continue
+      }
 
-            if (data.buildForNuke) {
-                this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, {
-                    opacity: 0.2,
-                    fill: 'yellow',
-                })
-                continue
-            }
-
-            if (data.buildForThreat) {
-                this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.2 })
-                continue
-            }
-
-            if (data.coversStructure) {
-                this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, {
-                    opacity: 0.2,
-                    fill: customColors.lightBlue,
-                })
-                continue
-            }
-
-            this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.5 })
-        }
-
-        this.room.visual.connectRoads()
-        this.room.visual.text(RCL.toString(), this.room.controller.pos)
+      this.room.visual.structure(coord.x, coord.y, STRUCTURE_RAMPART, { opacity: 0.5 })
     }
-    private migrate() {
-        if (!global.settings.structureMigration) return
-        if (!randomTick(100)) return
 
-        const structures = this.room.roomManager.structures
-        const basePlans = this.room.roomManager.basePlans
+    this.room.visual.connectRoads()
+    this.room.visual.text(RCL.toString(), this.room.controller.pos)
+  }
+  private migrate() {
+    if (!global.settings.structureMigration) return
+    if (!randomTick(100)) return
 
-        for (const structureType of generalMigrationStructures) {
-            for (const structure of structures[structureType]) {
-                const packedCoord = packCoord(structure.pos)
+    const structures = this.room.roomManager.structures
+    const basePlans = this.room.roomManager.basePlans
 
-                const coordData = basePlans.map[packedCoord]
-                if (!coordData) {
-                    structure.destroy()
-                    continue
-                }
+    for (const structureType of generalMigrationStructures) {
+      for (const structure of structures[structureType]) {
+        const packedCoord = packCoord(structure.pos)
 
-                const match = coordData.find(data => {
-                    return data.structureType === structure.structureType
-                })
-                if (match) continue
-
-                structure.destroy()
-            }
+        const coordData = basePlans.map[packedCoord]
+        if (!coordData) {
+          structure.destroy()
+          continue
         }
 
-        // Keep one spawn even if all are misplaced
+        const match = coordData.find(data => {
+          return data.structureType === structure.structureType
+        })
+        if (match) continue
 
-        const misplacedSpawns: StructureSpawn[] = []
+        structure.destroy()
+      }
+    }
 
-        for (const structure of structures.spawn) {
-            const packedCoord = packCoord(structure.pos)
+    // Keep one spawn even if all are misplaced
 
-            const coordData = basePlans.map[packedCoord]
-            if (!coordData) {
-                misplacedSpawns.push(structure)
-                continue
-            }
+    const misplacedSpawns: StructureSpawn[] = []
 
-            const match = coordData.find(data => {
-                return data.structureType === structure.structureType
-            })
-            if (match) continue
+    for (const structure of structures.spawn) {
+      const packedCoord = packCoord(structure.pos)
 
-            misplacedSpawns.push(structure)
-        }
+      const coordData = basePlans.map[packedCoord]
+      if (!coordData) {
+        misplacedSpawns.push(structure)
+        continue
+      }
 
-        let i = misplacedSpawns.length === structures.spawn.length ? 1 : 0
-        for (; i < misplacedSpawns.length; i++) {
-            misplacedSpawns[i].destroy()
-        }
-        /*
+      const match = coordData.find(data => {
+        return data.structureType === structure.structureType
+      })
+      if (match) continue
+
+      misplacedSpawns.push(structure)
+    }
+
+    let i = misplacedSpawns.length === structures.spawn.length ? 1 : 0
+    for (; i < misplacedSpawns.length; i++) {
+      misplacedSpawns[i].destroy()
+    }
+    /*
         const rampartPlans = this.room.roomManager.rampartPlans
 
         for (const structure of structures.rampart) {
@@ -330,26 +329,26 @@ export class ConstructionManager {
 
             structure.destroy()
         } */
+  }
+
+  /**
+   * If it hasn't yet been done for this room, check for and destroy any structures owned by another player
+   */
+  private clearEnemyStructures() {
+    const roomMemory = Memory.rooms[this.room.name]
+    if (roomMemory[RoomMemoryKeys.clearedEnemyStructures]) return Result.noAction
+
+    const structures = this.room.roomManager.structures
+    for (const structureType in structures) {
+      for (const structure of structures[structureType as StructureConstant]) {
+        if (!(structure as OwnedStructure).owner) continue
+        if ((structure as OwnedStructure).owner.username === Memory.me) continue
+
+        structure.destroy()
+      }
     }
 
-    /**
-     * If it hasn't yet been done for this room, check for and destroy any structures owned by another player
-     */
-    private clearEnemyStructures() {
-        const roomMemory = Memory.rooms[this.room.name]
-        if (roomMemory[RoomMemoryKeys.clearedEnemyStructures]) return Result.noAction
-
-        const structures = this.room.roomManager.structures
-        for (const structureType in structures) {
-            for (const structure of structures[structureType as StructureConstant]) {
-                if (!(structure as OwnedStructure).owner) continue
-                if ((structure as OwnedStructure).owner.username === Memory.me) continue
-
-                structure.destroy()
-            }
-        }
-
-        roomMemory[RoomMemoryKeys.clearedEnemyStructures] = true
-        return Result.action
-    }
+    roomMemory[RoomMemoryKeys.clearedEnemyStructures] = true
+    return Result.action
+  }
 }

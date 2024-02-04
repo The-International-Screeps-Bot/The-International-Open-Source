@@ -1,17 +1,23 @@
-import { PlayerMemoryKeys, RoomLogisticsRequestTypes } from "international/constants"
-import { playerManager } from "international/players"
-import { statsManager } from "international/statsManager"
-import { packCoord } from "other/codec"
-import { structureUtils } from "room/structureUtils"
-import { findWithHighestScore, findObjectWithID, randomTick, findWithLowestScore, scalePriority, utils } from "utils/utils"
-import { communeUtils } from "./communeUtils"
-import { towerUtils } from "./towerUtils"
+import { PlayerMemoryKeys, RoomLogisticsRequestTypes, RoomStatsKeys } from '../../constants/general'
+import { PlayerManager } from 'international/players'
+import { StatsManager } from 'international/stats'
+import { packCoord } from 'other/codec'
+import { StructureUtils } from 'room/structureUtils'
+import {
+  findWithHighestScore,
+  findObjectWithID,
+  randomTick,
+  findWithLowestScore,
+  scalePriority,
+  Utils,
+} from 'utils/utils'
+import { CommuneUtils } from './communeUtils'
+import { TowerUtils } from './towerUtils'
 
 export class TowerProcs {
-  run(room: Room) {
-
+  static run(room: Room) {
     const towers = room.roomManager.structures.tower.filter(tower =>
-      structureUtils.isRCLActionable(tower),
+      StructureUtils.isRCLActionable(tower),
     )
     if (!towers.length) {
       room.towerInferiority = room.roomManager.notMyCreeps.enemy.length > 0
@@ -37,9 +43,9 @@ export class TowerProcs {
     }
   }
 
-  private trackEnemySquads() {}
+  private static trackEnemySquads() {}
 
-  private considerAttackTargets(room: Room) {
+  private static considerAttackTargets(room: Room) {
     const enemyCreeps = room.roomManager.notMyCreeps.enemy
 
     if (!room.communeManager.towerAttackTarget) {
@@ -56,7 +62,7 @@ export class TowerProcs {
         } else {
           const playerMemory =
             Memory.players[enemyCreep.owner.username] ||
-            playerManager.initPlayer(enemyCreep.owner.username)
+            PlayerManager.initPlayer(enemyCreep.owner.username)
           const weight = playerMemory[PlayerMemoryKeys.rangeFromExitWeight]
 
           if (/* findWeightedRangeFromExit(enemyCreep.pos, weight) *  */ damage < enemyCreep.hits) {
@@ -84,10 +90,9 @@ export class TowerProcs {
     return room.communeManager.towerAttackTarget
   }
 
-  private attackEnemyCreeps(room: Room, actionableTowerIDs: Id<StructureTower>[]) {
+  private static attackEnemyCreeps(room: Room, actionableTowerIDs: Id<StructureTower>[]) {
     if (Game.flags.disableTowerAttacks) {
-      room.towerInferiority =
-        room.roomManager.enemyAttackers.length > 0
+      room.towerInferiority = room.roomManager.enemyAttackers.length > 0
       return false
     }
     if (!actionableTowerIDs.length) return false
@@ -105,7 +110,7 @@ export class TowerProcs {
 
       actionableTowerIDs.splice(i, 1)
 
-      attackTarget.reserveHits -= towerUtils.estimateDamageNet(tower, attackTarget)
+      attackTarget.reserveHits -= TowerUtils.estimateDamageNet(tower, attackTarget)
       if (attackTarget.reserveHits <= 0) return true
     }
 
@@ -116,7 +121,7 @@ export class TowerProcs {
    * @description Distribute fire amoung enemies
    * Maybe we can mess up healing
    */
-  scatterShot(room: Room, actionableTowerIDs: Id<StructureTower>[]) {
+  private static scatterShot(room: Room, actionableTowerIDs: Id<StructureTower>[]) {
     if (actionableTowerIDs.length <= 1) return false
     if (!randomTick(200)) return false
 
@@ -132,7 +137,7 @@ export class TowerProcs {
       if (tower.attack(attackTarget) !== OK) continue
 
       actionableTowerIDs.splice(i, 1)
-      attackTarget.reserveHits -= towerUtils.estimateDamageNet(tower, attackTarget)
+      attackTarget.reserveHits -= TowerUtils.estimateDamageNet(tower, attackTarget)
 
       if (targetIndex >= enemyCreeps.length - 1) {
         targetIndex = 0
@@ -145,10 +150,10 @@ export class TowerProcs {
     return true
   }
 
-  private healCreeps(room: Room, actionableTowerIDs: Id<StructureTower>[]) {
+  private static healCreeps(room: Room, actionableTowerIDs: Id<StructureTower>[]) {
     if (!actionableTowerIDs.length) return false
 
-    const healTarget = towerUtils.findHealTarget(room)
+    const healTarget = TowerUtils.findHealTarget(room)
     if (!healTarget) return false
 
     for (let i = actionableTowerIDs.length - 1; i >= 0; i--) {
@@ -162,27 +167,31 @@ export class TowerProcs {
     return true
   }
 
-  private repairRamparts(room: Room, actionableTowerIDs: Id<StructureTower>[]) {
+  private static repairRamparts(room: Room, actionableTowerIDs: Id<StructureTower>[]) {
     if (!actionableTowerIDs.length) return false
 
-    const repairTarget = towerUtils.findRampartRepairTarget(room)
+    const repairTarget = TowerUtils.findRampartRepairTarget(room)
     if (!repairTarget) return false
 
     for (let i = actionableTowerIDs.length - 1; i >= 0; i--) {
       const tower = findObjectWithID(actionableTowerIDs[i])
       if (tower.repair(repairTarget) !== OK) continue
 
-      statsManager.updateStat(room.name, 'eorwr', TOWER_ENERGY_COST)
+      StatsManager.updateStat(
+        room.name,
+        RoomStatsKeys.EnergyOutputRepairWallOrRampart,
+        TOWER_ENERGY_COST,
+      )
       actionableTowerIDs.splice(i, 1)
     }
 
     return true
   }
 
-  private repairGeneral(room: Room, actionableTowerIDs: Id<StructureTower>[]) {
+  private static repairGeneral(room: Room, actionableTowerIDs: Id<StructureTower>[]) {
     if (!actionableTowerIDs.length) return false
 
-    const structures = towerUtils.findGeneralRepairTargets(room)
+    const structures = TowerUtils.findGeneralRepairTargets(room)
     if (!structures.length) return false
 
     for (let i = actionableTowerIDs.length - 1; i >= 0; i--) {
@@ -200,15 +209,15 @@ export class TowerProcs {
     return true
   }
 
-  private createPowerTasks(room: Room) {
+  private static createPowerTasks(room: Room) {
     if (!room.myPowerCreeps.length) return
 
     for (const tower of room.roomManager.structures.tower) {
-      room.createPowerTask(tower, PWR_OPERATE_TOWER, 1)
+      room.createPowerRequest(tower, PWR_OPERATE_TOWER, 1)
     }
   }
 
-  private createRoomLogisticsRequests(room: Room) {
+  private static createRoomLogisticsRequests(room: Room) {
     for (const structure of room.roomManager.structures.tower) {
       // If don't have enough energy, request more
 
@@ -243,5 +252,3 @@ export class TowerProcs {
     }
   }
 }
-
-export const towerProcs = new TowerProcs()

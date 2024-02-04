@@ -1,18 +1,18 @@
 import {
-    MovedTypes,
-    RoomMemoryKeys,
-    RoomTypes,
-    customColors,
-    enemyDieChants,
-    friendlyDieChants,
-    powerCreepClassNames,
-} from 'international/constants'
-import { statsManager } from 'international/statsManager'
+  MovedTypes,
+  RoomMemoryKeys,
+  RoomTypes,
+  customColors,
+  enemyDieChants,
+  friendlyDieChants,
+  powerCreepClassNames,
+} from '../../constants/general'
+import { StatsManager } from 'international/stats'
 import { customLog } from 'utils/logging'
 import { forCoordsInRange, randomOf, randomRange, randomTick } from 'utils/utils'
 import { RoomManager } from '../room'
 import { packCoord, unpackCoord } from 'other/codec'
-import { communeUtils } from 'room/commune/communeUtils'
+import { CommuneUtils } from 'room/commune/communeUtils'
 
 export class EndTickCreepManager {
     roomManager: RoomManager

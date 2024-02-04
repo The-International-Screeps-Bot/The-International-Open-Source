@@ -1,50 +1,48 @@
-import { RoomMemoryKeys, WorkRequestKeys, maxControllerLevel } from './constants'
+import { RoomMemoryKeys, WorkRequestKeys, maxControllerLevel } from '../constants/general'
 import { findLowestScore, randomIntRange } from '../utils/utils'
-import { Sleepable } from 'utils/sleepable'
-import { collectiveManager } from './collective'
+import { Sleepable, StaticSleepable } from 'utils/sleepable'
+import { CollectiveManager } from './collective'
 
-export class RoomPruningManager extends Sleepable {
-    sleepFor = randomIntRange(50000, 100000)
-    run() {
-        if (this.isSleepingResponsive()) return
+export class RoomPruningManager extends StaticSleepable {
+  static sleepFor = randomIntRange(50000, 100000)
+  static run() {
+    if (this.isSleepingResponsive()) return
 
-        // Make sure all rooms are max RCL
-        // Temple rooms?
+    // Find the highest scoring commune. Remember that higher score is less preferable.
 
-        let rooms = 0
-        let highestCommuneScore = 0
-        let highestCommuneScoreCommuneName: string
+    let maxRCLRooms = 0
+    let highestCommuneScore = 0
+    let highestCommuneScoreCommuneName: string
 
-        for (const roomName of collectiveManager.communes) {
-            const room = Game.rooms[roomName]
-            if (room.controller.level < maxControllerLevel) return
+    for (const roomName of CollectiveManager.communes) {
+      const room = Game.rooms[roomName]
+      if (room.controller.level < maxControllerLevel) return
 
-            rooms += 1
+      maxRCLRooms += 1
 
-            const roomMemory = Memory.rooms[roomName]
-            const score = roomMemory[RoomMemoryKeys.score] + roomMemory[RoomMemoryKeys.dynamicScore]
+      const roomMemory = Memory.rooms[roomName]
+      const score = roomMemory[RoomMemoryKeys.score] + roomMemory[RoomMemoryKeys.dynamicScore]
 
-            if (score <= highestCommuneScore) continue
+      if (score <= highestCommuneScore) continue
 
-            highestCommuneScore = score
-            highestCommuneScoreCommuneName = roomName
-        }
-
-        // Have multiple rooms before we unclaim
-        if (rooms <= 1) return
-
-        // Find the lowest scoring workRequest
-        const lowestWorkRequestScore = findLowestScore(
-            Object.keys(Memory.workRequests),
-            roomName =>
-                Memory.rooms[roomName][RoomMemoryKeys.score] +
-                Memory.rooms[roomName][RoomMemoryKeys.dynamicScore],
-        )
-        // The best work request must be better than our worst commune
-        if (lowestWorkRequestScore >= highestCommuneScore) return
-
-        Memory.rooms[highestCommuneScoreCommuneName][RoomMemoryKeys.abandonCommune] = true
+      highestCommuneScore = score
+      highestCommuneScoreCommuneName = roomName
     }
-}
 
-export const roomPruningManager = new RoomPruningManager()
+    // Ensure that every room is max RCL
+    // What about temple rooms?
+    if (maxRCLRooms !== CollectiveManager.communes.size) return
+
+    // Find the lowest scoring workRequest
+    const lowestWorkRequestScore = findLowestScore(
+      Object.keys(Memory.workRequests),
+      roomName =>
+        Memory.rooms[roomName][RoomMemoryKeys.score] +
+        Memory.rooms[roomName][RoomMemoryKeys.dynamicScore],
+    )
+    // The best work request must be better than our worst commune
+    if (lowestWorkRequestScore >= highestCommuneScore) return
+
+    Memory.rooms[highestCommuneScoreCommuneName][RoomMemoryKeys.abandonCommune] = true
+  }
+}

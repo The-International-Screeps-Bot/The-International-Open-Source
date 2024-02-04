@@ -1,12 +1,12 @@
 import {
-    CreepMemoryKeys,
-    customColors,
-    remoteTypeWeights,
-    Result,
-    RoomMemoryKeys,
-    RoomTypes,
-    SleepFor,
-} from 'international/constants'
+  CreepMemoryKeys,
+  customColors,
+  remoteTypeWeights,
+  Result,
+  RoomMemoryKeys,
+  RoomTypes,
+  SleepFor,
+} from '../../../../constants/general'
 import { getRangeXY, randomIntRange, randomTick } from 'utils/utils'
 
 export class RemoteCoreAttacker extends Creep {

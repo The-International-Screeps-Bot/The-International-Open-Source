@@ -1,11 +1,7 @@
-import {
-  customColors,
-  HaulRequestKeys,
-  CombatRequestKeys,
-  RoomMemoryKeys,
-} from 'international/constants'
-import { randomIntRange, randomTick, utils } from 'utils/utils'
+import { customColors, HaulRequestKeys, CombatRequestKeys, RoomMemoryKeys } from '../../constants/general'
+import { randomIntRange, randomTick, Utils } from 'utils/utils'
 import { CommuneManager } from './commune'
+import { CommuneUtils } from './communeUtils'
 
 const checkRoomStatusInverval = randomIntRange(200, 500)
 
@@ -26,7 +22,7 @@ export class HaulRequestManager {
       if (
         !request ||
         !room.roomManager.structures.spawn.length ||
-        room.roomManager.resourcesInStoringStructures.energy < this.communeManager.minStoredEnergy
+        room.roomManager.resourcesInStoringStructures.energy < CommuneUtils.minStoredEnergy(this.communeManager.room)
       ) {
         this.communeManager.room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)
         continue
@@ -35,8 +31,9 @@ export class HaulRequestManager {
       // The room is closed or is now a respawn or novice zone
 
       if (
-        utils.isTickInterval(checkRoomStatusInverval) &&
-        Game.map.getRoomStatus(requestName).status !== Game.map.getRoomStatus(room.name).status
+        Utils.isTickInterval(checkRoomStatusInverval) &&
+        Memory.rooms[room.name][RoomMemoryKeys.status] !==
+          Memory.rooms[requestName][RoomMemoryKeys.status]
       ) {
         delete Memory.haulRequests[requestName]
         room.memory[RoomMemoryKeys.haulRequests].splice(index, 1)

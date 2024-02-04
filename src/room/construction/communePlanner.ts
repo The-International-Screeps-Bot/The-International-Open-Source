@@ -16,7 +16,7 @@ import {
   structureTypesToProtectSet,
   RoomMemoryKeys,
   basePlanCPUBucketThreshold,
-} from 'international/constants'
+} from '../../constants/general'
 import {
   areCoordsEqual,
   createPosMap,
@@ -43,7 +43,7 @@ import {
   randomIntRange,
   sortBy,
 } from 'utils/utils'
-import { collectiveManager } from 'international/collective'
+import { CollectiveManager } from 'international/collective'
 import {
   packCoord,
   packPos,
@@ -61,8 +61,9 @@ import { RoomManager } from '../room'
 import { BasePlans } from './basePlans'
 import { RampartPlans } from './rampartPlans'
 import { minCutToExit } from './minCut'
-import { customPathFinder } from 'international/customPathFinder'
-import { towerUtils } from 'room/commune/towerUtils'
+import { CustomPathFinder } from 'international/customPathFinder'
+import { TowerUtils } from 'room/commune/towerUtils'
+import { RoomOps } from 'room/roomOps'
 
 const unprotectedCoordWeight = defaultRoadPlanningPlainCost * 16
 const dynamicDistanceWeight = 8
@@ -218,76 +219,28 @@ export class CommunePlanner {
   }
 
   attemptPlan(room: Room) {
-    this.roomManager = room.roomManager
     this.room = room
 
-    if (Memory.rooms[room.name][RoomMemoryKeys.communePlanned] !== undefined) return Result.noAction
+    if (Memory.rooms[room.name][RoomMemoryKeys.communePlanned] !== undefined) {
+      return Result.noAction
+    }
 
     // Stop if there isn't sufficient CPU
     if (Game.cpu.bucket < CPUMaxPerTick) return Result.noAction
-    if (collectiveManager.communes.size <= 1 && Game.cpu.bucket < basePlanCPUBucketThreshold) {
+    // If we have more than one commune, make sure we have extra CPU before trying to plan for more
+    if (CollectiveManager.communes.size > 1 && Game.cpu.bucket < basePlanCPUBucketThreshold) {
       return Result.noAction
     }
 
     if (this.recording) this.record()
 
-    // If planning is complete, choose the best plan using a scoring system
-    if (
-      this.fastFillerStartCoords &&
-      this.planAttempts.length === this.fastFillerStartCoords.length
-    ) {
-      // Filter and make sure we have at least one completed plan, if not, mark the room as failed
-      const planAttempts = this.planAttempts.filter<BasePlanAttempt>(
-        (plan): plan is BasePlanAttempt => plan !== false,
-      )
-      if (!planAttempts.length) return Result.fail
-
-      /* this.visualizeBestPlan() */
-      this.choosePlan(planAttempts)
-
-      return Result.success
+    const tryChoosePlanResult = this.tryChoosePlan()
+    if (tryChoosePlanResult !== Result.noAction) {
+      return tryChoosePlanResult
     }
 
-    // Initial configuration
-
-    if (!this.terrainCoords) {
-      this.planAttempts = []
-      this.terrainCoords = collectiveManager.getTerrainBinary(this.room.name)
-    }
-
-    // Plan attempt / configuration
-
-    if (!this.planConfiged) {
-      this.baseCoords = new Uint8Array(this.terrainCoords)
-      this.roadCoords = new Uint8Array(this.terrainCoords)
-      this.rampartCoords = new Uint8Array(2500)
-      this.byPlannedRoad = new Uint8Array(2500)
-
-      this.byExitCoords = new Uint8Array(2500)
-      this.exitCoords = []
-      this.recordExits()
-
-      this.basePlans = new BasePlans()
-      this.rampartPlans = new RampartPlans()
-      this.stampAnchors = {}
-      this.RCLPlannedStructureTypes = {}
-      for (const stampType in stamps) {
-        this.stampAnchors[stampType as StampTypes] = []
-      }
-      for (const structureType of buildableStructureTypes) {
-        this.RCLPlannedStructureTypes[structureType] = {
-          structures: 0,
-          minRCL: 1,
-        }
-      }
-      this.roadQuota = []
-      for (let level = 0; level < 8; level += 1) {
-        this.roadQuota.push(0)
-      }
-
-      this.score = 0
-      this.planConfiged = true
-    }
+    this.tryConfigurePlanner()
+    this.tryConfigurePlan()
 
     this.avoidSources()
     this.avoidMineral()
@@ -467,6 +420,92 @@ export class CommunePlanner {
       needsStoringStructure: +needsStoringStructure,
     }
   }
+  private tryConfigurePlanner() {
+    if (this.terrainCoords) return
+
+    this.planAttempts = []
+    this.findFastFillerStartCoords()
+
+    this.terrainCoords = RoomOps.createTerrainBinary(this.room.name)
+  }
+  private findFastFillerStartCoords() {
+    if (this.fastFillerStartCoords) return
+
+    // Controller
+
+    const startCoords: Coord[] = [this.room.controller.pos]
+
+    // Both sources
+
+    const sources = this.room.find(FIND_SOURCES)
+    for (const source of sources) startCoords.push(source.pos)
+
+    // Find the closest source pos and its path to the controller
+
+    let shortestPath: RoomPosition[]
+
+    for (const source of sources) {
+      const path = CustomPathFinder.findPath({
+        origin: source.pos,
+        goals: [{ pos: this.room.controller.pos, range: 1 }],
+        plainCost: defaultRoadPlanningPlainCost,
+      })
+      if (shortestPath && path.length >= shortestPath.length) continue
+
+      shortestPath = path
+    }
+
+    let origin = shortestPath[Math.floor(shortestPath.length / 2)]
+    if (origin) startCoords.push(origin)
+
+    // Avg path between sources, if more than 1
+
+    if (sources.length > 1) {
+      const path = CustomPathFinder.findPath({
+        origin: sources[0].pos,
+        goals: [{ pos: sources[1].pos, range: 1 }],
+        plainCost: defaultRoadPlanningPlainCost,
+      })
+
+      origin = path[Math.floor(path.length / 2)]
+      if (origin) startCoords.push(origin)
+    }
+
+    this.fastFillerStartCoords = startCoords
+  }
+  private tryConfigurePlan() {
+    if (this.planConfiged) return
+
+    this.baseCoords = new Uint8Array(this.terrainCoords)
+    this.roadCoords = new Uint8Array(this.terrainCoords)
+    this.rampartCoords = new Uint8Array(2500)
+    this.byPlannedRoad = new Uint8Array(2500)
+
+    this.byExitCoords = new Uint8Array(2500)
+    this.exitCoords = []
+    this.recordExits()
+
+    this.basePlans = new BasePlans()
+    this.rampartPlans = new RampartPlans()
+    this.stampAnchors = {}
+    this.RCLPlannedStructureTypes = {}
+    for (const stampType in stamps) {
+      this.stampAnchors[stampType as StampTypes] = []
+    }
+    for (const structureType of buildableStructureTypes) {
+      this.RCLPlannedStructureTypes[structureType] = {
+        structures: 0,
+        minRCL: 1,
+      }
+    }
+    this.roadQuota = []
+    for (let level = 0; level < 8; level += 1) {
+      this.roadQuota.push(0)
+    }
+
+    this.score = 0
+    this.planConfiged = true
+  }
   private recordExits() {
     for (const packedCoord of this.room.roomManager.exitCoords) {
       const coord = unpackCoord(packedCoord)
@@ -638,7 +677,7 @@ export class CommunePlanner {
     // Paths for grid groups
 
     for (const leaderCoord of groupLeaders) {
-      const path = customPathFinder.findPath({
+      const path = CustomPathFinder.findPath({
         origin: new RoomPosition(leaderCoord.x, leaderCoord.y, this.room.name),
         goals: [{ pos: anchor, range: 3 }],
         weightCoordMaps: [this.weightedDiagonalCoords, this.gridCoords, this.baseCoords],
@@ -714,7 +753,7 @@ export class CommunePlanner {
     // Paths for exit groups
 
     for (const group of exitGroups) {
-      const path = customPathFinder.findPath({
+      const path = CustomPathFinder.findPath({
         origin: new RoomPosition(group[0].x, group[0].y, this.room.name),
         goals: [{ pos: anchor, range: 3 }],
         weightCoordMaps: [this.weightedDiagonalCoords, this.gridCoords],
@@ -927,7 +966,7 @@ export class CommunePlanner {
     sortBy(
       sources,
       ({ pos }) =>
-        customPathFinder.findPath({
+        CustomPathFinder.findPath({
           origin: pos,
           goals: [
             {
@@ -992,7 +1031,7 @@ export class CommunePlanner {
       sortBy(
         sourceHarvestPositions[i],
         origin =>
-          customPathFinder.findPath({
+          CustomPathFinder.findPath({
             origin,
             goals: [
               {
@@ -1020,7 +1059,7 @@ export class CommunePlanner {
     for (const i in this.communeSources) {
       const origin = sourceHarvestPositions[i][0]
 
-      const path = customPathFinder.findPath({
+      const path = CustomPathFinder.findPath({
         origin: origin,
         goals: [
           {
@@ -1057,7 +1096,7 @@ export class CommunePlanner {
     sortBy(
       this.mineralHarvestPositions,
       origin =>
-        customPathFinder.findPath({
+        CustomPathFinder.findPath({
           origin,
           goals: [
             {
@@ -1070,7 +1109,7 @@ export class CommunePlanner {
         }).length,
     )
 
-    const path = customPathFinder.findPath({
+    const path = CustomPathFinder.findPath({
       origin: this.mineralHarvestPositions[0],
       goals: [{ pos: goal, range: 1 }],
       weightCoordMaps: [this.diagonalCoords, this.roadCoords],
@@ -1117,7 +1156,7 @@ export class CommunePlanner {
     for (let i = 0; i < this.sourceHarvestPositions.length; i++) {
       const closestHarvestPos = this.sourceHarvestPositions[i][0]
 
-      const path = customPathFinder.findPath({
+      const path = CustomPathFinder.findPath({
         origin: closestHarvestPos,
         goals: [
           {
@@ -1768,52 +1807,6 @@ export class CommunePlanner {
 
     return false
   }
-  private findFastFillerOrigin() {
-    if (this.fastFillerStartCoords) return this.fastFillerStartCoords[this.planAttempts.length]
-
-    // Controller
-
-    const origins: Coord[] = [this.room.controller.pos]
-
-    // Both sources
-
-    const sources = this.room.find(FIND_SOURCES)
-    for (const source of sources) origins.push(source.pos)
-
-    // Find the closest source pos and its path to the controller
-
-    let shortestPath: RoomPosition[]
-
-    for (const source of sources) {
-      const path = customPathFinder.findPath({
-        origin: source.pos,
-        goals: [{ pos: this.room.controller.pos, range: 1 }],
-        plainCost: defaultRoadPlanningPlainCost,
-      })
-      if (shortestPath && path.length >= shortestPath.length) continue
-
-      shortestPath = path
-    }
-
-    let origin = shortestPath[Math.floor(shortestPath.length / 2)]
-    if (origin) origins.push(origin)
-
-    // Avg path between sources, if more than 1
-
-    if (sources.length > 1) {
-      const path = customPathFinder.findPath({
-        origin: sources[0].pos,
-        goals: [{ pos: sources[1].pos, range: 1 }],
-        plainCost: defaultRoadPlanningPlainCost,
-      })
-
-      origin = path[Math.floor(path.length / 2)]
-      if (origin) origins.push(origin)
-    }
-
-    this.fastFillerStartCoords = origins
-    return this.fastFillerStartCoords[this.planAttempts.length]
-  }
   private fastFiller() {
     if (this.stampAnchors.fastFiller.length) return Result.noAction
 
@@ -1824,7 +1817,7 @@ export class CommunePlanner {
     return this.planStamps({
       stampType: 'fastFiller',
       count: 1,
-      startCoords: [this.findFastFillerOrigin()],
+      startCoords: [this.fastFillerStartCoords[this.planAttempts.length]],
       cardinalFlood: true,
       consequence: stampAnchor => {
         const stampOffset = stamps.fastFiller.offset
@@ -1855,7 +1848,7 @@ export class CommunePlanner {
         sortBy(
           sources,
           ({ pos }) =>
-            customPathFinder.findPath({
+            CustomPathFinder.findPath({
               origin: pos,
               goals: [
                 {
@@ -1872,7 +1865,7 @@ export class CommunePlanner {
         sortBy(
           fastFillerCoords,
           ({ x, y }) =>
-            customPathFinder.findPath({
+            CustomPathFinder.findPath({
               origin: new RoomPosition(
                 x + stampAnchor.x - stampOffset,
                 y + stampAnchor.y - stampOffset,
@@ -1968,7 +1961,7 @@ export class CommunePlanner {
     let closestSourceDistance = Infinity
 
     for (const source of this.room.find(FIND_SOURCES)) {
-      const range = customPathFinder.findPath({
+      const range = CustomPathFinder.findPath({
         origin: source.pos,
         goals: [
           {
@@ -1991,7 +1984,7 @@ export class CommunePlanner {
       pathOrigin = closestSource.pos
     }
 
-    const path = customPathFinder.findPath({
+    const path = CustomPathFinder.findPath({
       origin: pathOrigin,
       goals: [{ pos: fastFillerPos, range: 3 }],
       weightCoordMaps: [this.roadCoords],
@@ -2072,7 +2065,7 @@ export class CommunePlanner {
         this.baseCoords[packAsNum(coord)] = 255
         this.roadCoords[packAsNum(coord)] = 255
 
-        const path = customPathFinder.findPath({
+        const path = CustomPathFinder.findPath({
           origin: new RoomPosition(stampAnchor.x, stampAnchor.y, this.room.name),
           goals: [{ pos: fastFillerPos, range: 3 }],
           weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
@@ -2184,7 +2177,7 @@ export class CommunePlanner {
         sortBy(
           this.outputLabCoords,
           ({ x, y }) =>
-            customPathFinder.findPath({
+            CustomPathFinder.findPath({
               origin: new RoomPosition(x, y, this.room.name),
               goals: [
                 {
@@ -2245,7 +2238,7 @@ export class CommunePlanner {
     for (let i = this.stampAnchors.gridExtension.length - 1; i >= 0; i -= 5) {
       const coord = this.stampAnchors.gridExtension[i]
 
-      const path = customPathFinder.findPath({
+      const path = CustomPathFinder.findPath({
         origin: new RoomPosition(coord.x, coord.y, this.room.name),
         goals: [{ pos: hubAnchorPos, range: 2 }],
         weightCoordMaps: [this.diagonalCoords, this.gridCoords, this.roadCoords],
@@ -2271,7 +2264,7 @@ export class CommunePlanner {
     for (let i = this.communeSources.length - 1; i >= 0; i -= 1) {
       const origin = this.sourceHarvestPositions[i][0]
 
-      const path = customPathFinder.findPath({
+      const path = CustomPathFinder.findPath({
         origin: origin,
         goals: [
           {
@@ -2292,7 +2285,7 @@ export class CommunePlanner {
       sourcePaths.push(path)
     }
 
-    const upgradePath = customPathFinder.findPath({
+    const upgradePath = CustomPathFinder.findPath({
       origin: this.centerUpgradePos,
       goals: [
         {
@@ -2439,7 +2432,7 @@ export class CommunePlanner {
       this.room.name,
     )
 
-    let path = customPathFinder.findPath({
+    let path = CustomPathFinder.findPath({
       origin: hubAnchor,
       goals: [
         {
@@ -2775,7 +2768,7 @@ export class CommunePlanner {
 
       // Path from the hubAnchor to the cloestPosToAnchor
 
-      const path = customPathFinder.findPath({
+      const path = CustomPathFinder.findPath({
         origin: new RoomPosition(closestCoord.x, closestCoord.y, this.room.name),
         goals: [{ pos: hubAnchorPos, range: 2 }],
         weightCoordMaps: [this.diagonalCoords, this.roadCoords, this.unprotectedCoords],
@@ -2952,7 +2945,7 @@ export class CommunePlanner {
         let minIndividualDamage = Infinity
 
         for (const packedCoord of this.outsideMinCut) {
-          const damage = towerUtils.estimateRangeDamage(coord, unpackNumAsCoord(packedCoord))
+          const damage = TowerUtils.estimateRangeDamage(coord, unpackNumAsCoord(packedCoord))
           damageMap[packedCoord] += damage
 
           if (damage >= minIndividualDamage) continue
@@ -3017,7 +3010,7 @@ export class CommunePlanner {
     for (const coord of this.bestTowerCoords) {
       const minRCL = this.basePlans.getXY(coord.x, coord.y)[0].minRCL
 
-      const path = customPathFinder.findPath({
+      const path = CustomPathFinder.findPath({
         origin: new RoomPosition(coord.x, coord.y, this.room.name),
         goals: [
           {
@@ -3237,8 +3230,30 @@ export class CommunePlanner {
 
     return bestPlanIndex
   }
+  private tryChoosePlan() {
+    // Check if planning is completed
+    if (!this.fastFillerStartCoords || this.planAttempts.length < this.fastFillerStartCoords.length)
+      return Result.noAction
+
+    // Planning is complete, choose the best plan using a scoring system
+
+    // Filter and make sure we have at least one completed plan, if not, mark the room as failed
+    const planAttempts = this.planAttempts.filter<BasePlanAttempt>(
+      (plan): plan is BasePlanAttempt => plan !== false,
+    )
+    if (!planAttempts.length) {
+      return Result.fail
+    }
+
+    /* this.visualizeBestPlan() */
+    this.choosePlan(planAttempts)
+    return Result.success
+  }
   private choosePlan(planAttempts: BasePlanAttempt[]) {
-    const plan = planAttempts[this.findBestPlanIndex(planAttempts)] as BasePlanAttempt
+    const plan = Object.assign(
+      {},
+      planAttempts[this.findBestPlanIndex(planAttempts)] as BasePlanAttempt,
+    )
     const roomMemory = Memory.rooms[this.room.name]
 
     roomMemory[RoomMemoryKeys.mineralType] = this.room.roomManager.mineral.mineralType
@@ -3258,15 +3273,14 @@ export class CommunePlanner {
     roomMemory[RoomMemoryKeys.centerUpgradePos] = plan.centerUpgradePos
     roomMemory[RoomMemoryKeys.upgradePath] = plan.upgradePath
 
-    roomMemory[RoomMemoryKeys.communePlanned] = true
+    roomMemory[RoomMemoryKeys.communePlanned] = Result.success
 
     // Delete uneeded plan data from global to free up space
-    /* delete this.planAttempts */
-    for (var key in this) {
-      if (this.hasOwnProperty(key)) {
-        delete this[key]
-      }
-    }
+
+    delete this.planAttempts
+    delete this.fastFillerStartCoords
+    delete this.terrainCoords
+    delete this._reverseExitFlood
   }
   private visualizeGrid() {
     for (let x = 0; x < roomDimensions; x++) {
