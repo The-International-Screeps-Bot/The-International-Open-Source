@@ -11,19 +11,6 @@ export class RoomUtils {
     const repairStructures: (StructureContainer | StructureRoad)[] = []
   }
 
-  static getSources(room: Room): Source[] {
-    const data = roomData[room.name]
-    if (data.sourceIDs !== undefined) {
-      return data.sourceIDs.map(ID => findObjectWithID(ID))
-    }
-
-    const sources = room.find(FIND_SOURCES)
-    const sourceIDs = sources.map(source => source.id)
-
-    data.sourceIDs = sourceIDs
-    return sources
-  }
-
   /**
    * returns a container if exists and is RCL actionable
    */

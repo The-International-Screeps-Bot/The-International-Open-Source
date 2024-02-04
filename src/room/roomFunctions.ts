@@ -101,11 +101,10 @@ Room.prototype.scoutEnemyReservedRemote = function () {
   if (
     !this.roomManager.structures.road &&
     !this.roomManager.structures.container &&
-    !this.find(FIND_SOURCES, {
-      filter: source => source.ticksToRegeneration > 0,
-    })
-  )
+    !RoomOps.getSources(this).find(source => source.ticksToRegeneration > 0)
+  ) {
     return false
+  }
 
   // If the controller is not reserved by an ally
 
@@ -128,10 +127,8 @@ Room.prototype.scoutEnemyUnreservedRemote = function () {
     if (controller.reservation.username === 'Invader') return false
   }
 
-  const harvestedSources = this.find(FIND_SOURCES, {
-    filter: source => source.ticksToRegeneration > 0,
-  })
-  if (!harvestedSources.length) return false
+  const harvestedSources = RoomOps.getSources(this).find(source => source.ticksToRegeneration > 0)
+  if (!harvestedSources) return false
 
   // Find creeps that I don't own that aren't invaders
 
@@ -1345,12 +1342,12 @@ Room.prototype.findAdjacentPositions = function (rx, ry) {
 }
 
 Room.prototype.createWorkRequest = function () {
-  if (this.find(FIND_SOURCES).length < 2) return false
+  const roomMemory = Memory.rooms[this.name]
+  if (roomMemory[RoomMemoryKeys.sourceCoords].length < 2) return false
   if (Memory.workRequests[this.name]) return false
 
   RoomNameUtils.findDynamicScore(this.name)
 
-  const roomMemory = Memory.rooms[this.name]
   const communePlanned = roomMemory[RoomMemoryKeys.communePlanned]
   if (communePlanned !== undefined) return false
 

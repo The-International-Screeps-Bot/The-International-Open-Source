@@ -374,12 +374,15 @@ Creep.prototype.findSourceIndex = function () {
 
   let creepThreshold = 1
 
+  const roomMemory = Memory.rooms[this.name]
+  const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length
+
   // So long as the creepThreshold is less than 4
 
   while (creepThreshold < 4) {
     // Find the first source with open spots
 
-    for (let i = 0; i < this.room.find(FIND_SOURCES).length; i++) {
+    for (let i = 0; i < sourceCount; i++) {
       // If there are still creeps needed to harvest a source under the creepThreshold
 
       if (

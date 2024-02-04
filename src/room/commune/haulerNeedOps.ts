@@ -35,7 +35,10 @@ export class HaulerNeedOps {
     if (hubLink && StructureUtils.isRCLActionable(hubLink)) {
       // There is a valid hubLink
 
-      for (let index in room.find(FIND_SOURCES)) {
+      const roomMemory = Memory.rooms[this.name]
+      const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length
+      
+      for (let index = 0; index < sourceCount; index++) {
         const sourceLink = room.communeManager.sourceLinks[index]
         if (sourceLink && StructureUtils.isRCLActionable(sourceLink)) continue
 
@@ -50,7 +53,10 @@ export class HaulerNeedOps {
 
     // There is no valid hubLink
 
-    for (let index in room.find(FIND_SOURCES)) {
+    const roomMemory = Memory.rooms[this.name]
+    const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length
+
+    for (let index = 0; index < sourceCount; index++) {
       room.communeManager.communeHaulerNeed += findCarryPartsRequired(
         packedSourcePaths[index].length / packedPosLength + 3,
         estimatedSourceIncome[index] * 1.1,

@@ -14,6 +14,7 @@ import { RoomUtils } from 'room/roomUtils'
 import { StructureUtils } from 'room/structureUtils'
 import { OrganizedSpawns } from './spawning/spawningStructureOps'
 import { ResourceTargets } from './commune'
+import { RoomOps } from 'room/roomOps'
 
 export class CommuneUtils {
   static getGeneralRepairStructures(room: Room) {
@@ -192,7 +193,7 @@ export class CommuneUtils {
     const data = communeData[room.name]
     if (data.estimatedCommuneSourceIncome !== undefined) return data.estimatedCommuneSourceIncome
 
-    const sources = RoomUtils.getSources(room)
+    const sources = RoomOps.getSources(room)
     const estimatedIncome: number[] = []
 
     for (let i = 0; i < sources.length; i += 1) {

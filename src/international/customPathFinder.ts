@@ -287,7 +287,8 @@ export class CustomPathFinder {
 
     // Weight potential and actual stationary positions
 
-    for (const index in room.find(FIND_SOURCES)) {
+    const sourcesCount = roomMemory[RoomMemoryKeys.sourceCoords].length
+    for (let index = 0; index < sourcesCount; index++) {
       // Loop through each position of harvestPositions, have creeps prefer to avoid
 
       for (const pos of room.roomManager.sourceHarvestPositions[index]) {

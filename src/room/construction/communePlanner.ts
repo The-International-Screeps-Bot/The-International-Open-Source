@@ -437,8 +437,10 @@ export class CommunePlanner {
 
     // Both sources
 
-    const sources = this.room.find(FIND_SOURCES)
-    for (const source of sources) startCoords.push(source.pos)
+    const sources = RoomOps.getSources(this.room)
+    for (const source of sources) {
+      startCoords.push(source.pos)
+    }
 
     // Find the closest source pos and its path to the controller
 
@@ -921,7 +923,8 @@ export class CommunePlanner {
   private avoidSources() {
     if (this.markSourcesAvoid) return
 
-    for (const source of this.room.find(FIND_SOURCES)) {
+    const sources = RoomOps.getSources(this.room)
+    for (const source of sources) {
       forAdjacentCoords(source.pos, adjCoord => {
         const packedCoord = packAsNum(adjCoord)
 
@@ -962,7 +965,7 @@ export class CommunePlanner {
       this.stampAnchors.fastFiller[0].y,
       this.room.name,
     )
-    const sources = this.room.find(FIND_SOURCES)
+    const sources = RoomOps.getSources(this.room)
     sortBy(
       sources,
       ({ pos }) =>
@@ -1844,7 +1847,7 @@ export class CommunePlanner {
         this.roadCoords[packedCoord] = 255
 
         const fastFillerPos = new RoomPosition(stampAnchor.x, stampAnchor.y, this.room.name)
-        const sources = this.room.find(FIND_SOURCES)
+        const sources = RoomOps.getSources(this.room)
         sortBy(
           sources,
           ({ pos }) =>
@@ -1960,7 +1963,8 @@ export class CommunePlanner {
     let closestSource: Source
     let closestSourceDistance = Infinity
 
-    for (const source of this.room.find(FIND_SOURCES)) {
+    const sources = RoomOps.getSources(this.room)
+    for (const source of sources) {
       const range = CustomPathFinder.findPath({
         origin: source.pos,
         goals: [

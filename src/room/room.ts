@@ -133,7 +133,7 @@ export class RoomManager {
     const anchor = commune.roomManager.anchor
     if (!anchor) throw Error('No anchor for remote source harvest positions ' + this.room.name)
 
-    const sources = this.room.find(FIND_SOURCES)
+    const sources = RoomOps.getSources(this.room)
 
     sortBy(
       sources,
@@ -196,8 +196,11 @@ export class RoomManager {
 
     const sourcePaths: RoomPosition[][] = []
 
-    for (const positions of packedRemoteSourceHarvestPositions) {
+    for (let i = packedRemoteSourceHarvestPositions.length - 1; i >= 0; i -= 1) {
+
+      const positions = packedRemoteSourceHarvestPositions[i]
       const origin = unpackPosAt(positions, 0)
+
       const path = CustomPathFinder.findPath({
         origin,
         goals: [{ pos: anchor, range: 3 }],
@@ -260,8 +263,11 @@ export class RoomManager {
 
     const sourcePaths: RoomPosition[][] = []
 
-    for (const positions of packedRemoteSourceHarvestPositions) {
+    for (let i = packedRemoteSourceHarvestPositions.length - 1; i >= 0; i -= 1) {
+
+      const positions = packedRemoteSourceHarvestPositions[i]
       const origin = unpackPosAt(positions, 0)
+
       const path = CustomPathFinder.findPath({
         origin,
         goals: [{ pos: goalPos, range: 1 }],
@@ -484,7 +490,7 @@ export class RoomManager {
 
     const sourceHarvestPositions: RoomPosition[][] = []
     const terrain = this.room.getTerrain()
-    const sources = this.room.find(FIND_SOURCES)
+    const sources = RoomOps.getSources(this.room)
 
     for (let i = 0; i < sources.length; i++) {
       const source = sources[i]

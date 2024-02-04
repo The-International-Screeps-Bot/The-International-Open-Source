@@ -2,7 +2,6 @@ import { Utils } from 'utils/utils'
 import { CommuneDataOps } from './commune/communeData'
 
 export interface RoomData {
-  sourceIDs: Id<Source>[]
   fastFillerContainerLeftId: Id<StructureContainer> | false
   fastFillerContainerRightId: Id<StructureContainer> | false
   fastFillerCoords: string[]

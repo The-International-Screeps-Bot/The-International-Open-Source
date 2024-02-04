@@ -525,6 +525,8 @@ declare global {
 
     structures: OrganizedStructures
 
+    sources: Source[]
+
     // Commune
 
     // Functions

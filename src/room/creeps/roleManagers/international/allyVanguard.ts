@@ -11,6 +11,7 @@ import { unpackCoord } from 'other/codec'
 import { CreepUtils } from 'room/creeps/creepUtils'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 import { CreepProcs } from 'room/creeps/creepProcs'
+import { RoomOps } from 'room/roomOps'
 
 export class AllyVanguard extends Creep {
   update() {
@@ -97,7 +98,7 @@ export class AllyVanguard extends Creep {
 
     // Try to normally harvest. Iterate if creep harvested
 
-    const source = room.find(FIND_SOURCES)[sourceIndex]
+    const source = RoomOps.getSources(room)[sourceIndex]
     if (CreepUtils.harvestSource(this, source) === Result.fail) return
   }
 

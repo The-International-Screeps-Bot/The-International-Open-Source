@@ -121,7 +121,9 @@ export class RoomOps {
     room.powerRequests = {}
 
     room.creepsOfSource = []
-    for (const index in room.find(FIND_SOURCES)) room.creepsOfSource.push([])
+
+    const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length
+    for (let i = 0; i < sourceCount; i++) room.creepsOfSource.push([])
 
     room.squadRequests = new Set()
 
@@ -315,7 +317,7 @@ export class RoomOps {
     }
 
     if (!roomMemory[RoomMemoryKeys.sourceCoords]) {
-      const sources = room.find(FIND_SOURCES)
+      const sources = this.getSources(room)
       if (sources.length) {
         const packedSourceCoords = packCoordList(sources.map(source => source.pos))
         roomMemory[RoomMemoryKeys.sourceCoords] = packedSourceCoords
@@ -369,5 +371,30 @@ export class RoomOps {
     }
 
     return roomMemory[RoomMemoryKeys.type]
+  }
+
+  /**
+   * Cached sources using recorded source coords
+   */
+  static getSources(room: Room) {
+    if (room.sources !== undefined) return room.sources
+
+    const sourceCoords = Memory.rooms[room.name][RoomMemoryKeys.sourceCoords]
+    if (!sourceCoords) {
+      throw Error('no sourceCoords')
+    }
+
+    const sources = new Array<Source>()
+
+    for (const packedCoord of sourceCoords) {
+      const coord = unpackCoord(packedCoord)
+
+      for (const source of room.lookForAt(LOOK_SOURCES, coord.x, coord.y)) {
+        sources.push(source)
+      }
+    }
+
+    room.sources = sources
+    return sources
   }
 }
