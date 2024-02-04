@@ -23,7 +23,7 @@ import { SpawnRequestConstructor, SpawnRequestConstructors } from './spawnReques
 import { CommuneUtils } from '../communeUtils'
 import { DebugUtils } from 'debug/debugUtils'
 
-export class SpawningStructureProcs {
+export class SpawningStructureOps {
   public static tryRunSpawning(room: Room) {
     const spawns = room.roomManager.structures.spawn
     if (!spawns.length) return
@@ -131,7 +131,7 @@ export class SpawningStructureProcs {
       if (testSpawnResult === ERR_NOT_ENOUGH_ENERGY) {
         customLog(
           'Failed to spawn: dryrun failed',
-          `request: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost} / ${room.communeManager.nextSpawnEnergyAvailable}, body: (${body.length}) ${body}`,
+          `request: ${testSpawnResult}, role: ${request.role}, ID: ${ID}, cost: ${request.cost} / ${room.communeManager.nextSpawnEnergyAvailable}, body: (${body.length}) ${body}`,
           {
             type: LogTypes.error,
           },
@@ -141,7 +141,7 @@ export class SpawningStructureProcs {
 
       customLog(
         'Failed to spawn: dryrun failed',
-        `request: ${testSpawnResult}, role: ${request.role}, cost: ${request.cost} / ${room.communeManager.nextSpawnEnergyAvailable}, body: (${body.length}) ${body}`,
+        `request: ${testSpawnResult}, role: ${request.role}, ID: ${ID}, cost: ${request.cost} / ${room.communeManager.nextSpawnEnergyAvailable}, body: (${body.length}) ${body}`,
         {
           type: LogTypes.error,
         },
@@ -153,7 +153,7 @@ export class SpawningStructureProcs {
     // Spawn the creep for real
 
     request.extraOpts.directions = this.findDirections(room, spawn.pos)
-    const result = this.advancedSpawn(spawn, request, body, ID)
+    const result = this.advancedSpawn(room, spawn, request, body, ID)
     if (result !== OK) {
       customLog(
         'Failed to spawn: spawning failed',
@@ -279,6 +279,7 @@ export class SpawningStructureProcs {
   }
 
   private static advancedSpawn(
+    room: Room,
     spawn: StructureSpawn,
     spawnRequest: SpawnRequest,
     body: BodyPartConstant[],
@@ -286,9 +287,9 @@ export class SpawningStructureProcs {
   ) {
     const creepName = `${creepRoles.indexOf(spawnRequest.role)}_${requestID}`
 
-    spawnRequest.extraOpts.energyStructures = spawn.room.communeManager.spawningStructuresByPriority
+    spawnRequest.extraOpts.energyStructures = room.communeManager.spawningStructuresByPriority
 
-    spawnRequest.extraOpts.memory[CreepMemoryKeys.commune] = spawn.room.name
+    spawnRequest.extraOpts.memory[CreepMemoryKeys.commune] = room.name
     spawnRequest.extraOpts.memory[CreepMemoryKeys.defaultParts] = spawnRequest.defaultParts
     spawnRequest.extraOpts.memory[CreepMemoryKeys.cost] = spawnRequest.cost
 

@@ -9,7 +9,7 @@ import {
   creepRoles,
   haulerUpdateDefault,
 } from '../../constants/general'
-import { Utils, randomIntRange, randomTick } from 'utils/utils'
+import { Utils, randomIntRange, randomTick, roundTo } from 'utils/utils'
 import { CollectiveManager } from 'international/collective'
 import { RoomNameUtils } from 'room/roomNameUtils'
 import { customLog, LogTypes } from 'utils/logging'
@@ -19,7 +19,7 @@ import { LogisticsProcs } from 'room/logisticsProcs'
 import { SourceProcs } from 'room/sourceProcs'
 import { DefenceProcs } from './defenceProcs'
 import { PowerSpawnProcs } from './powerSpawnProcs'
-import { SpawningStructureProcs } from './spawning/spawningStructureProcs'
+import { SpawningStructureOps } from './spawning/spawningStructureOps'
 import { TowerProcs } from './towerProcs'
 import { HaulerNeedOps } from './haulerNeedOps'
 import { CommuneManager } from './commune'
@@ -192,7 +192,7 @@ export class CommuneOps {
     communeManager.remotesManager.run()
     HaulerNeedOps.run(room)
 
-    SpawningStructureProcs.createRoomLogisticsRequests(room)
+    SpawningStructureOps.createRoomLogisticsRequests(room)
     LogisticsProcs.createCommuneStoringStructureLogisticsRequests(room)
     communeManager.factoryManager.run()
     LogisticsProcs.createCommuneContainerLogisticsRequests(room)
@@ -202,15 +202,15 @@ export class CommuneOps {
     communeManager.linkManager.run()
     communeManager.labManager.run()
     PowerSpawnProcs.run(room)
-    SpawningStructureProcs.createPowerTasks(room)
+    SpawningStructureOps.createPowerTasks(room)
 
     room.roomManager.creepRoleManager.run()
     room.roomManager.powerCreepRoleManager.run()
 
     CommuneOps.tryUpdateMinHaulerCost(room)
-    SpawningStructureProcs.tryRunSpawning(room)
+    SpawningStructureOps.tryRunSpawning(room)
 
-    SpawningStructureProcs.tryRegisterSpawningMovement(room)
+    SpawningStructureOps.tryRegisterSpawningMovement(room)
     room.roomManager.endTickCreepManager.run()
     room.roomManager.roomVisualsManager.run()
 
@@ -271,7 +271,7 @@ export class CommuneOps {
     if (roomMemory[RoomMemoryKeys.minHaulerCost] === undefined) {
       roomMemory[RoomMemoryKeys.minHaulerCost] = Math.max(
         Memory.minHaulerCost,
-        200 * room.roomManager.structures.spawn.length,
+        BODYPART_COST[CARRY] * 2 + BODYPART_COST[MOVE],
       )
       roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time + randomIntRange(1500, 3000)
       return
@@ -279,13 +279,42 @@ export class CommuneOps {
 
     if (Game.time - roomMemory[RoomMemoryKeys.minHaulerCostUpdate] < haulerUpdateDefault) return
 
-    // update the min hauler cost
-
+    // Update the raw hauler cost
     roomMemory[RoomMemoryKeys.minHaulerCost] = Math.max(
+      this.findHaulerCountBasedHaulerCost(room, roomMemory),
       Memory.minHaulerCost,
-      100 * room.roomManager.structures.spawn.length,
     )
+
+    // Bound the raw hauler cost
+
+    // Lower bound
+    roomMemory[RoomMemoryKeys.minHaulerCost] = Math.max(
+      roomMemory[RoomMemoryKeys.minHaulerCost],
+      BODYPART_COST[CARRY] * 2 + BODYPART_COST[MOVE],
+    )
+
+    // Upper bound
+    roomMemory[RoomMemoryKeys.minHaulerCost] = Math.min(
+      roomMemory[RoomMemoryKeys.minHaulerCost],
+      BODYPART_COST[MOVE] * MAX_CREEP_SIZE * 1.2,
+    )
+
     roomMemory[RoomMemoryKeys.minHaulerCostUpdate] = Game.time + randomIntRange(0, 10)
+  }
+
+  static findHaulerCountBasedHaulerCost(room: Room, roomMemory: RoomMemory): number {
+    const targetHaulers = 50
+    // We want this many haulers
+    const targetHaulersPercent = (targetHaulers * 0.9) / targetHaulers
+    // How far off we are from our ideal hauler count
+    const costError = roundTo(
+      targetHaulersPercent - room.creepsFromRoom.hauler.length / targetHaulers,
+      4,
+    )
+    const costDelta = Math.floor((roomMemory[RoomMemoryKeys.minHaulerCost] * costError) / 2)
+
+    const cost = roomMemory[RoomMemoryKeys.minHaulerCost] - costDelta
+    return cost
   }
 
   static registerRampartDamage(room: Room) {
@@ -322,6 +351,4 @@ export class CommuneOps {
     remoteMemory[RoomMemoryKeys.type] = RoomTypes.neutral
     RoomNameUtils.cleanMemory(remoteName)
   }
-
-
 }

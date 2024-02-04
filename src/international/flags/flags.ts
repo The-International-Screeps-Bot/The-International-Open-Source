@@ -18,7 +18,7 @@ import { packCoord } from 'other/codec'
 import { findObjectWithID, isAlly } from 'utils/utils'
 import { customLog } from 'utils/logging'
 import { RoomUtils } from 'room/roomUtils'
-import { SpawnRequestConstructorsByType } from 'room/commune/spawning/spawningStructureProcs'
+import { SpawnRequestConstructorsByType } from 'room/commune/spawning/spawningStructureOps'
 import { RoomOps } from 'room/roomOps'
 
 export class FlagManager {
@@ -210,6 +210,9 @@ export class FlagManager {
 
     if (!roomMemory) {
       flag.setColor(COLOR_RED)
+      flag.remove()
+
+      
       return
     }
     if (roomMemory[RoomMemoryKeys.communePlanned] !== Result.success) {

@@ -219,10 +219,7 @@ export class DefenceProcs {
     for (const playerName in presentThreat.byPlayers) {
       const threat = presentThreat.byPlayers[playerName]
 
-      const player = Memory.players[playerName]
-      if (!player) {
-        PlayerManager.initPlayer(playerName)
-      }
+      const player = Memory.players[playerName] || PlayerManager.initPlayer(playerName)
 
       player[PlayerMemoryKeys.offensiveThreat] = Math.max(
         threat,

@@ -96,8 +96,7 @@ import { TowerUtils } from 'room/commune/towerUtils'
 import { SourceProcs } from 'room/sourceProcs'
 import { SourceUtils } from 'room/sourceUtils'
 import { TerminalProcs } from 'room/commune/terminal/terminalProcs'
-import { SpawningStructureProcs } from 'room/commune/spawning/spawningStructureProcs'
-import { SpawningStructureUtils } from 'room/commune/spawning/spawningStructureUtils'
+import { SpawningStructureOps } from 'room/commune/spawning/spawningStructureOps'
 import { NukerProcs } from 'room/commune/nukerProcs'
 import { ObserverProcs } from 'room/commune/observerProcs'
 import { PowerSpawnProcs } from 'room/commune/powerSpawnProcs'
@@ -191,8 +190,7 @@ export function profilerRegister() {
   profiler.registerClass(SourceProcs, 'SourceProcs')
   profiler.registerClass(SourceUtils, 'SourceUtils')
   profiler.registerClass(TerminalProcs, 'TerminalProcs')
-  profiler.registerClass(SpawningStructureProcs, 'SpawningStructureProcs')
-  profiler.registerClass(SpawningStructureUtils, 'SpawningStructureUtils')
+  profiler.registerClass(SpawningStructureOps, 'SpawningStructureOps')
   profiler.registerClass(NukerProcs, 'NukerProcs')
   profiler.registerClass(ObserverProcs, 'ObserverProcs')
   profiler.registerClass(PowerSpawnProcs, 'PowerSpawnProcs')

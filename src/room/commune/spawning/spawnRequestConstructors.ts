@@ -171,7 +171,7 @@ export class SpawnRequestConstructors {
         }
 
         const maxCostPerCreep = Math.max(
-            args.maxCostPerCreep ?? room.energyCapacityAvailable,
+            Math.min(args.maxCostPerCreep, room.energyCapacityAvailable),
             args.minCostPerCreep,
         )
 
@@ -273,7 +273,7 @@ export class SpawnRequestConstructors {
             let stop = false
 
             // So long as the cost is less than the maxCostPerCreep and the size is below max size
-            while (cost - extraPartsCost <= maxCostPerCreep && remainingAllowedParts - args.extraParts.length >= 0) {
+            while (cost < maxCostPerCreep && remainingAllowedParts - args.extraParts.length >= 0) {
 
                 tier += 1
 
@@ -329,15 +329,16 @@ export class SpawnRequestConstructors {
             throw Error('extraParts of length 0 for ' + room.name + ' and role ' + args.role)
         }
 
-        const maxCostPerCreep = Math.max(
-            args.maxCostPerCreep ?? room.energyCapacityAvailable,
-            args.minCostPerCreep,
-        )
-        if (maxCostPerCreep < args.minCostPerCreep) {
+        if (args.maxCostPerCreep < args.minCostPerCreep) {
 
             customLog('maxCostPerCreep is less than minCostPerCreep, unable to continue spawn request for role: ' + args.role)
             return spawnRequests
         }
+
+        const maxCostPerCreep = Math.max(
+            Math.min(args.maxCostPerCreep, room.energyCapacityAvailable),
+            args.minCostPerCreep,
+        )
 
         if (args.maxCreeps === undefined) {
             args.maxCreeps = Number.MAX_SAFE_INTEGER

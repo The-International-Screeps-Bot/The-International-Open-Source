@@ -39,9 +39,15 @@ export class CreepOrganizer {
       return
     }
 
+    const creepMemory = Memory.creeps[creepName]
+
+    if (!creepMemory[CreepMemoryKeys.commune]) {
+      throw Error(`${creepName} has no recorded commune`)
+    }
+
     // Kill the creep if it has no valid commune (we don't know what to do with it)
 
-    const commune = creep.commune
+    const commune = Game.rooms[creepMemory[CreepMemoryKeys.commune]]
     if (!commune || !commune.controller.my) {
       creep.suicide()
       return

@@ -3,6 +3,7 @@ import { PlayerMemoryKeys, defaultDataDecay, playerDecayKeys } from '../constant
 import { randomTick } from '../utils/utils'
 import { Sleepable, StaticSleepable } from '../utils/sleepable'
 import { PlayerRelationships } from '../constants/general'
+import { PlayerMemory } from 'types/players'
 
 export class PlayerManager extends StaticSleepable {
     /**
@@ -42,7 +43,7 @@ export class PlayerManager extends StaticSleepable {
         }
     }
 
-    static initPlayer(playerName: string) {
+    static initPlayer(playerName: string): Partial<PlayerMemory> {
 
         return (Memory.players[playerName] = {
             [PlayerMemoryKeys.offensiveThreat]: 0,

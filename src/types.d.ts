@@ -44,7 +44,7 @@ import {
 import { UserScriptTemplate } from 'other/userScript/userScript.example'
 import { StatsMemory } from 'types/stats'
 import { WeightLayers, WeightsByID } from 'room/construction/neuralNetwork/network'
-import { OrganizedSpawns } from 'room/commune/spawning/spawningStructureProcs'
+import { OrganizedSpawns } from 'room/commune/spawning/spawningStructureOps'
 import { CreepTask, CreepPowerTask, PowerRequest } from 'types/creepTasks'
 
 declare global {
@@ -959,9 +959,13 @@ declare global {
      */
     readonly role: CreepRoles
 
+    /**
+     * @deprecated
+     */
     _commune: Room | undefined
     /**
      * The name of the room the creep is from
+     * @deprecated
      */
     readonly commune: Room | undefined
 

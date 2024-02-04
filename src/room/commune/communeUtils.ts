@@ -12,7 +12,7 @@ import {
 import { CollectiveManager } from 'international/collective'
 import { RoomUtils } from 'room/roomUtils'
 import { StructureUtils } from 'room/structureUtils'
-import { OrganizedSpawns } from './spawning/spawningStructureProcs'
+import { OrganizedSpawns } from './spawning/spawningStructureOps'
 import { ResourceTargets } from './commune'
 
 export class CommuneUtils {

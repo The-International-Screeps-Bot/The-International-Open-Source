@@ -85,8 +85,11 @@ export class RoomUtils {
 
     const sourcedFastFillerCoords = this.getSourcedFastFillerCoords(room)
     if (!sourcedFastFillerCoords) {
+
+      const fastFillerCoords = new Array<Coord>()
       data.fastFillerCoords = []
-      room.fastFillerCoords = []
+      room.fastFillerCoords = fastFillerCoords
+      return fastFillerCoords
     }
     const structureCoords = room.roomManager.structureCoords
     const fastFillerCoords: Coord[] = []

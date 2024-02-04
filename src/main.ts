@@ -63,8 +63,8 @@ export function originalLoop() {
     wasm.collaborator()
 
     RoomServices.cleanManagers()
-    RoomDataOps.initRooms()
     RoomDataOps.updateRooms()
+    RoomDataOps.initRooms()
     RoomServices.updateRun()
     TransactionsManager.run()
     RequestsManager.run()

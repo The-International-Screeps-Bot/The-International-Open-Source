@@ -153,9 +153,9 @@ export class CollectiveManager {
     if (Game.time - Memory.minHaulerCostUpdate < haulerUpdateDefault) return
 
     // cpu limit is potentially variable if GCL changes
-    const targetCPU = (Game.cpu.limit * 0.9) / Game.cpu.limit
+    const targetCPUPercent = (Game.cpu.limit * 0.9) / Game.cpu.limit
     // How far off we are from our ideal cpu usage
-    Memory.minHaulerCostError = roundTo(targetCPU - Memory.stats.cpu.usage / Game.cpu.limit, 4)
+    Memory.minHaulerCostError = roundTo(targetCPUPercent - Memory.stats.cpu.usage / Game.cpu.limit, 4)
 
     Memory.minHaulerCost -= Math.floor((Memory.minHaulerCost * Memory.minHaulerCostError) / 2)
 

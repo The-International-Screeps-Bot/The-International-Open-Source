@@ -295,6 +295,9 @@ export enum RoomMemoryKeys {
   nukeRequest,
   threatened,
   lastAttackedBy,
+  /**
+   * The ideal cost for haulers, not rounded or bounded by the room's spawn energy capacity
+   */
   minHaulerCost,
   minHaulerCostUpdate,
   greatestRCL,
