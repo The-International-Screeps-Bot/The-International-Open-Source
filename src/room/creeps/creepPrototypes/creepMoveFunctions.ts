@@ -19,6 +19,7 @@ import {
   getRange,
   isExit,
   forAdjacentCoords,
+  isAlly,
 } from 'utils/utils'
 import {
   packCoord,
@@ -189,8 +190,9 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
       const creepAtPos = Game.creeps[creepAtPosName]
       if (creepAtPos.fatigue > 0) return
       if (creepAtPos.moved) return
+      // maybe want to reconsider this parameter
       if (creepAtPos.moveRequest) return
-      if (creepAtPos.getActiveBodyparts(MOVE)) return
+      if (creepAtPos.getActiveBodyparts(MOVE) === 0) return
     }
 
     /*
@@ -235,13 +237,19 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
     if (
       this.memory[CreepMemoryKeys.rampartOnlyShoving] &&
       !room.findStructureAtCoord(coord, structure => structure.structureType === STRUCTURE_RAMPART)
-    )
+    ) {
       return
+    }
 
     let hasImpassibleStructure
 
     for (const cSite of room.lookForAt(LOOK_CONSTRUCTION_SITES, coord.x, coord.y)) {
-      if (!cSite.my && !global.settings.allies.includes(cSite.owner.username)) continue
+
+      // If the construction site is owned by an ally, don't allow its position
+      if (!cSite.my && isAlly(cSite.owner.username)) {
+        hasImpassibleStructure = true
+        break
+      }
 
       if (impassibleStructureTypesSet.has(cSite.structureType)) {
         hasImpassibleStructure = true
