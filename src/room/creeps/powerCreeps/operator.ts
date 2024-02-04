@@ -22,7 +22,7 @@ export class Operator extends PowerCreep {
   }
 
   managePowerTask?() {
-    const creepMemory = Memory.creeps[this.name]
+    const creepMemory = Memory.powerCreeps[this.name]
     const task = creepMemory[CreepMemoryKeys.powerTask]
     if (!task) return
 
@@ -43,7 +43,7 @@ export class Operator extends PowerCreep {
   // Basic tasks
 
   runTask?() {
-    const creepMemory = Memory.creeps[this.name]
+    const creepMemory = Memory.powerCreeps[this.name]
     const task = creepMemory[CreepMemoryKeys.task]
     if (!task && !this.findTask()) return Result.fail
 
@@ -68,7 +68,7 @@ export class Operator extends PowerCreep {
     const powerSpawn = this.room.roomManager.powerSpawn
     if (!powerSpawn) return false
 
-    const creepMemory = Memory.creeps[this.name]
+    const creepMemory = Memory.powerCreeps[this.name]
     creepMemory[CreepMemoryKeys.task] = {
       [CreepTaskKeys.taskName]: CreepTaskNames.advancedRenew,
       [CreepTaskKeys.target]: powerSpawn.id,
@@ -106,7 +106,7 @@ export class Operator extends PowerCreep {
 
     if (controller.isPowerEnabled) return false
 
-    const creepMemory = Memory.creeps[this.name]
+    const creepMemory = Memory.powerCreeps[this.name]
     creepMemory[CreepMemoryKeys.task] = {
       [CreepTaskKeys.taskName]: CreepTaskNames.advancedEnablePower,
     }
@@ -145,7 +145,7 @@ export class Operator extends PowerCreep {
 
     if (power.cooldown) return false
 
-    const creepMemory = Memory.creeps[this.name]
+    const creepMemory = Memory.powerCreeps[this.name]
     creepMemory[CreepMemoryKeys.task] = {
       [CreepTaskKeys.taskName]: CreepTaskNames.advancedGenerateOps,
     }
@@ -171,7 +171,7 @@ export class Operator extends PowerCreep {
     const storingStructure = CommuneUtils.storingStructures(this.room)[0]
     if (!storingStructure) return false
 
-    const creepMemory = Memory.creeps[this.name]
+    const creepMemory = Memory.powerCreeps[this.name]
     creepMemory[CreepMemoryKeys.task] = {
       [CreepTaskKeys.taskName]: CreepTaskNames.transferOps,
       [CreepTaskKeys.target]: storingStructure.id,
@@ -194,7 +194,7 @@ export class Operator extends PowerCreep {
   // Complex power tasks
 
   findPowerTask?() {
-    const creepMemory = Memory.creeps[this.name]
+    const creepMemory = Memory.powerCreeps[this.name]
     let task = creepMemory[CreepMemoryKeys.powerTask]
     if (task) {
       return task
@@ -302,7 +302,7 @@ export class Operator extends PowerCreep {
     //
 
     this.powered = true
-    delete Memory.creeps[CreepMemoryKeys.powerTask]
+    delete Memory.powerCreeps[CreepMemoryKeys.powerTask]
 
     return Result.success
   }

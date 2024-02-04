@@ -304,7 +304,7 @@ export class CommuneOps {
 
   static findHaulerCountBasedHaulerCost(room: Room, roomMemory: RoomMemory): number {
     // We want this many haulers
-    const targetHaulers = 40
+    const targetHaulers = 50
     const targetHaulersPercent = (targetHaulers * 0.9) / targetHaulers
     // How far off we are from our ideal hauler count
     const costError = roundTo(
