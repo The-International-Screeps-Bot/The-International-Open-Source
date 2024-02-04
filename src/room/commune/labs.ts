@@ -523,6 +523,7 @@ export class LabManager {
     if (!nextReaction) {
       this.assignNoReaction()
       this.snoozeUntil = Game.time + 30
+      return
     }
 
     // was...   But I kept getting negative values in the targetAmount.  I think I jusut need to get to the cycleAmount instead.
