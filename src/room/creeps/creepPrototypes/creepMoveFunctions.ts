@@ -195,10 +195,6 @@ PowerCreep.prototype.findShoveCoord = Creep.prototype.findShoveCoord = function 
       if (creepAtPos.getActiveBodyparts(MOVE) === 0) return
     }
 
-    /*
-        if (room.creepPositions[packedCoord]) continue
-        if (room.powerCreepPositions[packedCoord]) continue
- */
     if (avoidPackedCoords.has(packedCoord)) return
 
     if (isExit(coord)) return
