@@ -179,7 +179,7 @@ export class Hauler extends Creep {
     // Ensure the creep and the remote have the same opinions on roads
     if (
       !!remoteMemory[RoomMemoryKeys.roads][sourceIndex] !=
-      Memory.creeps[this.name][CreepMemoryKeys.preferRoads]
+      !!Memory.creeps[this.name][CreepMemoryKeys.preferRoads]
     )
       return false
 
@@ -786,12 +786,20 @@ export class Hauler extends Creep {
     )
       return false
 
+    const creepAtPosMemory = Memory.creeps[creepAtPos.name]
+    // ensure we aren't relaying with the same creep as last tick (from the other creep's perspective)
+    if (
+      creepAtPosMemory[CreepMemoryKeys.previousRelayer] &&
+      creepAtPosMemory[CreepMemoryKeys.previousRelayer][0] === creepAtPos.name
+    )
+      return false
+
     // ensure the creep receiving creep is empty
     /* if (creepAtPos.store.getUsedCapacity() > 0) return false */
     if (creepAtPos.store.getUsedCapacity() > 0) return false
 
     // Ensure that they have the same opinions on roads
-    if (creepMemory[CreepMemoryKeys.preferRoads] !== creepMemory[CreepMemoryKeys.preferRoads])
+    if (creepMemory[CreepMemoryKeys.preferRoads] !== creepAtPosMemory[CreepMemoryKeys.preferRoads])
       return false
 
     /* const logisticsRequest = Memory.creeps[this.name][CreepMemoryKeys.roomLogisticsRequests][0]
@@ -836,8 +844,6 @@ export class Hauler extends Creep {
 
     delete this.moved
     delete creepAtPos.moved
-
-    const creepAtPosMemory = Memory.creeps[creepAtPos.name]
 
     // Trade paths so they might reuse them
 
@@ -1026,10 +1032,7 @@ export class Hauler extends Creep {
     }
 
     // If there is no need for more commune haulers
-    if (
-      commune.communeManager.communeHaulerNeed <
-      commune.communeManager.communeHaulerCarryParts
-    ) {
+    if (commune.communeManager.communeHaulerNeed < commune.communeManager.communeHaulerCarryParts) {
       return false
     }
 

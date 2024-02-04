@@ -197,14 +197,13 @@ export class CreepUtils {
         const storingStructure = findObjectWithID(bestRequest.delivery as Id<AnyStoreStructure>)
 
         if (storingStructure) {
-
           const amount = Math.min(
             storingStructure.reserveStore[bestRequest.resourceType],
             Math.max(
-              creep.nextStore[bestRequest.resourceType] + RoomObjectUtils.freeNextStoreOf(creep, bestRequest.resourceType),
+              RoomObjectUtils.freeNextStoreOf(creep, bestRequest.resourceType),
               creepRequest[CreepLogisticsRequestKeys.amount],
-            )
-          ),
+            ),
+          )
 
           nextCreepRequest = {
             [CreepLogisticsRequestKeys.type]: RoomLogisticsRequestTypes.withdraw,
@@ -229,13 +228,13 @@ export class CreepUtils {
             ] ||
             creep.room.roomLogisticsRequests[RoomLogisticsRequestTypes.pickup][bestRequest.delivery]
 
-            const amount = Math.min(
-              nextRequest.amount,
-              Math.max(
-                creep.nextStore[bestRequest.resourceType] + RoomObjectUtils.freeNextStoreOf(creep, bestRequest.resourceType),
-                creepRequest[CreepLogisticsRequestKeys.amount],
-              )
-            )
+          const amount = Math.min(
+            nextRequest.amount,
+            Math.max(
+              RoomObjectUtils.freeNextStoreOf(creep, bestRequest.resourceType),
+              creepRequest[CreepLogisticsRequestKeys.amount],
+            ),
+          )
 
           nextCreepRequest = {
             [CreepLogisticsRequestKeys.type]: nextRequest.type,
@@ -575,7 +574,7 @@ export class CreepUtils {
       if (request.delivery) {
         // Take extra energy in case its needed
 
-/*         if (request.resourceType === RESOURCE_ENERGY) {
+        /*         if (request.resourceType === RESOURCE_ENERGY) {
           return creep.nextStore[request.resourceType] + creepFreeNextStore
         } */
 
@@ -659,7 +658,6 @@ export class CreepUtils {
    * Find the closest open fast filler coord, if exists. Then assign it to the creep
    */
   static findNewFastFillerCoord(creep: Creep, creepMemory = Memory.creeps[creep.name]) {
-
     const fastFillerCoords = RoomUtils.getFastFillerCoords(creep.room)
     if (!fastFillerCoords.length) return false
 
@@ -674,8 +672,10 @@ export class CreepUtils {
     return result.coord
   }
 
-  private static findOpenFastFillerCoord(creep: Creep, reservedCoords: Map<string, ReservedCoordTypes>) {
-
+  private static findOpenFastFillerCoord(
+    creep: Creep,
+    reservedCoords: Map<string, ReservedCoordTypes>,
+  ) {
     const packedFastFillerCoords = roomData[creep.room.name].fastFillerCoords
 
     let lowestScore = Infinity
