@@ -384,7 +384,10 @@ export class RoomOps {
 
     const packedSourceCoords = Memory.rooms[room.name][RoomMemoryKeys.sourceCoords]
     if (!packedSourceCoords) {
-      throw Error('no sourceCoords')
+      const sources = new Array<Source>()
+
+      room.sources = sources
+      return sources
     }
 
     const sources = new Array<Source>()
