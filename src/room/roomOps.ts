@@ -18,7 +18,7 @@ import { CommuneManager } from './commune/commune'
 import { CommuneOps } from './commune/communeOps'
 import { LogisticsProcs } from './logisticsProcs'
 import { customLog } from 'utils/logging'
-import { packCoord, packCoordList, unpackCoord } from 'other/codec'
+import { packCoord, packCoordList, unpackCoord, unpackCoordList } from 'other/codec'
 import { HaulerServices } from './creeps/roles/haulerServices'
 import { HaulerOps } from './creeps/roles/haulerOps'
 import { roomData } from './roomData'
@@ -122,8 +122,11 @@ export class RoomOps {
 
     room.creepsOfSource = []
 
-    const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length
-    for (let i = 0; i < sourceCount; i++) room.creepsOfSource.push([])
+    const packedSourceCoords = roomMemory[RoomMemoryKeys.sourceCoords]
+    if (packedSourceCoords) {
+      const sourceCount = packedSourceCoords.length
+      for (let i = 0; i < sourceCount; i++) room.creepsOfSource.push([])
+    }
 
     room.squadRequests = new Set()
 
@@ -379,15 +382,15 @@ export class RoomOps {
   static getSources(room: Room) {
     if (room.sources !== undefined) return room.sources
 
-    const sourceCoords = Memory.rooms[room.name][RoomMemoryKeys.sourceCoords]
-    if (!sourceCoords) {
+    const packedSourceCoords = Memory.rooms[room.name][RoomMemoryKeys.sourceCoords]
+    if (!packedSourceCoords) {
       throw Error('no sourceCoords')
     }
 
     const sources = new Array<Source>()
 
-    for (const packedCoord of sourceCoords) {
-      const coord = unpackCoord(packedCoord)
+    const sourceCoords = unpackCoordList(packedSourceCoords)
+    for (const coord of sourceCoords) {
 
       for (const source of room.lookForAt(LOOK_SOURCES, coord.x, coord.y)) {
         sources.push(source)
