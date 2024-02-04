@@ -16,6 +16,7 @@ import {
   RemoteResourcePathTypes,
   FlagNames,
   RoomStatusKeys,
+  packedCoordLength,
 } from '../constants/general'
 import {
   findAdjacentCoordsToCoord,
@@ -1343,7 +1344,8 @@ Room.prototype.findAdjacentPositions = function (rx, ry) {
 
 Room.prototype.createWorkRequest = function () {
   const roomMemory = Memory.rooms[this.name]
-  if (roomMemory[RoomMemoryKeys.sourceCoords].length < 2) return false
+
+  if (roomMemory[RoomMemoryKeys.sourceCoords].length / packedCoordLength < 2) return false
   if (Memory.workRequests[this.name]) return false
 
   RoomNameUtils.findDynamicScore(this.name)

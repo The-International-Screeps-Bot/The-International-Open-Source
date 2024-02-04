@@ -11,12 +11,14 @@ import {
   defaultSwampCost,
   impassibleStructureTypes,
   impassibleStructureTypesSet,
+  packedCoordLength,
   roomDimensions,
 } from '../constants/general'
 import { packCoord, unpackCoord, unpackCoordList, unpackPosAt, unpackPosList } from 'other/codec'
 import { LogTypes, customLog } from 'utils/logging'
 import { forCoordsAroundRange, unpackNumAsCoord, visualizePath } from '../utils/utils'
 import { RoomUtils } from 'room/roomUtils'
+import { RoomOps } from 'room/roomOps'
 
 export interface PathGoal {
   pos: RoomPosition
@@ -287,7 +289,7 @@ export class CustomPathFinder {
 
     // Weight potential and actual stationary positions
 
-    const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length
+    const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length / packedCoordLength
     for (let index = 0; index < sourceCount; index++) {
       // Loop through each position of harvestPositions, have creeps prefer to avoid
 

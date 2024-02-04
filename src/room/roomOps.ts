@@ -9,6 +9,7 @@ import {
   allStructureTypes,
   Result,
   constantRoomTypes,
+  packedCoordLength,
 } from '../constants/general'
 import { StatsManager } from 'international/stats'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
@@ -124,7 +125,7 @@ export class RoomOps {
 
     const packedSourceCoords = roomMemory[RoomMemoryKeys.sourceCoords]
     if (packedSourceCoords) {
-      const sourceCount = packedSourceCoords.length
+      const sourceCount = packedSourceCoords.length / packedCoordLength
       for (let i = 0; i < sourceCount; i++) room.creepsOfSource.push([])
     }
 

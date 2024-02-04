@@ -1,7 +1,8 @@
-import { RoomMemoryKeys, RoomStatsKeys, packedPosLength, stamps } from '../../constants/general'
+import { RoomMemoryKeys, RoomStatsKeys, packedCoordLength, packedPosLength, stamps } from '../../constants/general'
 import { StructureUtils } from 'room/structureUtils'
 import { findCarryPartsRequired } from 'utils/utils'
 import { CommuneUtils } from './communeUtils'
+import { RoomOps } from 'room/roomOps'
 
 export class HaulerNeedOps {
   static run(room: Room) {
@@ -28,15 +29,15 @@ export class HaulerNeedOps {
   }
 
   private static sourceNeed(room: Room) {
-    const packedSourcePaths = Memory.rooms[room.name][RoomMemoryKeys.communeSourcePaths]
+    const roomMemory = Memory.rooms[room.name]
+    const packedSourcePaths = roomMemory[RoomMemoryKeys.communeSourcePaths]
     const estimatedSourceIncome = CommuneUtils.getEstimatedSourceIncome(room)
 
     const hubLink = room.roomManager.hubLink
     if (hubLink && StructureUtils.isRCLActionable(hubLink)) {
       // There is a valid hubLink
 
-      const roomMemory = Memory.rooms[this.name]
-      const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length
+      const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length / packedCoordLength
 
       for (let index = 0; index < sourceCount; index++) {
         const sourceLink = room.communeManager.sourceLinks[index]
@@ -53,10 +54,10 @@ export class HaulerNeedOps {
 
     // There is no valid hubLink
 
-    const roomMemory = Memory.rooms[room.name]
-    const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length
+    const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length / packedCoordLength
 
     for (let index = 0; index < sourceCount; index++) {
+
       room.communeManager.communeHaulerNeed += findCarryPartsRequired(
         packedSourcePaths[index].length / packedPosLength + 3,
         estimatedSourceIncome[index] * 1.1,

@@ -9,6 +9,7 @@ import {
   WorkTypes,
   RoomLogisticsRequestTypes,
   RoomStatsKeys,
+  packedCoordLength,
 } from '../../../constants/general'
 import {
   findClosestObject,
@@ -375,7 +376,7 @@ Creep.prototype.findSourceIndex = function () {
   let creepThreshold = 1
 
   const roomMemory = Memory.rooms[this.name]
-  const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length
+  const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length / packedCoordLength
 
   // So long as the creepThreshold is less than 4
 
