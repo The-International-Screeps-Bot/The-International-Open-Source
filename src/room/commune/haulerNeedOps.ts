@@ -37,7 +37,7 @@ export class HaulerNeedOps {
 
       const roomMemory = Memory.rooms[this.name]
       const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length
-      
+
       for (let index = 0; index < sourceCount; index++) {
         const sourceLink = room.communeManager.sourceLinks[index]
         if (sourceLink && StructureUtils.isRCLActionable(sourceLink)) continue
@@ -53,7 +53,7 @@ export class HaulerNeedOps {
 
     // There is no valid hubLink
 
-    const roomMemory = Memory.rooms[this.name]
+    const roomMemory = Memory.rooms[room.name]
     const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length
 
     for (let index = 0; index < sourceCount; index++) {
