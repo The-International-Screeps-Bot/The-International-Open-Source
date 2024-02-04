@@ -72,8 +72,6 @@ export class RoomNameOps {
       return room.scoutEnemyRoom()
     }
 
-    room.createWorkRequest()
-
     // There is no controller owner
 
     if (room.scoutRemote()) return roomMemory[RoomMemoryKeys.type]

@@ -1344,8 +1344,10 @@ Room.prototype.findAdjacentPositions = function (rx, ry) {
 
 Room.prototype.createWorkRequest = function () {
   const roomMemory = Memory.rooms[this.name]
+  const packedSourceCoords = roomMemory[RoomMemoryKeys.sourceCoords]
 
-  if (roomMemory[RoomMemoryKeys.sourceCoords].length / packedCoordLength < 2) return false
+  if (!packedSourceCoords) return false
+  if (packedSourceCoords.length / packedCoordLength < 2) return false
   if (Memory.workRequests[this.name]) return false
 
   RoomNameUtils.findDynamicScore(this.name)

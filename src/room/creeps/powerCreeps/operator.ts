@@ -38,16 +38,17 @@ export class Operator extends PowerCreep {
     taskTarget._reservePowers.add(task[CreepPowerTaskKeys.power])
   }
 
-  endRun() { }
+  endRun() {}
 
   // Basic tasks
 
   runTask?() {
     const creepMemory = Memory.powerCreeps[this.name]
-    const task = creepMemory[CreepMemoryKeys.task]
-    if (!task && !this.findTask()) return Result.fail
+    if (!creepMemory[CreepMemoryKeys.task] && !this.findTask()) {
+      return Result.fail
+    }
 
-    const taskResult = (this as any)[task[CreepTaskKeys.taskName]]()
+    const taskResult = (this as any)[creepMemory[CreepMemoryKeys.task][CreepTaskKeys.taskName]]()
     if (!taskResult) return taskResult === Result.fail
 
     delete creepMemory[CreepMemoryKeys.task]
