@@ -180,7 +180,9 @@ export class CreepUtils {
       )
 
       if (creepRequest === Result.fail) return Result.fail
-    } else {
+    }
+    // Otherwise we found a request
+    else {
       creepRequest = {
         [CreepLogisticsRequestKeys.type]: bestRequest.type,
         [CreepLogisticsRequestKeys.target]: bestRequest.targetID,
@@ -190,19 +192,25 @@ export class CreepUtils {
       }
 
       if (bestRequest.delivery) {
-        // creep request will preceed the one we've accepted to provide for the delivery
+        // creep request will preceed the one we've accepted to provide for the delivery (withdraw task)
         let nextCreepRequest: CreepLogisticsRequest
         const storingStructure = findObjectWithID(bestRequest.delivery as Id<AnyStoreStructure>)
 
         if (storingStructure) {
+
+          const amount = Math.min(
+            storingStructure.reserveStore[bestRequest.resourceType],
+            Math.max(
+              creep.nextStore[bestRequest.resourceType] + RoomObjectUtils.freeNextStoreOf(creep, bestRequest.resourceType),
+              creepRequest[CreepLogisticsRequestKeys.amount],
+            )
+          ),
+
           nextCreepRequest = {
             [CreepLogisticsRequestKeys.type]: RoomLogisticsRequestTypes.withdraw,
             [CreepLogisticsRequestKeys.target]: storingStructure.id,
             [CreepLogisticsRequestKeys.resourceType]: bestRequest.resourceType,
-            [CreepLogisticsRequestKeys.amount]: Math.min(
-              storingStructure.reserveStore[bestRequest.resourceType],
-              creepRequest[CreepLogisticsRequestKeys.amount],
-            ),
+            [CreepLogisticsRequestKeys.amount]: amount,
             [CreepLogisticsRequestKeys.noReserve]: bestRequest.noReserve,
             [CreepLogisticsRequestKeys.delivery]: true,
           }
@@ -210,7 +218,7 @@ export class CreepUtils {
           storingStructure.reserveStore[nextCreepRequest[CreepLogisticsRequestKeys.resourceType]] -=
             nextCreepRequest[CreepLogisticsRequestKeys.amount]
         } else {
-          // The delivery provider is
+          // The delivery provider is based on a request (withdraw)
 
           const nextRequest =
             creep.room.roomLogisticsRequests[RoomLogisticsRequestTypes.withdraw][
@@ -221,14 +229,19 @@ export class CreepUtils {
             ] ||
             creep.room.roomLogisticsRequests[RoomLogisticsRequestTypes.pickup][bestRequest.delivery]
 
+            const amount = Math.min(
+              nextRequest.amount,
+              Math.max(
+                creep.nextStore[bestRequest.resourceType] + RoomObjectUtils.freeNextStoreOf(creep, bestRequest.resourceType),
+                creepRequest[CreepLogisticsRequestKeys.amount],
+              )
+            )
+
           nextCreepRequest = {
             [CreepLogisticsRequestKeys.type]: nextRequest.type,
             [CreepLogisticsRequestKeys.target]: nextRequest.targetID,
             [CreepLogisticsRequestKeys.resourceType]: nextRequest.resourceType,
-            [CreepLogisticsRequestKeys.amount]: Math.min(
-              creep.nextStore[nextRequest.resourceType] + creep.freeNextStore,
-              creepRequest[CreepLogisticsRequestKeys.amount],
-            ),
+            [CreepLogisticsRequestKeys.amount]: amount,
             [CreepLogisticsRequestKeys.noReserve]:
               creepRequest[CreepLogisticsRequestKeys.noReserve],
             [CreepLogisticsRequestKeys.delivery]: true,
@@ -562,9 +575,9 @@ export class CreepUtils {
       if (request.delivery) {
         // Take extra energy in case its needed
 
-        if (request.resourceType === RESOURCE_ENERGY) {
+/*         if (request.resourceType === RESOURCE_ENERGY) {
           return creep.nextStore[request.resourceType] + creepFreeNextStore
-        }
+        } */
 
         return Math.min(request.amount, creep.nextStore[request.resourceType] + creepFreeNextStore)
       }

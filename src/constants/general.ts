@@ -617,6 +617,8 @@ export const nonCommuneSigns = [
   'Religion is the opium of the people - Karl Marx',
 ]
 
+export const tauntSign = '✊🛠️'
+
 /**
  * What to say when one of our creeps dies
  */

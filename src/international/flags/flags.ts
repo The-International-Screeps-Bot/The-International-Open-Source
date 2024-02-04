@@ -210,9 +210,6 @@ export class FlagManager {
 
     if (!roomMemory) {
       flag.setColor(COLOR_RED)
-      flag.remove()
-
-      
       return
     }
     if (roomMemory[RoomMemoryKeys.communePlanned] !== Result.success) {
@@ -229,7 +226,6 @@ export class FlagManager {
     }
 
     global.claim(roomName, communeName, score)
-
     flag.remove()
   }
 

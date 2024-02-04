@@ -209,8 +209,8 @@ export class RequestsManager extends StaticSleepable {
     // If there is no GCL left to claim with
     if (Game.gcl.level <= reservedGCL) {
       const room = Game.rooms[roomName]
-      // If we don't own the request room's contorller already, then we should stop
-      if (room && !room.controller.my) {
+      // If we don't own the request room's controller already, then we should stop
+      if (!room || !room.controller.my) {
         return false
       }
     }

@@ -189,14 +189,15 @@ global.claim = function (requestName, communeName, priority = 0, override?: bool
   const request = Memory.workRequests[requestName]
 
   request[WorkRequestKeys.priority] = priority
-  request[WorkRequestKeys.abandon] = 0
+  delete request[WorkRequestKeys.abandon]
 
   if (communeName) {
     const roomMemory = Memory.rooms[communeName]
     if (!roomMemory) return `No memory for ${communeName}`
 
-    if (roomMemory[RoomMemoryKeys.workRequest])
+    if (roomMemory[RoomMemoryKeys.workRequest]) {
       delete Memory.workRequests[roomMemory[RoomMemoryKeys.workRequest]][WorkRequestKeys.responder]
+    }
 
     roomMemory[RoomMemoryKeys.workRequest] = requestName
     request[WorkRequestKeys.responder] = communeName

@@ -1,4 +1,4 @@
-import { WorkRequestKeys, CreepMemoryKeys, Result, RoomTypes } from '../../../../constants/general'
+import { WorkRequestKeys, CreepMemoryKeys, Result, RoomTypes, tauntSign } from '../../../../constants/general'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 
 export class Claimer extends Creep {
@@ -13,6 +13,13 @@ export class Claimer extends Creep {
     if (!request) return
 
     request[WorkRequestKeys.claimer] -= 1
+  }
+
+  findSwampCost?() {
+    const moveParts = MyCreepUtils.parts(this)
+    if (moveParts.move >= 5) return 1
+
+    return undefined
   }
 
   /**
@@ -34,7 +41,7 @@ export class Claimer extends Creep {
         goals: [{ pos: room.controller.pos, range: 1 }],
         avoidEnemyRanges: true,
         plainCost: 1,
-        swampCost: MyCreepUtils.parts(this).move >= 5 ? 1 : undefined,
+        swampCost: this.findSwampCost(),
       })
 
       return
@@ -55,6 +62,8 @@ export class Claimer extends Creep {
     if (!creep.claimController(room.controller)) return
 
     // We claimed the controller
+
+    creep.signController(room.controller, tauntSign)
   }
 
   static roleManager(room: Room, creepsOfRole: string[]) {

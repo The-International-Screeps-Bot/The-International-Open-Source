@@ -191,9 +191,11 @@ export class CollectiveManager {
     return (this._workRequestsByScore = Object.keys(Memory.workRequests).sort(
       (a, b) =>
         (Memory.workRequests[a][WorkRequestKeys.priority] ??
-          Memory.rooms[a][RoomMemoryKeys.score] + Memory.rooms[a][RoomMemoryKeys.dynamicScore]) -
-        (Memory.workRequests[b][WorkRequestKeys.priority] ??
-          Memory.rooms[b][RoomMemoryKeys.score] + Memory.rooms[b][RoomMemoryKeys.dynamicScore]),
+          Memory.rooms[a][RoomMemoryKeys.score]) +
+        Memory.rooms[a][RoomMemoryKeys.dynamicScore] -
+        ((Memory.workRequests[b][WorkRequestKeys.priority] ??
+          Memory.rooms[b][RoomMemoryKeys.score]) +
+          Memory.rooms[b][RoomMemoryKeys.dynamicScore]),
     ))
   }
 

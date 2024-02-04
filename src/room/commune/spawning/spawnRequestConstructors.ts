@@ -171,7 +171,7 @@ export class SpawnRequestConstructors {
         }
 
         const maxCostPerCreep = Math.max(
-            Math.min(args.maxCostPerCreep, room.energyCapacityAvailable),
+            Math.min(args.maxCostPerCreep ?? room.energyCapacityAvailable, room.energyCapacityAvailable),
             args.minCostPerCreep,
         )
 
@@ -336,7 +336,7 @@ export class SpawnRequestConstructors {
         }
 
         const maxCostPerCreep = Math.max(
-            Math.min(args.maxCostPerCreep, room.energyCapacityAvailable),
+            Math.min(args.maxCostPerCreep ?? room.energyCapacityAvailable, room.energyCapacityAvailable),
             args.minCostPerCreep,
         )
 

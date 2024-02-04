@@ -179,7 +179,7 @@ export class Hauler extends Creep {
     // Ensure the creep and the remote have the same opinions on roads
     if (
       !!remoteMemory[RoomMemoryKeys.roads][sourceIndex] !=
-      !!Memory.creeps[this.name][CreepMemoryKeys.preferRoads]
+      Memory.creeps[this.name][CreepMemoryKeys.preferRoads]
     )
       return false
 
@@ -1015,19 +1015,20 @@ export class Hauler extends Creep {
   runRestrictedCommuneLogistics?() {
     const creepMemory = Memory.creeps[this.name]
     // let it respond to its remote
-    if (Memory.creeps[this.name][CreepMemoryKeys.remote]) return false
+    if (creepMemory[CreepMemoryKeys.remote]) return false
     // We aren't in the commune
-    if (this.room.name !== this.commune.name) return false
+    const commune = Game.rooms[creepMemory[CreepMemoryKeys.commune]]
+    if (this.room.name !== commune.name) return false
 
-    if (this.commune.communeManager.hasSufficientRoads) {
+    if (commune.communeManager.hasSufficientRoads) {
       // If we have a body not optimized for roads, try to respond to a remote instead
-      if (!creepMemory[CreepMemoryKeys.preferRoads]) return false
+      if (creepMemory[CreepMemoryKeys.preferRoads] !== true) return false
     }
 
     // If there is no need for more commune haulers
     if (
-      this.commune.communeManager.communeHaulerNeed <
-      this.commune.communeManager.communeHaulerCarryParts
+      commune.communeManager.communeHaulerNeed <
+      commune.communeManager.communeHaulerCarryParts
     ) {
       return false
     }
@@ -1036,7 +1037,7 @@ export class Hauler extends Creep {
 
     if (!creepMemory[CreepMemoryKeys.taskRoom]) {
       creepMemory[CreepMemoryKeys.taskRoom] = this.room.name
-      this.commune.communeManager.communeHaulerCarryParts += MyCreepUtils.parts(this).carry
+      commune.communeManager.communeHaulerCarryParts += MyCreepUtils.parts(this).carry
     }
 
     this.runCommuneLogistics()
