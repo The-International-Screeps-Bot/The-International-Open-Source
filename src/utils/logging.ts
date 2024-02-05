@@ -58,6 +58,9 @@ interface LogOpts {
 
 const positionPaddingPixels = 8
 
+/**
+ * @deprecated
+ */
 export function customLog(title: any, message?: any, opts?: LogOpts) {
   if (!global.settings.logging) return
 
@@ -82,6 +85,61 @@ export function customLog(title: any, message?: any, opts?: LogOpts) {
   }</div></div>`
 }
 
+/**
+ * @deprecated
+ */
 export function stringifyLog(title: any, message: any, opts?: LogOpts) {
   return customLog(title, DebugUtils.stringify(message), opts)
+}
+
+export class LogOps {
+  static customLog(title: any, message?: any, opts?: LogOpts) {
+    if (!global.settings.logging) return
+
+    if (!opts) opts = {}
+    if (!global.settings.debugLogging && opts.type === LogTypes.debug) return
+
+    const logType = opts.type ?? LogTypes.info
+    const logProperties = logTypeProperties[logType]
+
+    const BGColor = opts.BGColor ?? logProperties.BGColor
+    const textColor = opts.textColor ?? logProperties.textColor
+
+    // Create the title
+    CollectiveManager.logs += `<div class='consolePrefaceParent' style='background: ${BGColor}; margin-left: ${
+      (opts.position ?? 0) * positionPaddingPixels
+    }px;'><div class='consolePrefaceChild' style='color: ${textColor};'>${logProperties.preface} ${title}:</div>`
+
+    CollectiveManager.logs += `<div class='consoleMessage' style='color: ${textColor};'>${message ?? ''}</div></div>`
+  }
+
+  static stringifyLog(title: any, message: any, opts?: LogOpts) {
+    return this.customLog(title, DebugUtils.stringify(message), opts)
+  }
+
+  static registerStyles() {
+    const stylesID = 'styles'
+    const css =
+      `.consolePrefaceParent {
+      style='width: 100vw; text-align: center; align-items: center; justify-content: left; display: flex;
+    }` +
+      `consolePrefaceChild {
+      padding: 3px; font-size: 14px; font-weight: 600;
+    }` +
+      `.consoleMessage {
+      background-color: rgb(0, 0, 0, 0.15); border-radius:5px; padding: 1px 10px 1px 10px; font-size: 14px; font-weight: 200;
+    }`
+
+    console.log(
+      `<script>` +
+        `var node = document.getElementById("${stylesID}");` +
+        `if (node === null) {` +
+        `let style = document.createElement("style");` +
+        `style.id = "${stylesID}";` +
+        `document.body.appendChild(style);` +
+        `}` +
+        `document.getElementById("${stylesID}").innerHTML = "${css}";` +
+        `</script>`,
+    )
+  }
 }

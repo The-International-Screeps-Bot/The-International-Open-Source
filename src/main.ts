@@ -38,6 +38,7 @@ import { Utils } from 'utils/utils'
 import { Procs } from 'utils/procs'
 import { CommuneDataOps } from 'room/commune/communeData'
 import { GarbageCollector } from 'international/garbageCollector'
+import { LogOps } from 'utils/logging'
 
 export function originalLoop() {
   MemoryHack.runHack()
@@ -56,6 +57,7 @@ export function originalLoop() {
     InitManager.tryInit()
 
     TickInit.configGeneral()
+    LogOps.registerStyles()
     StatsManager.tickInit()
     CollectiveManager.update()
     GarbageCollector.tryRun()

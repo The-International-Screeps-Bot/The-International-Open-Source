@@ -95,6 +95,11 @@ export class WorkRequestManager {
     }
 
     const requestRoom = Game.rooms[requestName]
+    if (!requestRoom && Game.gcl.level === CollectiveManager.communes.size) {
+      this.stopResponse(true)
+      return
+    }
+
     if (!request[WorkRequestKeys.forAlly] && (!requestRoom || !requestRoom.controller.my)) {
       request[WorkRequestKeys.claimer] = 1
       return
