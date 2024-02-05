@@ -25,7 +25,7 @@ import {
 } from 'utils/utils'
 import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from './commune/commune'
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { RoomOps } from './roomOps'
 import { RoomNameOps } from './roomNameOps'
 import { RoomUtils } from './roomUtils'
@@ -113,7 +113,7 @@ export class RoomNameUtils {
     dynamicScore += mineralScore * 40
 
     dynamicScore = roundTo(dynamicScore, 2)
-    /* customLog('Dynamic scores', `enemy ${closestEnemy} commune ${communeScore} ally ${allyScore} mineralScore ${mineralScore} val1 ${Math.round(Math.pow(closestEnemy, -0.8) * 25)} val2 ${Math.round(communeScore * 50)} val3 ${mineralScore * 40} val4 ${dynamicScore}`) */
+    /* LogOps.LogOps'Dynamic scores', `enemy ${closestEnemy} commune ${communeScore} ally ${allyScore} mineralScore ${mineralScore} val1 ${Math.round(Math.pow(closestEnemy, -0.8) * 25)} val2 ${Math.round(communeScore * 50)} val3 ${mineralScore * 40} val4 ${dynamicScore}`) */
     roomMemory[RoomMemoryKeys.dynamicScore] = dynamicScore
     roomMemory[RoomMemoryKeys.dynamicScoreUpdate] = Game.time
 

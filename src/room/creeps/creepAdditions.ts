@@ -6,7 +6,7 @@ import {
   roomDimensions,
   towerPowers,
 } from '../../constants/general'
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { getRangeXY, getRange, isXYExit, isExit } from 'utils/utils'
 import { profiler } from 'other/profiler'
 import { CreepUtils } from './creepUtils'

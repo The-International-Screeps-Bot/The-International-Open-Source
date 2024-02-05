@@ -1,4 +1,4 @@
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { findLowestScore, roundTo } from 'utils/utils'
 import { CollectiveManager } from 'international/collective'
 import { StatsManager } from 'international/stats'

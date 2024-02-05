@@ -1,7 +1,7 @@
 import { findHighestScore, randomIntRange, randomTick, Utils } from 'utils/utils'
 import { PlayerMemoryKeys, Result, RoomMemoryKeys } from '../../constants/general'
 import { CollectiveManager } from '../collective'
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 
 const optimizeOrdersInterval = randomIntRange(900, 1000)
 

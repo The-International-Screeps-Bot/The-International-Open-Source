@@ -8,7 +8,7 @@ import {
 } from '../../../constants/general'
 import { CommuneUtils } from 'room/commune/communeUtils'
 import { CreepPowerTask, PowerRequest } from 'types/creepTasks'
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { findObjectWithID, getRange } from 'utils/utils'
 
 export class Operator extends PowerCreep {
@@ -264,7 +264,7 @@ export class Operator extends PowerCreep {
     const target = findObjectWithID(task[CreepPowerTaskKeys.target])
 
     // We aren't in range, get closer
-    customLog('TRY TASK', target)
+    LogOps.log('TRY TASK', target)
     const minRange = (POWER_INFO[task[CreepPowerTaskKeys.power]] as any).range
     if (minRange && getRange(this.pos, target.pos) > minRange) {
       this.createMoveRequest({
@@ -285,7 +285,7 @@ export class Operator extends PowerCreep {
     this.usePower(task[CreepPowerTaskKeys.power], target)
 
     // We did the power
-    customLog('WE DID THE POWA', target)
+    LogOps.log('WE DID THE POWA', target)
 
     // Assume the power consumed ops if it does so
 

@@ -3,7 +3,7 @@ import {
   linkReceiveTreshold,
   linkSendThreshold,
 } from '../../constants/general'
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { CommuneManager } from './commune'
 import { StructureUtils } from 'room/structureUtils'
 import { CommuneUtils } from './communeUtils'

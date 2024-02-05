@@ -3,7 +3,7 @@ import { Result } from '../../../constants/general'
 import { MarketManager } from 'international/market/marketOrders'
 import { simpleAllies } from 'international/simpleAllies/simpleAllies'
 import { StructureUtils } from 'room/structureUtils'
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { newID, Utils } from 'utils/utils'
 import { ResourceTargets } from '../commune'
 import { TradingUtils } from './tradingUtils'
@@ -120,7 +120,7 @@ export class TerminalProcs {
 
       const consequentSend = storedResource - equivalentAmount
 
-      customLog(
+      LogOps.log(
         'TERMINAL SEND SPECIAL VALUES',
         `${equivalentAmount} vs ${storedResource} vs ${
           Game.rooms[request.roomName].roomManager.resourcesInStoringStructures[request.resource]
@@ -145,7 +145,7 @@ export class TerminalProcs {
           room.name,
           request.roomName,
         ) / 2
-      customLog(
+      LogOps.log(
         'TERMINAL REQUEST ' + request.resource,
         maxSendAmount +
           ' ,' +

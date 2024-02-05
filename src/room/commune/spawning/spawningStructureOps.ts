@@ -17,7 +17,7 @@ import { unpackPosAt, packCoord, unpackCoord } from 'other/codec'
 import { CreepProcs } from 'room/creeps/creepProcs'
 import { StructureUtils } from 'room/structureUtils'
 import { SpawnRequest, BodyPartCounts, SpawnRequestTypes } from 'types/spawnRequest'
-import { customLog, LogTypes } from 'utils/logging'
+import { LogOps, LogTypes } from 'utils/logOps'
 import { getRange, findAdjacentCoordsToCoord, Utils } from 'utils/utils'
 import { SpawnRequestConstructor, SpawnRequestConstructors } from './spawnRequestConstructors'
 import { CommuneUtils } from '../communeUtils'
@@ -85,7 +85,7 @@ export class SpawningStructureOps {
     // If this is ran then there is a bug in spawnRequest creation
 
     if (request.cost > room.energyCapacityAvailable) {
-      customLog(
+      LogOps.log(
         'Failed to spawn: not enough energy',
         `cost greater then energyCapacityAvailable, role: ${request.role}, cost: ${
           room.energyCapacityAvailable
@@ -99,7 +99,7 @@ export class SpawningStructureOps {
     }
 
     if (request.cost > room.communeManager.nextSpawnEnergyAvailable) {
-      customLog(
+      LogOps.log(
         'Failed to spawn: not enough energy',
         `cost greater then nextSpawnEnergyAvailable, role: ${request.role}, cost: ${
           request.cost
@@ -129,7 +129,7 @@ export class SpawningStructureOps {
 
     if (testSpawnResult !== OK) {
       if (testSpawnResult === ERR_NOT_ENOUGH_ENERGY) {
-        customLog(
+        LogOps.log(
           'Failed to spawn: dryrun failed',
           `request: ${testSpawnResult}, role: ${request.role}, ID: ${ID}, cost: ${request.cost} / ${room.communeManager.nextSpawnEnergyAvailable}, body: (${body.length}) ${body}`,
           {
@@ -139,7 +139,7 @@ export class SpawningStructureOps {
         return Result.fail
       }
 
-      customLog(
+      LogOps.log(
         'Failed to spawn: dryrun failed',
         `request: ${testSpawnResult}, role: ${request.role}, ID: ${ID}, cost: ${request.cost} / ${room.communeManager.nextSpawnEnergyAvailable}, body: (${body.length}) ${body}`,
         {
@@ -155,7 +155,7 @@ export class SpawningStructureOps {
     request.extraOpts.directions = this.findDirections(room, spawn.pos)
     const result = this.advancedSpawn(room, spawn, request, body, ID)
     if (result !== OK) {
-      customLog(
+      LogOps.log(
         'Failed to spawn: spawning failed',
         `error: ${result}, request: ${DebugUtils.stringify(request)}`,
         {
@@ -346,13 +346,13 @@ export class SpawningStructureOps {
 
     for (const request of spawnRequestsArgs) {
       if (request.role === 'remoteSourceHarvester') {
-        customLog(
+        LogOps.log(
           'SPAWN REQUEST ARGS',
           request.role + request.memoryAdditions[CreepMemoryKeys.remote] + ', ' + request.priority,
         )
         continue
       }
-      customLog('SPAWN REQUEST ARGS', request.role + ', ' + request.priority)
+      LogOps.log('SPAWN REQUEST ARGS', request.role + ', ' + request.priority)
     }
   }
 

@@ -34,7 +34,7 @@ import { CollectiveManager } from 'international/collective'
 import { packCoord, packCoordList, packXYAsCoord, unpackPosList } from 'other/codec'
 import { PlayerManager } from 'international/players'
 import { RoomNameUtils } from './roomNameUtils'
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { RoomObjectUtils } from './roomObjectUtils'
 import { RoomNameOps } from './roomNameOps'
 import { RoomOps } from './roomOps'
@@ -1444,7 +1444,7 @@ Room.prototype.coordHasStructureTypes = function (coord, types) {
 
 Room.prototype.createPowerRequest = function (target, powerType, priority) {
   // There is already has a power creep responding to this target with the power
-  customLog('MADE POWER TASK FOR', target)
+  LogOps.log('MADE POWER TASK FOR', target)
   if (target.reservePowers.has(powerType)) return false
 
   // Create a power task with info on the cooldown

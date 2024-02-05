@@ -1,5 +1,5 @@
 import { minerals, Result, RoomMemoryKeys } from '../../../constants/general'
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { newID, roundTo } from 'utils/utils'
 import './tradingUtils'
 import { CollectiveManager } from 'international/collective'

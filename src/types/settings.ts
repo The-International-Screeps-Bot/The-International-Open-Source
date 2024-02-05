@@ -56,7 +56,7 @@ export interface Settings {
   marketUsage: boolean
 
   /**
-   * The number of ticks to publish customLogs for. 0 disabled logging. Cannot be more than 100
+   * The number of ticks to publish LogOpss for. 0 disabled logging. Cannot be more than 100
    */
   logging: number
 

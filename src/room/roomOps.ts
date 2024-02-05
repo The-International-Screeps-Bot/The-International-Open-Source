@@ -18,7 +18,7 @@ import { RoomNameUtils } from './roomNameUtils'
 import { CommuneManager } from './commune/commune'
 import { CommuneOps } from './commune/communeOps'
 import { LogisticsProcs } from './logisticsProcs'
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { packCoord, packCoordList, unpackCoord, unpackCoordList } from 'other/codec'
 import { HaulerServices } from './creeps/roles/haulerServices'
 import { HaulerOps } from './creeps/roles/haulerOps'
@@ -220,7 +220,7 @@ export class RoomOps {
   visualizeReservedCoords(room: Room) {
     const roomManager = room.roomManager
 
-    customLog('reservedCoords', JSON.stringify([...roomManager.reservedCoords]))
+    LogOps.log('reservedCoords', JSON.stringify([...roomManager.reservedCoords]))
     for (const [packedCoord, reserveType] of roomManager.reservedCoords) {
       const coord = unpackCoord(packedCoord)
       room.coordVisual(coord.x, coord.y, `hsl(${200}${reserveType * 50}, 100%, 60%)`)
@@ -395,7 +395,6 @@ export class RoomOps {
 
     const sourceCoords = unpackCoordList(packedSourceCoords)
     for (const coord of sourceCoords) {
-
       for (const source of room.lookForAt(LOOK_SOURCES, coord.x, coord.y)) {
         sources.push(source)
       }

@@ -12,7 +12,7 @@ import {
 import { Utils, randomIntRange, randomTick, roundTo } from 'utils/utils'
 import { CollectiveManager } from 'international/collective'
 import { RoomNameUtils } from 'room/roomNameUtils'
-import { customLog, LogTypes } from 'utils/logging'
+import { LogOps, LogTypes } from 'utils/logOps'
 import { ObserverProcs } from './observerProcs'
 import { TerminalProcs } from './terminal/terminalProcs'
 import { LogisticsProcs } from 'room/logisticsProcs'
@@ -166,7 +166,7 @@ export class CommuneOps {
 
     let CPUUsed = Game.cpu.getUsed()
 
-    customLog('CPU TEST 1 ' + room.name, Game.cpu.getUsed() - CPUUsed, {
+    LogOps.log('CPU TEST 1 ' + room.name, Game.cpu.getUsed() - CPUUsed, {
       type: LogTypes.info,
     })
   }
@@ -222,7 +222,7 @@ export class CommuneOps {
 
     let CPUUsed = Game.cpu.getUsed()
 
-    customLog('CPU TEST 1 ' + room.name, Game.cpu.getUsed() - CPUUsed, {
+    LogOps.log('CPU TEST 1 ' + room.name, Game.cpu.getUsed() - CPUUsed, {
       type: LogTypes.info,
     })
   }
@@ -231,7 +231,7 @@ export class CommuneOps {
    * Debug
    */
   static visualizeSpawningStructuresByNeed(room: Room) {
-    customLog('spawningStructuresByNeed', room.communeManager.spawningStructuresByNeed, {
+    LogOps.log('spawningStructuresByNeed', room.communeManager.spawningStructuresByNeed, {
       type: LogTypes.error,
     })
     for (const structure of room.communeManager.spawningStructuresByNeed) {

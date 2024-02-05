@@ -1,4 +1,4 @@
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { HaulerServices } from './roles/haulerServices'
 
 export class MyCreepServices {
@@ -12,8 +12,8 @@ export class MyCreepServices {
           HaulerServices.runCreeps(creepNames)
           break
         default:
-          customLog('No server for role', role)
-          /* throw Error(`No service for role ${role}`) */
+          LogOps.log('No server for role', role)
+        /* throw Error(`No service for role ${role}`) */
       }
     }
   }

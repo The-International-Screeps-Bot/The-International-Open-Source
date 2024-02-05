@@ -6,7 +6,7 @@ import {
   RoomStatsKeys,
   RoomTypes,
 } from '../constants/general'
-import { customLog, LogTypes } from 'utils/logging'
+import { LogOps, LogTypes } from 'utils/logOps'
 import { CollectiveManager } from './collective'
 
 export interface RoomStats {
@@ -326,7 +326,7 @@ export class StatsManager {
         ? Game.cpu.getUsed()
         : // limit * time step from last stats recording
           Game.cpu.limit * (Game.time - Memory.stats.lastTick)
-    /* customLog('STATS' + (Game.time - Memory.stats.lastTick), usedCPU) */
+    /* LogOps.LogOps'STATS' + (Game.time - Memory.stats.lastTick), usedCPU) */
     Memory.stats.cpu = {
       bucket: Game.cpu.bucket,
       limit: Game.cpu.limit,

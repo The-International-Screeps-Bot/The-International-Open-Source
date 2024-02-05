@@ -15,7 +15,7 @@ import {
   roomDimensions,
 } from '../constants/general'
 import { packCoord, unpackCoord, unpackCoordList, unpackPosAt, unpackPosList } from 'other/codec'
-import { LogTypes, customLog } from 'utils/logging'
+import { LogTypes, LogOps } from 'utils/logOps'
 import { forCoordsAroundRange, unpackNumAsCoord, visualizePath } from '../utils/utils'
 import { RoomUtils } from 'room/roomUtils'
 import { RoomOps } from 'room/roomOps'
@@ -448,7 +448,7 @@ export class CustomPathFinder {
     // If the pathFindResult is incomplete, inform an empty array
 
     if (pathFinderResult.incomplete) {
-      customLog(
+      LogOps.log(
         'Incomplete Path',
         `${args.origin} -> ${args.goals[0].pos} range: ${args.goals[0].range} goals: ${
           args.goals.length

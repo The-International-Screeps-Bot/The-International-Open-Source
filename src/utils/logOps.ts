@@ -58,10 +58,7 @@ interface LogOpts {
 
 const positionPaddingPixels = 8
 
-/**
- * @deprecated
- */
-export function customLog(title: any, message?: any, opts?: LogOpts) {
+/* export function LogOps.LogOpstitle: any, message?: any, opts?: LogOpts) {
   if (!global.settings.logging) return
 
   if (!opts) opts = {}
@@ -83,17 +80,10 @@ export function customLog(title: any, message?: any, opts?: LogOpts) {
   CollectiveManager.logs += `<div style='background-color: rgb(0, 0, 0, 0.15); border-radius:5px; padding: 1px 10px 1px 10px; font-size: 14px; font-weight: 200; color: ${textColor};'>${
     message ?? ''
   }</div></div>`
-}
-
-/**
- * @deprecated
- */
-export function stringifyLog(title: any, message: any, opts?: LogOpts) {
-  return customLog(title, DebugUtils.stringify(message), opts)
-}
+} */
 
 export class LogOps {
-  static customLog(title: any, message?: any, opts?: LogOpts) {
+  static log(title: any, message?: any, opts?: LogOpts) {
     if (!global.settings.logging) return
 
     if (!opts) opts = {}
@@ -106,28 +96,51 @@ export class LogOps {
     const textColor = opts.textColor ?? logProperties.textColor
 
     // Create the title
-    CollectiveManager.logs += `<div class='consolePrefaceParent' style='background: ${BGColor}; margin-left: ${
+    CollectiveManager.logs += `<div class='log' style='width: 100vw; text-align: center; align-items: center; justify-content: left; display: flex; background: ${BGColor}; margin-left: ${
       (opts.position ?? 0) * positionPaddingPixels
-    }px;'><div class='consolePrefaceChild' style='color: ${textColor};'>${logProperties.preface} ${title}:</div>`
+    }px;'><div style='padding: 3px; font-size: 14px; font-weight: 600; color: ${textColor};'>${
+      logProperties.preface
+    } ${title}:</div>`
 
-    CollectiveManager.logs += `<div class='consoleMessage' style='color: ${textColor};'>${message ?? ''}</div></div>`
+    CollectiveManager.logs += `<div style='background-color: rgb(0, 0, 0, 0.15); border-radius:5px; padding: 1px 10px 1px 10px; font-size: 14px; font-weight: 200; color: ${textColor};'>${
+      message ?? ''
+    }</div></div>`
+/*     CollectiveManager.logs += `<div class='consolePrefaceParent' style='background: ${BGColor}; margin-left: ${
+      (opts.position ?? 0) * positionPaddingPixels
+    }px;'><div class='consolePrefaceChild' style='color: ${textColor};'>${
+      logProperties.preface
+    } ${title}:</div>`
+
+    CollectiveManager.logs += `<div class='consoleMessage' style='color: ${textColor};'>${
+      message ?? ''
+    }</div></div>` */
   }
 
   static stringifyLog(title: any, message: any, opts?: LogOpts) {
-    return this.customLog(title, DebugUtils.stringify(message), opts)
+    return this.log(title, DebugUtils.stringify(message), opts)
   }
 
   static registerStyles() {
     const stylesID = 'styles'
-    const css =
-      `.consolePrefaceParent {
-      style='width: 100vw; text-align: center; align-items: center; justify-content: left; display: flex;
-    }` +
-      `consolePrefaceChild {
-      padding: 3px; font-size: 14px; font-weight: 600;
-    }` +
-      `.consoleMessage {
-      background-color: rgb(0, 0, 0, 0.15); border-radius:5px; padding: 1px 10px 1px 10px; font-size: 14px; font-weight: 200;
+    const css = `
+    .consolePrefaceParent {
+      width: 100vw;
+      text-align: center;
+      align-items: center;
+      justify-content: left;
+      display: flex;
+    }
+    .consolePrefaceChild {
+      padding: 3px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .consoleMessage {
+      background-color: rgb(0, 0, 0, 0.15);
+      border-radius:5px;
+      padding: 1px 10px 1px 10px;
+      font-size: 14px;
+      font-weight: 200;
     }`
 
     console.log(
@@ -138,7 +151,7 @@ export class LogOps {
         `style.id = "${stylesID}";` +
         `document.body.appendChild(style);` +
         `}` +
-        `document.getElementById("${stylesID}").innerHTML = "${css}";` +
+        'document.getElementById("${stylesID}").innerHTML = `' + css + '`;' +
         `</script>`,
     )
   }

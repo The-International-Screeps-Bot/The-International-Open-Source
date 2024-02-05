@@ -11,7 +11,7 @@ import {
   FlagNames,
 } from '../constants/general'
 import { StatsManager } from 'international/stats'
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { findObjectWithID, unpackNumAsCoord } from 'utils/utils'
 import { RoomManager } from './room'
 import { Rectangle, Table, Dial, Grid, Bar, Dashboard, LineChart, Label } from 'screeps-viz'

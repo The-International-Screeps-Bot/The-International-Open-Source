@@ -1,5 +1,5 @@
 import { allResources, customColors } from '../constants/general'
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { findObjectWithID } from 'utils/utils'
 
 Object.defineProperties(RoomObject.prototype, {

@@ -1,6 +1,6 @@
 import { customColors, powerCreepClassNames } from '../../constants/general'
 import { statsManager } from 'international/stats'
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { RoomManager } from 'room/room'
 import { Operator } from './powerCreeps/operator'
 
@@ -38,7 +38,7 @@ export class PowerCreepRoleManager {
 
     // Log className cpu
 
-    customLog(
+    LogOps.log(
       `${className}s`,
       `Creeps: ${creepsOfRoleAmount}, CPU: ${(Game.cpu.getUsed() - roleCPUStart).toFixed(
         2,

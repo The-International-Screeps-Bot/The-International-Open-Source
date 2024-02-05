@@ -19,7 +19,7 @@ import { StatsManager } from 'international/stats'
 import './creeps/endTickCreepManager'
 import { CommuneManager } from './commune/commune'
 import { RoomManager } from './room'
-import { LogTypes, customLog } from 'utils/logging'
+import { LogTypes, LogOps } from 'utils/logOps'
 import { RoomOps } from './roomOps'
 import { CommuneOps } from './commune/communeOps'
 
@@ -76,7 +76,7 @@ export class RoomServices {
     const roomMemory = Memory.rooms[room.name]
     const roomType = roomMemory[RoomMemoryKeys.type]
 
-    customLog(
+    LogOps.log(
       `<a style="cursor: pointer;color:inherit; text-decoration:underline;" href="#!/room/${Game.shard.name}/${room.name}">${room.name}</a>`,
       `Type: ${RoomTypes[roomType]} Creeps: ${room.myCreeps.length}`,
       {

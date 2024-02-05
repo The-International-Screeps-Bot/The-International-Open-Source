@@ -25,7 +25,7 @@ import {
   RoomLogisticsRequest,
   RoomLogisticsTargets,
 } from '../../types/roomLogistics'
-import { customLog, stringifyLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { RoomObjectUtils } from 'room/roomObjectUtils'
 import { StructureUtils } from 'room/structureUtils'
 import { packCoord } from 'other/codec'
@@ -117,7 +117,11 @@ export class CreepProcs {
 
             // Add control points to total controlPoints counter and say the success
 
-            StatsManager.updateStat(creep.room.name, RoomStatsKeys.EnergyOutputRepairOther, energySpentOnRepairs)
+            StatsManager.updateStat(
+              creep.room.name,
+              RoomStatsKeys.EnergyOutputRepairOther,
+              energySpentOnRepairs,
+            )
             creep.message += `🔧${energySpentOnRepairs * REPAIR_POWER}`
           }
         }
@@ -207,7 +211,11 @@ export class CreepProcs {
         MyCreepUtils.parts(creep).work * UPGRADE_CONTROLLER_POWER,
       )
 
-      StatsManager.updateStat(creep.room.name, RoomStatsKeys.EnergyOutputUpgrade, energySpentOnUpgrades)
+      StatsManager.updateStat(
+        creep.room.name,
+        RoomStatsKeys.EnergyOutputUpgrade,
+        energySpentOnUpgrades,
+      )
       creep.message = `🔋${energySpentOnUpgrades}`
 
       // Inform true
@@ -264,10 +272,18 @@ export class CreepProcs {
 
     // Record the repair attempt in different places for barricades than other structures
     if (target.structureType === STRUCTURE_RAMPART || target.structureType === STRUCTURE_WALL) {
-      StatsManager.updateStat(creep.room.name, RoomStatsKeys.EnergyOutputRepairWallOrRampart, energySpentOnRepair)
+      StatsManager.updateStat(
+        creep.room.name,
+        RoomStatsKeys.EnergyOutputRepairWallOrRampart,
+        energySpentOnRepair,
+      )
       creep.message = `🧱${energySpentOnRepair * REPAIR_POWER}`
     } else {
-      StatsManager.updateStat(creep.room.name, RoomStatsKeys.EnergyOutputRepairOther, energySpentOnRepair)
+      StatsManager.updateStat(
+        creep.room.name,
+        RoomStatsKeys.EnergyOutputRepairOther,
+        energySpentOnRepair,
+      )
       creep.message = `🔧${energySpentOnRepair * REPAIR_POWER}`
     }
 
@@ -490,7 +506,7 @@ export class CreepProcs {
           creep.pos,
           { font: 0.2 },
         )
-        customLog(
+        LogOps.log(
           'not enough free store',
           creep.name +
             ', ' +
@@ -523,7 +539,7 @@ export class CreepProcs {
           creep.pos,
           { font: 0.2 },
         )
-        customLog(
+        LogOps.log(
           'not enough amount',
           creep.name +
             ', ' +

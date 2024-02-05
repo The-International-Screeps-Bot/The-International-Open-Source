@@ -627,7 +627,7 @@ export class SpawnRequestsManager {
             (REPAIR_POWER * 0.3)
         }
 
-        /* customLog('e', partsMultiplier) */
+        /* LogOps.LogOps'e', partsMultiplier) */
         const role = 'maintainer'
 
         if (this.communeManager.hasSufficientRoads) {

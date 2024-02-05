@@ -11,9 +11,9 @@ import { PlayerManager } from "international/players"
 import { simpleAllies } from "international/simpleAllies/simpleAllies"
 import { packCoord } from "other/codec"
 import { RoomNameUtils } from "room/roomNameUtils"
-import { customLog, LogTypes } from "utils/logging"
-import { findObjectWithID, isAlly, randomIntRange } from "utils/utils"
-import { DefenceUtils } from "./defenceUtils"
+import { LogOps, LogTypes } from 'utils/logOps'
+import { findObjectWithID, isAlly, randomIntRange } from 'utils/utils'
+import { DefenceUtils } from './defenceUtils'
 
 export class DefenceProcs {
   static run(room: Room) {
@@ -89,7 +89,6 @@ export class DefenceProcs {
   }
 
   private static assignDefenceTargets(room: Room) {
-
     // Sort by estimated percent health change
 
     const defenderEnemyTargetsByDamage = Array.from(
@@ -106,7 +105,7 @@ export class DefenceProcs {
       )
     })
 
-    customLog('ENEMY TARGETS BY DAMAGE', defenderEnemyTargetsByDamage, {
+    LogOps.log('ENEMY TARGETS BY DAMAGE', defenderEnemyTargetsByDamage, {
       type: LogTypes.warning,
     })
 
@@ -151,7 +150,6 @@ export class DefenceProcs {
   }
 
   static manageDefenceRequests(room: Room) {
-
     if (!room.towerInferiority) return
 
     const hasTowers = !!room.roomManager.structures.tower.length
@@ -194,7 +192,6 @@ export class DefenceProcs {
   }
 
   static manageThreat(room: Room) {
-
     const presentThreat = DefenceUtils.findPresentThreat(room)
     const roomMemory = Memory.rooms[room.name]
 

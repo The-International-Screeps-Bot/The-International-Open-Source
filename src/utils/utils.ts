@@ -6,7 +6,7 @@ import {
   Result,
   FlagNames,
 } from '../constants/general'
-import { customLog } from './logging'
+import { LogOps } from './logOps'
 import { PlayerRelationships } from '../constants/general'
 import { RoomNameUtils } from 'room/roomNameUtils'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
@@ -423,7 +423,7 @@ export function findCPUOf(func: Function) {
 
   func()
 
-  customLog('CPU for ' + func.name, Game.cpu.getUsed() - CPU)
+  LogOps.log('CPU for ' + func.name, Game.cpu.getUsed() - CPU)
 }
 
 export function isXYExit(x: number, y: number) {

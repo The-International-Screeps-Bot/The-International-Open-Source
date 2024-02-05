@@ -7,7 +7,7 @@ import {
   RoomMemoryKeys,
   structureTypesToProtectSet,
 } from '../../constants/general'
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { findObjectWithID, packAsNum, randomIntRange, randomTick, Utils } from 'utils/utils'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneManager } from 'room/commune/commune'

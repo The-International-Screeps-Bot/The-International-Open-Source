@@ -38,7 +38,7 @@ import { Utils } from 'utils/utils'
 import { Procs } from 'utils/procs'
 import { CommuneDataOps } from 'room/commune/communeData'
 import { GarbageCollector } from 'international/garbageCollector'
-import { LogOps } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 
 export function originalLoop() {
   MemoryHack.runHack()

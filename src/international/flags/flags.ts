@@ -16,7 +16,7 @@ import { CombatRequestTypes } from 'types/internationalRequests'
 import { RoomNameUtils } from 'room/roomNameUtils'
 import { packCoord } from 'other/codec'
 import { findObjectWithID, isAlly } from 'utils/utils'
-import { customLog } from 'utils/logging'
+import { LogOps } from 'utils/logOps'
 import { RoomUtils } from 'room/roomUtils'
 import { SpawnRequestConstructorsByType } from 'room/commune/spawning/spawningStructureOps'
 import { RoomOps } from 'room/roomOps'
@@ -423,10 +423,10 @@ export class FlagManager {
     const stampAnchors = room.roomManager.stampAnchors
     if (!stampAnchors) return
 
-    customLog('sourceLinks stampAnchors', JSON.stringify(stampAnchors.sourceLink))
+    LogOps.log('sourceLinks stampAnchors', JSON.stringify(stampAnchors.sourceLink))
 
     const links = room.communeManager.sourceLinks
-    customLog('sourceLinks', links)
+    LogOps.log('sourceLinks', links)
     for (let sourceIndex = 0; sourceIndex < links.length; sourceIndex++) {
       const link = links[sourceIndex]
       if (!link) continue
@@ -458,7 +458,7 @@ export class FlagManager {
     const roomName = flagNameParts[1] || flag.pos.roomName
 
     const dynamicScore = RoomNameUtils.findDynamicScore(roomName)
-    customLog('dynamic score for ' + roomName, dynamicScore)
+    LogOps.log('dynamic score for ' + roomName, dynamicScore)
   }
 
   private spawnRequestVisuals(flagName: string, flagNameParts: string[]) {
