@@ -504,12 +504,12 @@ export class CreepUtils {
     const storingStructures = CommuneUtils.storingStructures(creep.commune)
     if (!storingStructures.length) return Result.fail
 
-    const nextStore = creep.nextStore
+    const creepNextStore = creep.nextStore
     let resourceType: ResourceConstant
 
-    for (const key in nextStore) {
+    for (const key in creepNextStore) {
       if (key === RESOURCE_ENERGY) continue
-      if (nextStore[key as ResourceConstant] <= 0) continue
+      if (creepNextStore[key as ResourceConstant] <= 0) continue
 
       resourceType = key as ResourceConstant
       break
@@ -518,7 +518,7 @@ export class CreepUtils {
     if (!resourceType) return Result.fail
 
     const storingStructure = storingStructures.find(
-      structure => structure.freeReserveStore >= nextStore[resourceType],
+      structure => structure.freeReserveStore >= creepNextStore[resourceType],
     )
     if (!storingStructure) return Result.fail
     /* creep.room.visual.text((creep.nextStore[resourceType]).toString(), creep.pos.x, creep.pos.y, { color: customColors.red }) */
@@ -526,7 +526,7 @@ export class CreepUtils {
       [CreepLogisticsRequestKeys.type]: RoomLogisticsRequestTypes.transfer,
       [CreepLogisticsRequestKeys.target]: storingStructure.id,
       [CreepLogisticsRequestKeys.resourceType]: resourceType,
-      [CreepLogisticsRequestKeys.amount]: nextStore[resourceType],
+      [CreepLogisticsRequestKeys.amount]: creepNextStore[resourceType],
     }
   }
 
