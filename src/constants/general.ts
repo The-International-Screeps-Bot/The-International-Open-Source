@@ -1234,6 +1234,8 @@ export enum Result {
   action,
   noAction,
   stop,
+  noPath,
+  notFound,
 }
 
 export const maxRemoteRoomDistance = 5

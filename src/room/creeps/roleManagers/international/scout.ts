@@ -13,8 +13,6 @@ import { RoomNameOps } from 'room/roomNameOps'
 import { RoomOps } from 'room/roomOps'
 
 export class Scout extends Creep {
-  scoutedRooms?: string[]
-  unscoutedRooms?: string[]
 
   constructor(creepID: Id<Creep>) {
     super(creepID)
@@ -40,11 +38,11 @@ export class Scout extends Creep {
     return true
   }
 
-  findScoutTargets?() {
+  findScoutTargets?(creepMemory: CreepMemory) {
     // Construct storage of exit information
 
-    this.scoutedRooms = []
-    this.unscoutedRooms = []
+    const scoutedRooms = []
+    const unscoutedRooms = []
 
     // Get information about the room's exits
     const exits = Game.map.describeExits(this.room.name)
@@ -58,13 +56,16 @@ export class Scout extends Creep {
 
       // If a scout already has this room as a target
 
-      if (this.commune.scoutTargets.has(roomName)) continue
+      const commune = Game.rooms[creepMemory[CreepMemoryKeys.commune]]
+      if (commune.scoutTargets.has(roomName)) continue
 
       // Iterate if the room statuses aren't the same
 
+      const status = RoomNameUtils.getStatusForPotentialMemory(roomName)
       if (
+        status !== undefined &&
         Memory.rooms[this.room.name][RoomMemoryKeys.status] !==
-        RoomNameUtils.getStatusForPotentialMemory(roomName)
+        status
       )
         continue
 
@@ -73,46 +74,50 @@ export class Scout extends Creep {
       if (Memory.rooms[roomName] && Memory.rooms[roomName][RoomMemoryKeys.lastScout]) {
         // Add it to scoutedRooms and iterate
 
-        this.scoutedRooms.push(roomName)
+        scoutedRooms.push(roomName)
         continue
       }
 
-      this.unscoutedRooms.push(roomName)
+      unscoutedRooms.push(roomName)
     }
+
+    return {unscoutedRooms, scoutedRooms}
   }
 
   findBestScoutTarget?() {
-    this.findScoutTargets()
+
+    const creepMemory = Memory.creeps[this.name]
+    const {unscoutedRooms, scoutedRooms} = this.findScoutTargets(creepMemory)
 
     // Find the closest room to the creep's commune
 
-    if (this.unscoutedRooms.length) {
+    if (unscoutedRooms.length) {
       let lowestRange = Infinity
 
-      for (const roomName of this.unscoutedRooms) {
-        const range = Game.map.getRoomLinearDistance(this.commune.name, roomName)
-        if (range > lowestRange) continue
+      for (const roomName of unscoutedRooms) {
+        const range = Game.map.getRoomLinearDistance(creepMemory[CreepMemoryKeys.commune], roomName)
+        if (range >= lowestRange) continue
 
         lowestRange = range
-        this.memory[CreepMemoryKeys.scoutTarget] = roomName
+        creepMemory[CreepMemoryKeys.scoutTarget] = roomName
       }
 
-      return this.memory[CreepMemoryKeys.scoutTarget]
+      return creepMemory[CreepMemoryKeys.scoutTarget]
     }
 
     // Find the room scouted longest ago
 
     let lowestLastScoutTick = Infinity
 
-    for (const roomName of this.scoutedRooms) {
+    for (const roomName of scoutedRooms) {
       const lastScoutTick = Memory.rooms[roomName][RoomMemoryKeys.lastScout]
-      if (lastScoutTick > lowestLastScoutTick) continue
+      if (lastScoutTick >= lowestLastScoutTick) continue
 
       lowestLastScoutTick = lastScoutTick
-      this.memory[CreepMemoryKeys.scoutTarget] = roomName
+      creepMemory[CreepMemoryKeys.scoutTarget] = roomName
     }
 
-    return this.memory[CreepMemoryKeys.scoutTarget]
+    return creepMemory[CreepMemoryKeys.scoutTarget]
   }
 
   // THIS SHOULD BE A ROOM FUNCTION BASED OFF Room.advancedScout

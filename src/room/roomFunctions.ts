@@ -1484,8 +1484,9 @@ Room.prototype.createRoomLogisticsRequest = function (args) {
   // Don't make requests when there is nobody to respond
 
   if (!this.myCreeps.length) return Result.noAction
-  if (this.roomManager.roomLogisticsBlacklistCoords.has(packCoord(args.target.pos)))
+  if (this.roomManager.roomLogisticsBlacklistCoords.has(packCoord(args.target.pos))) {
     return Result.noAction
+  }
 
   if (!args.resourceType) args.resourceType = RESOURCE_ENERGY
   // We should only handle energy until we have an active storage or terminal

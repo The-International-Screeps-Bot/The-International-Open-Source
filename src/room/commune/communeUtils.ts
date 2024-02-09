@@ -166,10 +166,10 @@ export class CommuneUtils {
 
     if (hubLink && StructureUtils.isRCLActionable(hubLink)) {
       // Add a bit of extra range because of inherent limitations of withdrawing and transferring
-      const range = getRange(upgradeStructure.pos, hubLink.pos) + 3
+      const range = Math.max(getRange(upgradeStructure.pos, hubLink.pos), 3)
 
       // Increase strength by throughput
-      maxUpgradeStrength += findLinkThroughput(range) * 0.7
+      maxUpgradeStrength += findLinkThroughput(range) * 0.9
     }
 
     for (let i = 0; i < sourceLinks.length; i++) {

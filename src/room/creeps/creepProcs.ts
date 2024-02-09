@@ -753,7 +753,7 @@ export class CreepProcs {
 
   static runRoomLogisticsRequestAdvanced(creep: Creep, args?: FindNewRoomLogisticsRequestArgs) {
     const request = CreepUtils.findRoomLogisticsRequest(creep, args)
-    if (!request) return Result.noAction
+    if (request === Result.fail) return Result.notFound
 
     /* log('REQUEST RESPONSE', request.T, { position: 1 }) */
     const target = findObjectWithID(request[CreepLogisticsRequestKeys.target])
@@ -773,7 +773,7 @@ export class CreepProcs {
       // An enemy is probably blocking access to the logistics target
       if (result === Result.fail) {
         creep.room.roomManager.roomLogisticsBlacklistCoords.add(packCoord(target.pos))
-        Result.fail
+        Result.noPath
       }
 
       return Result.action
@@ -884,7 +884,7 @@ export class CreepProcs {
     if (creep.spawning) return Result.noAction
 
     const result = this.runRoomLogisticsRequestAdvanced(creep, args)
-    if (result === Result.action) return result
+    if (result === Result.action || result === Result.notFound) return result
 
     this.runRoomLogisticsRequestAdvanced(creep, args)
     return Result.success

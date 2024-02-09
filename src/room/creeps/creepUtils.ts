@@ -508,6 +508,7 @@ export class CreepUtils {
     let resourceType: ResourceConstant
 
     for (const key in creepNextStore) {
+      // Energy is handled by storing structure logistics requests, not backup-created requests
       if (key === RESOURCE_ENERGY) continue
       if (creepNextStore[key as ResourceConstant] <= 0) continue
 
@@ -518,7 +519,7 @@ export class CreepUtils {
     if (!resourceType) return Result.fail
 
     const storingStructure = storingStructures.find(
-      structure => structure.freeReserveStore >= creepNextStore[resourceType],
+      structure => RoomObjectUtils.freeReserveStoreOf(structure, resourceType) >= creepNextStore[resourceType],
     )
     if (!storingStructure) return Result.fail
     /* creep.room.visual.text((creep.nextStore[resourceType]).toString(), creep.pos.x, creep.pos.y, { color: customColors.red }) */
@@ -542,7 +543,7 @@ export class CreepUtils {
 
     for (resourceType of resourceTypes) {
       storingStructure = storingStructures.find(
-        structure => structure.reserveStore[resourceType] >= creep.freeNextStore,
+        structure => structure.reserveStore[resourceType] >= RoomObjectUtils.freeNextStoreOf(creep, resourceType),
       )
       if (storingStructure) break
     }
@@ -554,7 +555,7 @@ export class CreepUtils {
       [CreepLogisticsRequestKeys.type]: RoomLogisticsRequestTypes.withdraw,
       [CreepLogisticsRequestKeys.target]: storingStructure.id,
       [CreepLogisticsRequestKeys.resourceType]: resourceType,
-      [CreepLogisticsRequestKeys.amount]: creep.freeNextStore,
+      [CreepLogisticsRequestKeys.amount]: RoomObjectUtils.freeNextStoreOf(creep, resourceType),
     }
   }
 

@@ -120,7 +120,7 @@ export class MapVisualsManager {
                 const anchor = commune.roomManager.anchor
                 if (!anchor) throw Error('No anchor for mapVisuals remote ' + roomName)
 
-                if (commune) {
+                if (commune && commune.controller.my) {
                     for (const sourceIndex in roomMemory[
                         RoomMemoryKeys.remoteSourceFastFillerPaths
                     ]) {

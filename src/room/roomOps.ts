@@ -365,9 +365,9 @@ export class RoomOps {
         return room.scoutEnemyRoom()
       }
 
-      room.createWorkRequest()
-
       // No controlller owner
+
+      room.createWorkRequest()
 
       if (room.scoutRemote(scoutingRoom)) return roomMemory[RoomMemoryKeys.type]
 

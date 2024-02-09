@@ -560,7 +560,7 @@ export class Hauler extends Creep {
       if (this.room.name === commune.name) {
         CreepProcs.passiveRenew(this)
 
-        CreepProcs.runRoomLogisticsRequestsAdvanced(this, {
+        const logisticsResult = CreepProcs.runRoomLogisticsRequestsAdvanced(this, {
           types: new Set([RoomLogisticsRequestTypes.transfer]),
           resourceTypes: new Set([RESOURCE_ENERGY]),
           noDelivery: true,
@@ -577,7 +577,15 @@ export class Hauler extends Creep {
 
         // We haven't emptied ourselves yet
         if (!this.needsResources()) {
-          if (getRange(this.pos, commune.storage.pos) <= 1) return true
+          if (getRange(this.pos, commune.storage.pos) <= 1) {
+            // We are adjacent to the storage
+            // If we were unable to find a request to transfer to the storage, just drop the energy
+            if (logisticsResult === Result.notFound) {
+              this.drop(RESOURCE_ENERGY, this.store.getUsedCapacity(RESOURCE_ENERGY))
+              return true
+            }
+            return true
+          }
 
           this.createMoveRequestByPath(
             {
