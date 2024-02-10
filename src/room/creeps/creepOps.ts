@@ -18,7 +18,7 @@ import {
   ReservedCoordTypes,
   WorkTypes,
 } from '../../constants/general'
-import { RoomStatsKeys } from 'constants/stats'
+import { RoomStatsKeys } from '../../constants/stats'
 import { CreepUtils } from './creepUtils'
 import { CommuneUtils } from 'room/commune/communeUtils'
 import {

@@ -1,10 +1,10 @@
 import { roundTo } from 'utils/utils'
 import { CPUMaxPerTick, customColors, RoomMemoryKeys, RoomTypes } from '../constants/general'
-import { RoomStatsKeys } from 'constants/stats'
+import { RoomStatsKeys } from '../constants/stats'
 import { LogOps, LogTypes } from 'utils/logOps'
 import { CollectiveManager } from './collective'
-import { remoteStatNames } from 'constants/stats'
-import { averageStatNames } from 'constants/stats'
+import { remoteStatNames } from '../constants/stats'
+import { averageStatNames } from '../constants/stats'
 import { RoomStats } from 'types/stats'
 import { CommuneStats } from 'types/stats'
 

@@ -12,7 +12,7 @@ import {
   packedPosLength,
   relayOffsets,
 } from '../../../../constants/general'
-import { RoomStatsKeys } from 'constants/stats'
+import { RoomStatsKeys } from '../../../../constants/stats'
 import { StatsManager } from 'international/stats'
 import { packCoord, reversePosList, unpackCoord, unpackPosAt } from 'other/codec'
 import { CreepOps } from 'room/creeps/creepOps'

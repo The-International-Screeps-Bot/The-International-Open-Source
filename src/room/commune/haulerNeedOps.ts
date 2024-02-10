@@ -1,5 +1,5 @@
 import { RoomMemoryKeys, packedCoordLength, packedPosLength, stamps } from '../../constants/general'
-import { RoomStatsKeys } from 'constants/stats'
+import { RoomStatsKeys } from '../../constants/stats'
 import { StructureUtils } from 'room/structureUtils'
 import { findCarryPartsRequired } from 'utils/utils'
 import { CommuneUtils } from './communeUtils'

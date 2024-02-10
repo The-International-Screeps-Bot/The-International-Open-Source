@@ -11,7 +11,7 @@ import {
   FlagNames,
   relayOffsets,
 } from '../../../constants/general'
-import { RoomStatsKeys } from 'constants/stats'
+import { RoomStatsKeys } from '../../../constants/stats'
 import { StatsManager } from 'international/stats'
 import { unpackPosAt, reversePosList, packCoord, unpackCoord } from 'other/codec'
 import { CreepOps } from 'room/creeps/creepOps'

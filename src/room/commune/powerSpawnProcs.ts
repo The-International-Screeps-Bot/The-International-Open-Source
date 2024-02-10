@@ -1,6 +1,6 @@
 import { CollectiveManager } from 'international/collective'
 import { RoomLogisticsRequestTypes } from '../../constants/general'
-import { RoomStatsKeys } from 'constants/stats'
+import { RoomStatsKeys } from '../../constants/stats'
 import { StatsManager } from 'international/stats'
 import { scalePriority } from 'utils/utils'
 import { CommuneUtils } from './communeUtils'

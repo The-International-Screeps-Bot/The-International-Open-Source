@@ -4,7 +4,7 @@ import { CollectiveManager } from 'international/collective'
 import { StatsManager } from 'international/stats'
 import { MarketManager } from 'international/market/marketOrders'
 import { Result } from '../../../constants/general'
-import { RoomStatsKeys } from 'constants/stats'
+import { RoomStatsKeys } from '../../../constants/stats'
 
 export class TradingUtils {
   static advancedSell(room: Room, resourceType: ResourceConstant, amount: number) {

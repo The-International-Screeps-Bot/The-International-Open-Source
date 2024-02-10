@@ -12,7 +12,7 @@ import {
   roomLogisticsRoles,
   storingStructureTypesSet,
 } from '../../constants/general'
-import { RoomStatsKeys } from 'constants/stats'
+import { RoomStatsKeys } from '../../constants/stats'
 import { CreepRoleManager } from './creepRoleManager'
 import { packCoord, unpackCoord, unpackCoordAsPos, unpackPosAt } from 'other/codec'
 import { RoomManager } from 'room/room'

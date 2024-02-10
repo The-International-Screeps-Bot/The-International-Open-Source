@@ -4,7 +4,7 @@ import {
   customColors,
   roomTypesUsedForStats,
 } from '../constants/general'
-import { RoomStatsKeys } from 'constants/stats'
+import { RoomStatsKeys } from '../constants/stats'
 
 import './roomFunctions'
 

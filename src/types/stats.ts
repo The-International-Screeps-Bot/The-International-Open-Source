@@ -1,4 +1,4 @@
-import { RoomStatsKeys } from 'constants/stats'
+import { RoomStatsKeys } from '../constants/stats'
 
 export interface RoomStats {
   [RoomStatsKeys.GameTime]: number
