@@ -26,6 +26,10 @@ jobs:
                  run: hostname -I
                - name: Install dependencies
                  run: npm install
+               - name: Setup required files
+                 run: node helper/preBuild.js
+               - name: Build bot
+                 run: npm run build
                - name: Start instances
                  run: node helper/server --maxTicks=25000 --debug --tickDuration=5000
                  env:
