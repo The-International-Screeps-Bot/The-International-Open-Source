@@ -26,7 +26,7 @@ function getPorts() {
 const ports = getPorts()
 
 const options = { stdio: 'inherit' }
-const botPath = join(__dirname, 'dist')
+const botPath = join(__dirname, '../dist')
 console.log('START')
 // execSync(
 //     `npx screeps-grafana-go_carbon setup && npx screeps-grafana-go_carbon --grafanaPort=${ports.grafanaPort} --relayPort=${ports.relayPort} --force ${argv.debug ? '--debug' : ''} --deleteLogs --deleteWhisper`,
