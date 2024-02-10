@@ -27,7 +27,7 @@ jobs:
                - name: Install dependencies
                  run: npm install
                - name: Start instances
-                 run: node server --maxTicks=25000 --debug --tickDuration=5000
+                 run: node helper/server --maxTicks=25000 --debug --tickDuration=5000
                  env:
                     STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
                     EXPORT_DISCORD_WEBHOOK_URL: ${{ secrets.EXPORT_DISCORD_WEBHOOK_URL }}
