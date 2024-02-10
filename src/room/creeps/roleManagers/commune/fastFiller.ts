@@ -2,7 +2,7 @@ import { CreepMemoryKeys, ReservedCoordTypes } from '../../../../constants/gener
 import { findClosestPos, getRangeXY, getRange } from 'utils/utils'
 import { packCoord, packPos, unpackCoord, unpackCoordAsPos, unpackPos } from 'other/codec'
 import { StructureUtils } from 'room/structureUtils'
-import { CreepProcs } from 'room/creeps/creepProcs'
+import { CreepOps } from 'room/creeps/creepOps'
 import { RoomUtils } from 'room/roomUtils'
 import { roomData } from 'room/roomData'
 import { CreepUtils } from 'room/creeps/creepUtils'
@@ -202,7 +202,7 @@ export class FastFiller extends Creep {
 
       if (creep.fillFastFiller()) continue
 
-      CreepProcs.passiveRenew(creep)
+      CreepOps.passiveRenew(creep)
 
       /* creep.message = ('🚬') */
     }

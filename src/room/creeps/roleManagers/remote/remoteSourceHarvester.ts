@@ -22,7 +22,7 @@ import { packCoord, reversePosList, unpackPosAt } from 'other/codec'
 import { indexOf } from 'lodash'
 import { CreepUtils } from 'room/creeps/creepUtils'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
-import { CreepProcs } from 'room/creeps/creepProcs'
+import { CreepOps } from 'room/creeps/creepOps'
 import { CommuneUtils } from 'room/commune/communeUtils'
 
 export class RemoteHarvester extends Creep {
@@ -291,7 +291,12 @@ export class RemoteHarvester extends Creep {
       if (this.maintainContainer(container) === Result.action) return Result.success
 
       const source = this.room.roomManager.remoteSources[sourceIndex]
-      CreepUtils.harvestSource(this, source)
+      
+      const harvestResult = CreepOps.harvestSource(this, source)
+      if (harvestResult !== Result.success) {
+        this.message = harvestResult.toString()
+        return Result.action
+      }
 
       // Give our energy to the container so it doesn't drop on the ground
 
@@ -310,11 +315,18 @@ export class RemoteHarvester extends Creep {
     if (this.buildContainer() === Result.action) return Result.success
 
     const source = this.room.roomManager.remoteSources[sourceIndex]
-    CreepUtils.harvestSource(this, source)
+
+    const harvestResult = CreepOps.harvestSource(this, source)
+    if (harvestResult !== Result.success) {
+      this.message = harvestResult.toString()
+      return Result.action
+    }
 
     // Stop, we don't have enough energy to justify a request
 
-    if (this.reserveStore.energy < this.store.getCapacity() * 0.5) return Result.action
+    if (this.reserveStore.energy < this.store.getCapacity() * 0.5) {
+      return Result.action
+    }
 
     // Try to have haulers get energy directly from us (avoids decay)
 
@@ -331,7 +343,7 @@ export class RemoteHarvester extends Creep {
     if (this.nextStore.energy >= MyCreepUtils.parts(this).work) return Result.success
     if (this.movedResource) return Result.fail
 
-    return CreepProcs.runRoomLogisticsRequestAdvanced(this, {
+    return CreepOps.runRoomLogisticsRequestAdvanced(this, {
       resourceTypes: new Set([RESOURCE_ENERGY]),
       types: new Set<RoomLogisticsRequestTypes>([
         RoomLogisticsRequestTypes.withdraw,
@@ -419,7 +431,10 @@ export class RemoteHarvester extends Creep {
 
     // Unpack the harvestPos
 
-    const harvestPos = this.findRemoteSourceHarvestPos(this.memory[CreepMemoryKeys.sourceIndex])
+    const harvestPos = CreepOps.findRemoteSourceHarvestPos(
+      this,
+      this.memory[CreepMemoryKeys.sourceIndex],
+    )
     if (!harvestPos) return Result.noAction
 
     this.actionCoord =
@@ -427,7 +442,10 @@ export class RemoteHarvester extends Creep {
 
     // If the creep is at the creep's packedHarvestPos, inform false
 
-    if (getRange(this.pos, harvestPos) === 0) return Result.success
+    if (getRange(this.pos, harvestPos) === 0) {
+      this.message = '🎯'
+      return Result.success
+    }
 
     // Otherwise say the intention and create a moveRequest to the creep's harvestPos, and inform the attempt
 

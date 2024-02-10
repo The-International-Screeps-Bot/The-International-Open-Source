@@ -11,7 +11,7 @@ import { packCoord } from 'other/codec'
 import { StatsManager } from './stats'
 import { CreepUtils } from 'room/creeps/creepUtils'
 import { CreepDataProcs, creepData } from 'room/creeps/creepData'
-import { CreepProcs } from 'room/creeps/creepProcs'
+import { CreepOps } from 'room/creeps/creepOps'
 
 export class CreepOrganizer {
   public static run() {
@@ -84,9 +84,9 @@ export class CreepOrganizer {
     if (!creep.spawning) creep.room.creepPositions[packCoord(creep.pos)] = creep.name
 
     if (roomLogisticsRoles.has(role)) {
-      CreepProcs.updateLogisticsRequests(creep)
+      CreepOps.updateLogisticsRequests(creep)
     }
-    CreepProcs.registerInterTickRepairTarget(creep)
+    CreepOps.registerInterTickRepairTarget(creep)
 
     // initialize inter-tick data for the creep if it isn't already
     CreepDataProcs.initCreep(creep.name)

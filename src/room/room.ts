@@ -196,7 +196,7 @@ export class RoomManager {
 
     const sourcePaths: RoomPosition[][] = []
 
-    for (let i = packedRemoteSourceHarvestPositions.length - 1; i >= 0; i -= 1) {
+    for (let i = 0; i < packedRemoteSourceHarvestPositions.length; i += 1) {
 
       const positions = packedRemoteSourceHarvestPositions[i]
       const origin = unpackPosAt(positions, 0)
@@ -263,7 +263,7 @@ export class RoomManager {
 
     const sourcePaths: RoomPosition[][] = []
 
-    for (let i = packedRemoteSourceHarvestPositions.length - 1; i >= 0; i -= 1) {
+    for (let i = 0; i < packedRemoteSourceHarvestPositions.length; i += 1) {
 
       const positions = packedRemoteSourceHarvestPositions[i]
       const origin = unpackPosAt(positions, 0)

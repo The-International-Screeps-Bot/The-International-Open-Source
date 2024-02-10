@@ -9,6 +9,7 @@ import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
 import { CreepUtils } from 'room/creeps/creepUtils'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
+import { CreepOps } from 'room/creeps/creepOps'
 
 export class Vanguard extends Creep {
   constructor(creepID: Id<Creep>) {
@@ -46,7 +47,10 @@ export class Vanguard extends Creep {
 
     this.message = '🚬'
 
-    const harvestPos = this.findCommuneSourceHarvestPos(this.memory[CreepMemoryKeys.sourceIndex])
+    const harvestPos = CreepOps.findCommuneSourceHarvestPos(
+      this,
+      this.memory[CreepMemoryKeys.sourceIndex],
+    )
     if (!harvestPos) return true
 
     // If the creep is at the creep's packedHarvestPos, inform false
@@ -161,7 +165,7 @@ export class Vanguard extends Creep {
         // Try to normally harvest. Iterate if creep harvested
 
         const source = this.room.roomManager.communeSources[sourceIndex]
-        if (CreepUtils.harvestSource(this, source) === Result.success) {
+        if (CreepOps.harvestSource(this, source) === Result.success) {
           return
         }
         return

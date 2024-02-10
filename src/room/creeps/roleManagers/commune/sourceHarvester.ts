@@ -21,7 +21,7 @@ import { Hauler } from './hauler'
 import { CreepUtils } from 'room/creeps/creepUtils'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 import { StructureUtils } from 'room/structureUtils'
-import { CreepProcs } from 'room/creeps/creepProcs'
+import { CreepOps } from 'room/creeps/creepOps'
 
 export class SourceHarvester extends Creep {
   constructor(creepID: Id<Creep>) {
@@ -68,7 +68,7 @@ export class SourceHarvester extends Creep {
     const source = this.room.roomManager.communeSources[this.memory[CreepMemoryKeys.sourceIndex]]
 
     if (getRange(this.pos, source.pos) <= 1) {
-      CreepUtils.harvestSource(this, source)
+      CreepOps.harvestSource(this, source)
     }
   }
 
@@ -79,7 +79,10 @@ export class SourceHarvester extends Creep {
 
     // Unpack the harvestPos
 
-    const harvestPos = this.findCommuneSourceHarvestPos(this.memory[CreepMemoryKeys.sourceIndex])
+    const harvestPos = CreepOps.findCommuneSourceHarvestPos(
+      this,
+      this.memory[CreepMemoryKeys.sourceIndex],
+    )
     if (!harvestPos) return Result.fail
 
     this.actionCoord =
@@ -188,7 +191,7 @@ export class SourceHarvester extends Creep {
       if (this.nextStore.energy < MyCreepUtils.parts(this).work) {
         if (this.movedResource) return false
 
-        const result = CreepProcs.runRoomLogisticsRequestAdvanced(this, {
+        const result = CreepOps.runRoomLogisticsRequestAdvanced(this, {
           resourceTypes: new Set([RESOURCE_ENERGY]),
           types: new Set<RoomLogisticsRequestTypes>([
             RoomLogisticsRequestTypes.withdraw,
@@ -222,7 +225,7 @@ export class SourceHarvester extends Creep {
     if (this.nextStore.energy < workPartCount) {
       if (this.movedResource) return false
 
-      const result = CreepProcs.runRoomLogisticsRequestAdvanced(this, {
+      const result = CreepOps.runRoomLogisticsRequestAdvanced(this, {
         resourceTypes: new Set([RESOURCE_ENERGY]),
         types: new Set<RoomLogisticsRequestTypes>([
           RoomLogisticsRequestTypes.withdraw,

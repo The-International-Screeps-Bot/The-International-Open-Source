@@ -9,6 +9,7 @@ import { StatsManager } from 'international/stats'
 import { getRangeXY, getRange, areCoordsEqual } from 'utils/utils'
 import { reversePosList, unpackPos } from 'other/codec'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
+import { CreepOps } from 'room/creeps/creepOps'
 
 export class MineralHarvester extends Creep {
   update() {
@@ -28,7 +29,7 @@ export class MineralHarvester extends Creep {
 
     // Unpack the creep's packedHarvestPos
 
-    const harvestPos = this.findMineralHarvestPos()
+    const harvestPos = CreepOps.findMineralHarvestPos(this)
     if (!harvestPos) return Result.fail
 
     this.actionCoord = this.room.roomManager.mineral.pos

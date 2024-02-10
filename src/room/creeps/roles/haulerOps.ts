@@ -14,7 +14,7 @@ import {
 } from '../../../constants/general'
 import { StatsManager } from 'international/stats'
 import { unpackPosAt, reversePosList, packCoord, unpackCoord } from 'other/codec'
-import { CreepProcs } from 'room/creeps/creepProcs'
+import { CreepOps } from 'room/creeps/creepOps'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
 import { Hauler } from 'room/creeps/roleManagers/commune/hauler'
 import { StructureUtils } from 'room/structureUtils'
@@ -355,7 +355,7 @@ export class HaulerOps {
     if (creep.room.name !== creep.commune.name) {
       // Fulfill requests near the hauler
 
-      CreepProcs.runRoomLogisticsRequestsAdvanced(creep, {
+      CreepOps.runRoomLogisticsRequestsAdvanced(creep, {
         types: new Set([RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.withdraw]),
         resourceTypes: new Set([RESOURCE_ENERGY]),
         conditions: request => {
@@ -467,7 +467,7 @@ export class HaulerOps {
     if (isBySourceHarvestPos || creepMemory[CreepMemoryKeys.roomLogisticsRequests].length > 0) {
       const freeNextStoreInitial = creep.freeNextStore
 
-      CreepProcs.runRoomLogisticsRequestsAdvanced(creep, {
+      CreepOps.runRoomLogisticsRequestsAdvanced(creep, {
         types: new Set([RoomLogisticsRequestTypes.pickup, RoomLogisticsRequestTypes.withdraw]),
         resourceTypes: new Set([RESOURCE_ENERGY]),
         conditions: request => {
@@ -502,7 +502,7 @@ export class HaulerOps {
 
     // Fulfill requests near the hauler
 
-    CreepProcs.runRoomLogisticsRequestsAdvanced(creep, {
+    CreepOps.runRoomLogisticsRequestsAdvanced(creep, {
       types: new Set<RoomLogisticsRequestTypes>([
         RoomLogisticsRequestTypes.pickup,
         RoomLogisticsRequestTypes.withdraw,
@@ -559,7 +559,7 @@ export class HaulerOps {
       if (creep.room.name === commune.name) {
         this.passiveRenew(creep)
 
-        CreepProcs.runRoomLogisticsRequestsAdvanced(creep, {
+        CreepOps.runRoomLogisticsRequestsAdvanced(creep, {
           types: new Set([RoomLogisticsRequestTypes.transfer]),
           resourceTypes: new Set([RESOURCE_ENERGY]),
           noDelivery: true,
@@ -680,7 +680,7 @@ export class HaulerOps {
     if (creep.room.name === commune.name) {
       this.passiveRenew(creep)
 
-      CreepProcs.runRoomLogisticsRequestAdvanced(creep, {
+      CreepOps.runRoomLogisticsRequestAdvanced(creep, {
         types: new Set<RoomLogisticsRequestTypes>([RoomLogisticsRequestTypes.transfer]),
         resourceTypes: new Set([RESOURCE_ENERGY]),
       })
@@ -1046,7 +1046,7 @@ export class HaulerOps {
   private static runCommuneLogistics(creep: Creep) {
     this.passiveRenew(creep)
 
-    if (CreepProcs.runRoomLogisticsRequestsAdvanced(creep) === Result.action) {
+    if (CreepOps.runRoomLogisticsRequestsAdvanced(creep) === Result.action) {
       this.relay(creep)
       return Result.action
     }

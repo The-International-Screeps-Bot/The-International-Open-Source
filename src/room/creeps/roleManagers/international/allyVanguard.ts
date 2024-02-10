@@ -10,7 +10,7 @@ import { findObjectWithID, getRangeXY, getRange } from 'utils/utils'
 import { unpackCoord } from 'other/codec'
 import { CreepUtils } from 'room/creeps/creepUtils'
 import { MyCreepUtils } from 'room/creeps/myCreepUtils'
-import { CreepProcs } from 'room/creeps/creepProcs'
+import { CreepOps } from 'room/creeps/creepOps'
 import { RoomOps } from 'room/roomOps'
 
 export class AllyVanguard extends Creep {
@@ -99,14 +99,14 @@ export class AllyVanguard extends Creep {
     // Try to normally harvest. Iterate if creep harvested
 
     const source = RoomOps.getSources(room)[sourceIndex]
-    if (CreepUtils.harvestSource(this, source) === Result.fail) return
+    if (CreepOps.harvestSource(this, source) !== Result.success) return
   }
 
   getEnergyFromRoom?(): boolean {
     if (this.room.controller.owner) return false
 
     if (
-      CreepProcs.runRoomLogisticsRequestsAdvanced(this, {
+      CreepOps.runRoomLogisticsRequestsAdvanced(this, {
         resourceTypes: new Set([RESOURCE_ENERGY]),
       }) === Result.success
     )
@@ -127,7 +127,7 @@ export class AllyVanguard extends Creep {
     // Try to normally harvest. Iterate if creep harvested
 
     const source = this.room.roomManager.communeSources[sourceIndex]
-    if (CreepUtils.harvestSource(this, source) === Result.success) {
+    if (CreepOps.harvestSource(this, source) === Result.success) {
       return true
     }
     return true
@@ -139,7 +139,7 @@ export class AllyVanguard extends Creep {
   travelToSource?(sourceIndex: number): boolean {
     this.message = '🚬'
 
-    const harvestPos = this.findSourceHarvestPos(this.memory[CreepMemoryKeys.sourceIndex])
+    const harvestPos = CreepOps.findSourceHarvestPos(this, this.memory[CreepMemoryKeys.sourceIndex])
     if (!harvestPos) return true
 
     // If the creep is at the creep's packedHarvestPos, inform false

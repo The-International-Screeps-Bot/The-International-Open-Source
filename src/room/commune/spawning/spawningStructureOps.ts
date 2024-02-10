@@ -14,7 +14,7 @@ import {
 } from '../../../constants/general'
 import { StatsManager } from 'international/stats'
 import { unpackPosAt, packCoord, unpackCoord } from 'other/codec'
-import { CreepProcs } from 'room/creeps/creepProcs'
+import { CreepOps } from 'room/creeps/creepOps'
 import { StructureUtils } from 'room/structureUtils'
 import { SpawnRequest, BodyPartCounts, SpawnRequestTypes } from 'types/spawnRequest'
 import { LogOps, LogTypes } from 'utils/logOps'
@@ -61,7 +61,7 @@ export class SpawningStructureOps {
   private static registerSpawningCreeps(room: Room, activeSpawns: StructureSpawn[]) {
     for (const spawn of activeSpawns) {
       const creep = Game.creeps[spawn.spawning.name]
-      CreepProcs.registerSpawning(creep, spawn)
+      CreepOps.registerSpawning(creep, spawn)
       creep.spawnID = spawn.id
 
       if (

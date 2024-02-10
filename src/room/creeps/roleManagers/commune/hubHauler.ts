@@ -10,7 +10,7 @@ import {
 } from '../../../../constants/general'
 import { packCoord, unpackCoord } from 'other/codec'
 import { CommuneUtils } from 'room/commune/communeUtils'
-import { CreepProcs } from 'room/creeps/creepProcs'
+import { CreepOps } from 'room/creeps/creepOps'
 import { findObjectWithID, getRange, unpackNumAsPos } from 'utils/utils'
 
 //import { HubHauler } from '../../creepClasses'
@@ -108,14 +108,14 @@ export class HubHauler extends Creep {
     if (!storage || !factory) return false
 
     if (factory.store.energy > 3000 && storage.store.getFreeCapacity() > 3000) {
-      CreepProcs.createCreepRoomLogisticsRequest(
+      CreepOps.createCreepRoomLogisticsRequest(
         this,
         RoomLogisticsRequestTypes.withdraw,
         factory.id,
         3000,
         RESOURCE_ENERGY,
       )
-      CreepProcs.createCreepRoomLogisticsRequest(
+      CreepOps.createCreepRoomLogisticsRequest(
         this,
         RoomLogisticsRequestTypes.transfer,
         storage.id,
@@ -162,14 +162,14 @@ export class HubHauler extends Creep {
 
       let amount = this.store.getFreeCapacity()
 
-      CreepProcs.createCreepRoomLogisticsRequest(
+      CreepOps.createCreepRoomLogisticsRequest(
         this,
         RoomLogisticsRequestTypes.withdraw,
         terminal.id,
         amount,
         resourceType,
       )
-      CreepProcs.createCreepRoomLogisticsRequest(
+      CreepOps.createCreepRoomLogisticsRequest(
         this,
         RoomLogisticsRequestTypes.transfer,
         storage.id,
@@ -214,14 +214,14 @@ export class HubHauler extends Creep {
 
       let amount = this.store.getFreeCapacity()
 
-      CreepProcs.createCreepRoomLogisticsRequest(
+      CreepOps.createCreepRoomLogisticsRequest(
         this,
         RoomLogisticsRequestTypes.withdraw,
         storage.id,
         amount,
         resourceType,
       )
-      CreepProcs.createCreepRoomLogisticsRequest(
+      CreepOps.createCreepRoomLogisticsRequest(
         this,
         RoomLogisticsRequestTypes.transfer,
         terminal.id,
@@ -283,13 +283,13 @@ export class HubHauler extends Creep {
 
     let amount = Math.min(this.freeNextStore, hubLink.store.getUsedCapacity(RESOURCE_ENERGY))
 
-    CreepProcs.createCreepRoomLogisticsRequest(
+    CreepOps.createCreepRoomLogisticsRequest(
       this,
       RoomLogisticsRequestTypes.withdraw,
       hubLink.id,
       amount,
     )
-    CreepProcs.createCreepRoomLogisticsRequest(
+    CreepOps.createCreepRoomLogisticsRequest(
       this,
       RoomLogisticsRequestTypes.transfer,
       target.id,
@@ -346,13 +346,13 @@ export class HubHauler extends Creep {
 
     this.message += 'RHLT'
 
-    CreepProcs.createCreepRoomLogisticsRequest(
+    CreepOps.createCreepRoomLogisticsRequest(
       this,
       RoomLogisticsRequestTypes.withdraw,
       provider.id,
       amount,
     )
-    CreepProcs.createCreepRoomLogisticsRequest(
+    CreepOps.createCreepRoomLogisticsRequest(
       this,
       RoomLogisticsRequestTypes.transfer,
       hubLink.id,
@@ -407,14 +407,14 @@ export class HubHauler extends Creep {
         ],
       )
 
-      CreepProcs.createCreepRoomLogisticsRequest(
+      CreepOps.createCreepRoomLogisticsRequest(
         this,
         RoomLogisticsRequestTypes.withdraw,
         factory.id,
         amount,
         resource as CommodityConstant | MineralConstant | RESOURCE_GHODIUM | RESOURCE_ENERGY,
       )
-      CreepProcs.createCreepRoomLogisticsRequest(
+      CreepOps.createCreepRoomLogisticsRequest(
         this,
         RoomLogisticsRequestTypes.transfer,
         target.id,
@@ -442,14 +442,14 @@ export class HubHauler extends Creep {
 
     let amount = this.freeNextStore
 
-    CreepProcs.createCreepRoomLogisticsRequest(
+    CreepOps.createCreepRoomLogisticsRequest(
       this,
       RoomLogisticsRequestTypes.withdraw,
       factory.id,
       amount,
       RESOURCE_BATTERY,
     )
-    CreepProcs.createCreepRoomLogisticsRequest(
+    CreepOps.createCreepRoomLogisticsRequest(
       this,
       RoomLogisticsRequestTypes.transfer,
       target.id,
@@ -505,14 +505,14 @@ export class HubHauler extends Creep {
         )
           continue
 
-        CreepProcs.createCreepRoomLogisticsRequest(
+        CreepOps.createCreepRoomLogisticsRequest(
           this,
           RoomLogisticsRequestTypes.withdraw,
           provider.id,
           amount,
           resource,
         )
-        CreepProcs.createCreepRoomLogisticsRequest(
+        CreepOps.createCreepRoomLogisticsRequest(
           this,
           RoomLogisticsRequestTypes.transfer,
           factory.id,
@@ -579,18 +579,21 @@ export class HubHauler extends Creep {
 
     this.message += 'RPSTP'
 
-    CreepProcs.createCreepRoomLogisticsRequest(
+    CreepOps.createCreepRoomLogisticsRequest(
       this,
       RoomLogisticsRequestTypes.withdraw,
       provider.id,
       amount,
       resource,
     )
-    CreepProcs.createCreepRoomLogisticsRequest(
+    CreepOps.createCreepRoomLogisticsRequest(
       this,
       RoomLogisticsRequestTypes.transfer,
       powerSpawn.id,
-      Math.min(this.freeNextStore + this.store[resource], powerSpawn.store.getFreeCapacity(resource)),
+      Math.min(
+        this.freeNextStore + this.store[resource],
+        powerSpawn.store.getFreeCapacity(resource),
+      ),
       resource,
     )
     return true
@@ -629,18 +632,21 @@ export class HubHauler extends Creep {
 
     this.message += 'RPSTE'
 
-    CreepProcs.createCreepRoomLogisticsRequest(
+    CreepOps.createCreepRoomLogisticsRequest(
       this,
       RoomLogisticsRequestTypes.withdraw,
       provider.id,
       amount,
       resource,
     )
-    CreepProcs.createCreepRoomLogisticsRequest(
+    CreepOps.createCreepRoomLogisticsRequest(
       this,
       RoomLogisticsRequestTypes.transfer,
       powerSpawn.id,
-      Math.min(this.freeNextStore + this.store[resource], powerSpawn.store.getFreeCapacity(resource)),
+      Math.min(
+        this.freeNextStore + this.store[resource],
+        powerSpawn.store.getFreeCapacity(resource),
+      ),
       resource,
     )
     return true
@@ -674,7 +680,7 @@ export class HubHauler extends Creep {
                 continue
             }
  */
-      if (!CreepProcs.runRoomLogisticsRequests(creep)) continue
+      if (!CreepOps.runRoomLogisticsRequests(creep)) continue
 
       creep.message += '🚬'
     }

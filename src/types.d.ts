@@ -763,15 +763,6 @@ declare global {
     findRemoteSourceIndex(): boolean
 
     /**
-     * Find a source harvest pos when not necessarily in a commune or remote
-     */
-    findSourceHarvestPos(sourceIndex: number): RoomPosition | false
-    findCommuneSourceHarvestPos(sourceIndex: number): false | RoomPosition
-    findRemoteSourceHarvestPos(sourceIndex: number): false | RoomPosition
-
-    findMineralHarvestPos(): false | RoomPosition
-
-    /**
      *
      */
     createMoveRequestByPath(args: CustomPathFinderArgs, pathOpts: MoveRequestByPathOpts): number
