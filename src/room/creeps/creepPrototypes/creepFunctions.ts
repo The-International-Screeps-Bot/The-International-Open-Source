@@ -8,9 +8,9 @@ import {
   ReservedCoordTypes,
   WorkTypes,
   RoomLogisticsRequestTypes,
-  RoomStatsKeys,
   packedCoordLength,
 } from '../../../constants/general'
+import { RoomStatsKeys } from 'constants/stats'
 import {
   findClosestObject,
   findObjectWithID,

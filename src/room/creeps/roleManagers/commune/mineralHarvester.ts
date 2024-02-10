@@ -3,8 +3,8 @@ import {
   ReservedCoordTypes,
   Result,
   RoomMemoryKeys,
-  RoomStatsKeys,
 } from '../../../../constants/general'
+import { RoomStatsKeys } from 'constants/stats'
 import { StatsManager } from 'international/stats'
 import { getRangeXY, getRange, areCoordsEqual } from 'utils/utils'
 import { reversePosList, unpackPos } from 'other/codec'

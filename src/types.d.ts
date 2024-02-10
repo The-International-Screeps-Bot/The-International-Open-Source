@@ -24,9 +24,9 @@ import {
   CreepPowerTaskNames,
   RoomLogisticsRequestTypes,
   MovedTypes,
-  RoomStatsKeys,
   RoomStatusKeys,
 } from './constants/general'
+import { RoomStatsKeys } from 'constants/stats'
 import { Operator } from 'room/creeps/powerCreeps/operator'
 import { MeleeDefender } from 'room/creeps/roleManagers/commune/defenders/meleeDefender'
 import { Settings } from 'international/settingsDefault'

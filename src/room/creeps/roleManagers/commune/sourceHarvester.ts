@@ -5,9 +5,9 @@ import {
   Result,
   RoomLogisticsRequestTypes,
   RoomMemoryKeys,
-  RoomStatsKeys,
   WorkTypes,
 } from '../../../../constants/general'
+import { RoomStatsKeys } from 'constants/stats'
 import { StatsManager } from 'international/stats'
 import {
   findCoordsInsideRect,

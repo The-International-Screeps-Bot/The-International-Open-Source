@@ -1,11 +1,10 @@
 import {
-    CreepLogisticsRequestKeys,
-    CreepMemoryKeys,
-    ReservedCoordTypes,
-    Result,
-    RoomLogisticsRequestTypes,
+  CreepLogisticsRequestKeys,
+  CreepMemoryKeys,
+  ReservedCoordTypes,
+  Result,
+  RoomLogisticsRequestTypes,
   RoomMemoryKeys,
-  RoomStatsKeys,
   WorkTypes,
   creepRoles,
   packedCoordLength,
@@ -13,6 +12,7 @@ import {
   roomLogisticsRoles,
   storingStructureTypesSet,
 } from '../../constants/general'
+import { RoomStatsKeys } from 'constants/stats'
 import { CreepRoleManager } from './creepRoleManager'
 import { packCoord, unpackCoord, unpackCoordAsPos, unpackPosAt } from 'other/codec'
 import { RoomManager } from 'room/room'

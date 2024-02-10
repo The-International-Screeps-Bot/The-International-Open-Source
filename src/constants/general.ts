@@ -1295,38 +1295,6 @@ export const partsByPriorityPartType: { [key in PartsByPriority]: BodyPartConsta
 
 export const rangedMassAttackMultiplierByRange = [1, 1, 0.4, 0.1]
 
-export enum RoomStatsKeys {
-  ControllerLevel = 'cl',
-  EnergyInputHarvest = 'eih',
-  EnergyInputBought = 'eib',
-  EnergyOutputUpgrade = 'eou',
-  EnergyOutputRepairOther = 'eoro',
-  EnergyOutputRepairWallOrRampart = 'eorwr',
-  EnergyOutputBuild = 'eob',
-  EnergyOutputSold = 'eos',
-  EnergyOutputSpawn = 'eosp',
-  EnergyOutputPower = 'eop',
-  MineralsHarvested = 'mh',
-  EnergyStored = 'es',
-  BatteriesStoredTimes10 = 'bes',
-  CreepCount = 'cc',
-  TotalCreepCount = 'tcc',
-  PowerCreepCount = 'pcc',
-  SpawnUsagePercentage = 'su',
-  MinHaulerCost = 'mhc',
-  EnergyOutputTransactionCosts = 'eotc',
-  EnergyTerminalSentDomestic = 'etsd',
-  EnergyTerminalSentOther = 'etso',
-  CpuUsed = 'cpu',
-
-  GameTime = 'gt',
-  RemoteCount = 'rc',
-  RemoteEnergyStored = 'res',
-  RemoteEnergyInputHarvest = 'reih',
-  RemoteEnergyOutputRepairOther = 'reoro',
-  RemoteEnergyOutputBuild = 'reob',
-}
-
 export const packedPosLength = 3
 export const packedCoordLength = 2
 export const cardinalOffsets = [

@@ -12,8 +12,8 @@ import {
   rampartUpkeepCost,
   RemoteResourcePathTypes,
   ReservedCoordTypes,
-  RoomStatsKeys,
 } from '../../constants/general'
+import { RoomStatsKeys } from 'constants/stats'
 import './factory'
 import { LabManager } from './labs'
 import './links'

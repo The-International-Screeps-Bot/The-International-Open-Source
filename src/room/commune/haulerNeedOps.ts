@@ -1,4 +1,5 @@
-import { RoomMemoryKeys, RoomStatsKeys, packedCoordLength, packedPosLength, stamps } from '../../constants/general'
+import { RoomMemoryKeys, packedCoordLength, packedPosLength, stamps } from '../../constants/general'
+import { RoomStatsKeys } from 'constants/stats'
 import { StructureUtils } from 'room/structureUtils'
 import { findCarryPartsRequired } from 'utils/utils'
 import { CommuneUtils } from './communeUtils'
@@ -57,7 +58,6 @@ export class HaulerNeedOps {
     const sourceCount = roomMemory[RoomMemoryKeys.sourceCoords].length / packedCoordLength
 
     for (let index = 0; index < sourceCount; index++) {
-
       room.communeManager.communeHaulerNeed += findCarryPartsRequired(
         packedSourcePaths[index].length / packedPosLength + 3,
         estimatedSourceIncome[index] * 1.1,

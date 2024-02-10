@@ -1,79 +1,12 @@
 import { roundTo } from 'utils/utils'
-import {
-  CPUMaxPerTick,
-  customColors,
-  RoomMemoryKeys,
-  RoomStatsKeys,
-  RoomTypes,
-} from '../constants/general'
+import { CPUMaxPerTick, customColors, RoomMemoryKeys, RoomTypes } from '../constants/general'
+import { RoomStatsKeys } from 'constants/stats'
 import { LogOps, LogTypes } from 'utils/logOps'
 import { CollectiveManager } from './collective'
-
-export interface RoomStats {
-  [RoomStatsKeys.GameTime]: number
-  [RoomStatsKeys.RemoteCount]: number
-  [RoomStatsKeys.RemoteEnergyStored]: number
-  [RoomStatsKeys.RemoteEnergyInputHarvest]: number
-  [RoomStatsKeys.RemoteEnergyOutputRepairOther]: number
-  [RoomStatsKeys.RemoteEnergyOutputBuild]: number
-}
-
-export interface CommuneStats extends RoomStats {
-  [RoomStatsKeys.ControllerLevel]: number
-  [RoomStatsKeys.EnergyInputHarvest]: number
-  [RoomStatsKeys.EnergyInputBought]: number
-  [RoomStatsKeys.EnergyOutputUpgrade]: number
-  [RoomStatsKeys.EnergyOutputRepairOther]: number
-  [RoomStatsKeys.EnergyOutputRepairWallOrRampart]: number
-  [RoomStatsKeys.EnergyOutputSold]: number
-  [RoomStatsKeys.EnergyOutputBuild]: number
-  [RoomStatsKeys.EnergyOutputSpawn]: number
-  [RoomStatsKeys.EnergyOutputPower]: number
-  [RoomStatsKeys.MineralsHarvested]: number
-  [RoomStatsKeys.EnergyStored]: number
-  [RoomStatsKeys.CreepCount]: number
-  [RoomStatsKeys.TotalCreepCount]: number
-  [RoomStatsKeys.PowerCreepCount]: number
-  [RoomStatsKeys.SpawnUsagePercentage]: number
-  [RoomStatsKeys.MinHaulerCost]: number
-  [RoomStatsKeys.EnergyOutputTransactionCosts]: number
-  [RoomStatsKeys.EnergyTerminalSentDomestic]: number
-  [RoomStatsKeys.EnergyTerminalSentOther]: number
-  [RoomStatsKeys.BatteriesStoredTimes10]: number
-  [RoomStatsKeys.CpuUsed]: number
-}
-
-const remoteStatNames: Set<Partial<keyof CommuneStats>> = new Set([
-  RoomStatsKeys.EnergyStored,
-  RoomStatsKeys.EnergyInputHarvest,
-  RoomStatsKeys.EnergyOutputRepairOther,
-  RoomStatsKeys.EnergyOutputBuild,
-])
-
-/**
- * Names of stats to average for
- */
-const averageStatNames: Set<keyof CommuneStats | keyof RoomStats> = new Set([
-  RoomStatsKeys.SpawnUsagePercentage,
-  RoomStatsKeys.EnergyInputHarvest,
-  RoomStatsKeys.MineralsHarvested,
-  RoomStatsKeys.EnergyInputBought,
-  RoomStatsKeys.EnergyOutputSold,
-  RoomStatsKeys.EnergyOutputUpgrade,
-  RoomStatsKeys.EnergyOutputBuild,
-  RoomStatsKeys.EnergyOutputRepairOther,
-  RoomStatsKeys.EnergyOutputRepairWallOrRampart,
-  RoomStatsKeys.EnergyOutputSpawn,
-  RoomStatsKeys.EnergyOutputPower,
-  RoomStatsKeys.RemoteEnergyStored,
-  RoomStatsKeys.RemoteEnergyInputHarvest,
-  RoomStatsKeys.RemoteEnergyOutputRepairOther,
-  RoomStatsKeys.RemoteEnergyOutputBuild,
-  RoomStatsKeys.EnergyOutputTransactionCosts,
-  RoomStatsKeys.EnergyTerminalSentDomestic,
-  RoomStatsKeys.EnergyTerminalSentOther,
-  RoomStatsKeys.CpuUsed,
-])
+import { remoteStatNames } from 'constants/stats'
+import { averageStatNames } from 'constants/stats'
+import { RoomStats } from 'types/stats'
+import { CommuneStats } from 'types/stats'
 
 export class StatsManager {
   static stats: {

@@ -9,9 +9,9 @@ import {
   creepRoles,
   customColors,
   MovedTypes,
-  RoomStatsKeys,
   FlagNames,
 } from '../../../constants/general'
+import { RoomStatsKeys } from 'constants/stats'
 import { StatsManager } from 'international/stats'
 import { unpackPosAt, packCoord, unpackCoord } from 'other/codec'
 import { CreepOps } from 'room/creeps/creepOps'
