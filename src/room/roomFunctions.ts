@@ -36,7 +36,6 @@ import { PlayerManager } from 'international/players'
 import { RoomNameUtils } from './roomNameUtils'
 import { LogOps } from 'utils/logOps'
 import { RoomObjectUtils } from './roomObjectUtils'
-import { RoomNameOps } from './roomNameOps'
 import { RoomOps } from './roomOps'
 
 /**

@@ -10,10 +10,11 @@ import {
   Result,
   constantRoomTypes,
   packedCoordLength,
+  RoomStatusKeys,
 } from '../constants/general'
 import { StatsManager } from 'international/stats'
 import { Dashboard, Rectangle, Table } from 'screeps-viz'
-import { packXYAsNum, randomTick } from 'utils/utils'
+import { isAlly, packXYAsNum, randomTick } from 'utils/utils'
 import { RoomNameUtils } from './roomNameUtils'
 import { CommuneManager } from './commune/commune'
 import { CommuneOps } from './commune/communeOps'
@@ -24,7 +25,6 @@ import { HaulerServices } from './creeps/roles/haulerServices'
 import { HaulerOps } from './creeps/roles/haulerOps'
 import { roomData } from './roomData'
 import { RoomManager } from './room'
-import { RoomNameOps } from './roomNameOps'
 
 export class RoomOps {
   /**
@@ -95,7 +95,7 @@ export class RoomOps {
 
     // If it hasn't been scouted for 100~ ticks
     if (Game.time - roomMemory[RoomMemoryKeys.lastScout] > Math.floor(Math.random() * 200)) {
-      RoomNameOps.basicScout(room.name)
+      this.basicScout(room.name)
       RoomNameUtils.cleanMemory(room.name)
     }
 
@@ -308,7 +308,7 @@ export class RoomOps {
     const roomMemory = Memory.rooms[room.name]
 
     if (roomMemory[RoomMemoryKeys.status] === undefined) {
-      RoomNameOps.findAndRecordStatus(room.name, roomMemory)
+      this.findAndRecordStatus(room.name, roomMemory)
     }
 
     // Record that the room was scouted this tick
@@ -321,11 +321,7 @@ export class RoomOps {
     }
 
     if (!roomMemory[RoomMemoryKeys.sourceCoords]) {
-      const sources = this.getSources(room)
-      if (sources.length) {
-        const packedSourceCoords = packCoordList(sources.map(source => source.pos))
-        roomMemory[RoomMemoryKeys.sourceCoords] = packedSourceCoords
-      }
+      this.getSources(room)
     }
 
     // If the room already has a type and its type is constant, no need to go further
@@ -333,7 +329,7 @@ export class RoomOps {
       return roomMemory[RoomMemoryKeys.type]
     }
 
-    const roomNameScoutType = RoomNameOps.findAndRecordConstantType(room.name)
+    const roomNameScoutType = this.findAndRecordConstantType(room.name)
     if (roomNameScoutType !== Result.fail) {
       if (roomNameScoutType === RoomTypes.sourceKeeper) {
         // Record the positions of keeper lairs
@@ -383,9 +379,13 @@ export class RoomOps {
   static getSources(room: Room) {
     if (room.sources !== undefined) return room.sources
 
-    const packedSourceCoords = Memory.rooms[room.name][RoomMemoryKeys.sourceCoords]
+    const roomMemory = Memory.rooms[room.name]
+    const packedSourceCoords = roomMemory[RoomMemoryKeys.sourceCoords]
     if (!packedSourceCoords) {
-      const sources = new Array<Source>()
+      const sources = room.find(FIND_SOURCES)
+
+      const sourceCoords = sources.map(source => source.pos)
+      roomMemory[RoomMemoryKeys.sourceCoords] = packCoordList(sourceCoords)
 
       room.sources = sources
       return sources
@@ -402,5 +402,94 @@ export class RoomOps {
 
     room.sources = sources
     return sources
+  }
+
+  static basicScout(roomName: string) {
+    const roomMemory = Memory.rooms[roomName]
+
+    if (roomMemory[RoomMemoryKeys.status] === undefined) {
+      this.findAndRecordStatus(roomName, roomMemory)
+    }
+
+    // Record that the room was scouted this tick
+    roomMemory[RoomMemoryKeys.lastScout] = Game.time
+
+    const room = Game.rooms[roomName]
+    if (!room) return roomMemory[RoomMemoryKeys.type]
+
+    // We have vision of the room
+
+    if (roomMemory[RoomMemoryKeys.controllerCoord] === undefined) {
+      if (room.controller) {
+        roomMemory[RoomMemoryKeys.controllerCoord] = packCoord(room.controller.pos)
+      }
+    }
+
+    if (roomMemory[RoomMemoryKeys.sourceCoords] === undefined) {
+      RoomOps.getSources(room)
+    }
+
+    if (!room.controller) return roomMemory[RoomMemoryKeys.type]
+
+    // If the contoller is owned
+    if (room.controller.owner) {
+      // Stop if the controller is owned by me
+
+      if (room.controller.my) return roomMemory[RoomMemoryKeys.type]
+
+      const owner = room.controller.owner.username
+      roomMemory[RoomMemoryKeys.owner] = owner
+
+      // If the controller is owned by an ally
+
+      if (isAlly(owner)) {
+        roomMemory[RoomMemoryKeys.type] = RoomTypes.ally
+      }
+
+      return room.scoutEnemyRoom()
+    }
+
+    // There is no controller owner
+
+    if (room.scoutRemote()) return roomMemory[RoomMemoryKeys.type]
+
+    return (roomMemory[RoomMemoryKeys.type] = RoomTypes.neutral)
+  }
+
+  static findAndRecordConstantType(roomName: string) {
+    // Find the numbers in the room's name
+    const [EWstring, NSstring] = roomName.match(/\d+/g)
+
+    // Convert he numbers from strings into actual numbers
+
+    const EW = parseInt(EWstring)
+    const NS = parseInt(NSstring)
+
+    const roomMemory = Memory.rooms[roomName]
+
+    // Use the numbers to deduce some room types - cheaply!
+
+    if (EW % 10 === 0 && NS % 10 === 0) {
+      return (roomMemory[RoomMemoryKeys.type] = RoomTypes.intersection)
+    }
+
+    if (EW % 10 === 0 || NS % 10 === 0) {
+      return (roomMemory[RoomMemoryKeys.type] = RoomTypes.highway)
+    }
+    if (EW % 5 === 0 && NS % 5 === 0) {
+      return (roomMemory[RoomMemoryKeys.type] = RoomTypes.center)
+    }
+    if (Math.abs(5 - (EW % 10)) <= 1 && Math.abs(5 - (NS % 10)) <= 1) {
+      return (roomMemory[RoomMemoryKeys.type] = RoomTypes.sourceKeeper)
+    }
+
+    return Result.fail
+  }
+
+  static findAndRecordStatus(roomName: string, roomMemory = Memory.rooms[roomName]) {
+    const status = Game.map.getRoomStatus(roomName).status
+    roomMemory[RoomMemoryKeys.status] = RoomStatusKeys[status]
+
+    return status
   }
 }

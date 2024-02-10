@@ -4,6 +4,7 @@ import { StatsManager } from './stats'
 import { PlayerMemoryKeys, SegmentIDs } from '../constants/general'
 import { PlayerRelationships } from '../constants/general'
 import { RoomNameUtils } from 'room/roomNameUtils'
+import { RoomOps } from 'room/roomOps'
 
 /**
  * Configures variables to align with the bot's expectations, to ensure proper function
@@ -65,7 +66,7 @@ export class InitManager {
 
       playerMemory[PlayerMemoryKeys.relationship] = PlayerRelationships.ally
     }
-  }
+}
 
   private static initSegments() {
     RawMemory.segments[SegmentIDs.basePlans] = JSON.stringify({} as BasePlansSegment)

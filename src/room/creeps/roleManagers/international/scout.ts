@@ -9,7 +9,6 @@ import {
 import { getRangeXY, getRange, randomOf } from 'utils/utils'
 import { partial } from 'lodash'
 import { RoomNameUtils } from 'room/roomNameUtils'
-import { RoomNameOps } from 'room/roomNameOps'
 import { RoomOps } from 'room/roomOps'
 
 export class Scout extends Creep {

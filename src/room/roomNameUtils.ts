@@ -27,7 +27,6 @@ import { unpackPosAt } from 'other/codec'
 import { CommuneManager } from './commune/commune'
 import { LogOps } from 'utils/logOps'
 import { RoomOps } from './roomOps'
-import { RoomNameOps } from './roomNameOps'
 import { RoomUtils } from './roomUtils'
 
 /**
@@ -343,7 +342,7 @@ export class RoomNameUtils {
     const roomMemory = Memory.rooms[roomName]
     if (roomMemory === undefined) {
       const roomMemory = (Memory.rooms[roomName] = {} as RoomMemory)
-      RoomNameOps.basicScout(roomName)
+      RoomOps.basicScout(roomName)
 
       return roomMemory[RoomMemoryKeys.status]
     }

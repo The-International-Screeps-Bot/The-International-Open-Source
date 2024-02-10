@@ -1,6 +1,6 @@
 import { RoomNameUtils } from 'room/roomNameUtils'
 import { RoomMemoryKeys, RoomTypes, SegmentIDs, majorVersion } from '../constants/general'
-import { RoomNameOps } from 'room/roomNameOps'
+import { RoomOps } from 'room/roomOps'
 
 /**
  * Migrate version by performing actions, if required
@@ -76,11 +76,11 @@ export class MigrationManager {
     }
     if (Memory.breakingVersion === 126) {
       for (const roomName in Memory.rooms) {
-        RoomNameOps.findAndRecordStatus(roomName)
+        RoomOps.findAndRecordStatus(roomName)
       }
       Memory.breakingVersion += 1
     }
-    
+
   }
 
   private static hardMigration() {

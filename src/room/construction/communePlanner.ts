@@ -239,7 +239,9 @@ export class CommunePlanner {
       return tryChoosePlanResult
     }
 
-    this.tryConfigurePlanner()
+    if (this.tryConfigurePlanner() === Result.fail) {
+      return Result.fail
+    }
     this.tryConfigurePlan()
 
     this.avoidSources()
@@ -421,12 +423,14 @@ export class CommunePlanner {
     }
   }
   private tryConfigurePlanner() {
-    if (this.terrainCoords) return
+    if (this.fastFillerStartCoords) return Result.success
 
     this.planAttempts = []
-    this.findFastFillerStartCoords()
-
     this.terrainCoords = RoomOps.createTerrainBinary(this.room.name)
+
+    this.findFastFillerStartCoords()
+    if (!this.fastFillerStartCoords.length) return Result.fail
+    return Result.success
   }
   private findFastFillerStartCoords() {
     if (this.fastFillerStartCoords) return
@@ -444,33 +448,38 @@ export class CommunePlanner {
 
     // Find the closest source pos and its path to the controller
 
-    let shortestPath: RoomPosition[]
+    let shortestPath: RoomPosition[] | undefined
 
     for (const source of sources) {
       const path = CustomPathFinder.findPath({
         origin: source.pos,
         goals: [{ pos: this.room.controller.pos, range: 1 }],
         plainCost: defaultRoadPlanningPlainCost,
+        maxRooms: 1,
       })
+
       if (shortestPath && path.length >= shortestPath.length) continue
 
       shortestPath = path
     }
 
-    let origin = shortestPath[Math.floor(shortestPath.length / 2)]
-    if (origin) startCoords.push(origin)
-
-    // Avg path between sources, if more than 1
-
-    if (sources.length > 1) {
-      const path = CustomPathFinder.findPath({
-        origin: sources[0].pos,
-        goals: [{ pos: sources[1].pos, range: 1 }],
-        plainCost: defaultRoadPlanningPlainCost,
-      })
-
-      origin = path[Math.floor(path.length / 2)]
+    if (shortestPath !== undefined) {
+      let origin = shortestPath[Math.floor(shortestPath.length / 2)]
       if (origin) startCoords.push(origin)
+
+      // Avg path between sources, if more than 1
+
+      if (sources.length > 1) {
+        const path = CustomPathFinder.findPath({
+          origin: sources[0].pos,
+          goals: [{ pos: sources[1].pos, range: 1 }],
+          plainCost: defaultRoadPlanningPlainCost,
+          maxRooms: 1,
+        })
+
+        origin = path[Math.floor(path.length / 2)]
+        if (origin) startCoords.push(origin)
+      }
     }
 
     this.fastFillerStartCoords = startCoords

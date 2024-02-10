@@ -101,7 +101,6 @@ import { NukerProcs } from 'room/commune/nukerProcs'
 import { ObserverProcs } from 'room/commune/observerProcs'
 import { PowerSpawnProcs } from 'room/commune/powerSpawnProcs'
 import { RoomOps } from 'room/roomOps'
-import { RoomNameOps } from 'room/roomNameOps'
 import { SegmentsManager } from 'international/segments'
 import { wasm } from './wasmInit'
 import { initSync } from '../wasm/pkg/commiebot_wasm.js'
@@ -172,7 +171,6 @@ export function profilerRegister() {
   profiler.registerClass(RoomVisualsManager, 'RoomVisualsManager')
   profiler.registerClass(Operator, 'Operator')
   profiler.registerClass(RoomNameUtils, 'RoomNameUtils')
-  profiler.registerClass(RoomNameOps, 'RoomNameOps')
   profiler.registerClass(RoomUtils, 'RoomUtils')
   profiler.registerClass(RoomOps, 'RoomProcs')
   profiler.registerClass(CommuneUtils, 'CommuneUtils')

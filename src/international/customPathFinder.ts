@@ -596,6 +596,8 @@ export class CustomPathFinder {
   }
 
   static weightStructures(costs: CostMatrix, args: CustomPathFinderArgs, room: Room) {
+    if (!args.weightStructures) return
+
     for (const key in args.weightStructures) {
       // Get the numeric value of the weight
 
