@@ -32,6 +32,8 @@ console.log('START')
 //     `npx screeps-grafana-go_carbon setup && npx screeps-grafana-go_carbon --grafanaPort=${ports.grafanaPort} --relayPort=${ports.relayPort} --force ${argv.debug ? '--debug' : ''} --deleteLogs --deleteWhisper`,
 //     options,
 // )
+console.log(process.env.EXPORT_DISCORD_WEBHOOK_URL, process.env.EXPORT_PASTEBIN_KEY, process.env.STEAM_API_KEY, process.env.ACTIONS_RUNNER_NAME)
+
 
 const cmdString = `npx screeps-performance-server --maxTickCount=${argv.maxTicks || 20000} --maxBots=10 --botFilePath=${botPath} --steamKey=${
     process.env.STEAM_API_KEY
