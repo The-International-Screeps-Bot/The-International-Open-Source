@@ -34,7 +34,7 @@ console.log('START')
 // )
 
 const cmdString = `npx screeps-performance-server --maxTickCount=${argv.maxTicks || 20000} --maxBots=10 --botFilePath=${botPath} --steamKey=${
-    process.env.STEAM_KEY
+    process.env.STEAM_API_KEY
 } --discordWebHookUrl=${process.env.EXPORT_DISCORD_WEBHOOK_URL} --pasteBinUrlDevKey=${process.env.EXPORT_PASTEBIN_KEY} --serverPort=${ports.serverPort} --cliPort=${ports.cliPort} --force ${
     argv.debug ? '--debug' : ''
 } --deleteLogs --tickDuration=${argv.tickDuration || 250} --logFilter='Error:'`;
