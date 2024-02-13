@@ -7,8 +7,10 @@ import {
   RoomMemoryKeys,
   minerals,
   haulerUpdateDefault,
+  FlagNames,
 } from '../constants/general'
 import { CommuneUtils } from 'room/commune/communeUtils'
+import { LogOps, LogTypes } from 'utils/logOps'
 
 const periodicUpdateInterval = randomIntRange(100, 200)
 
@@ -342,7 +344,7 @@ export class CollectiveManager {
     // How much energy we are allowed to distribute each tick of funneling
     let funnelDistribution = 0
     const funnelTargetQuotas: {[roomName: string]: number} = {}
-    
+
     const funnelOrder = this.getFunnelOrder()
     funnelTargets.add(funnelOrder[0])
 
@@ -361,6 +363,10 @@ export class CollectiveManager {
       funnelTargetQuotas[roomName] = maxUpgradeStrength
     }
 
+    if (Game.flags[FlagNames.debugFunneling]) {
+        LogOps.log('Funnel quotas', `distribution: ${funnelDistribution}, quotas: ${JSON.stringify(funnelTargetQuotas)}`, { type: LogTypes.debug })
+    }
+
     if (funnelDistribution === 0) return funnelTargets
 
     for (const roomName in funnelTargetQuotas) {
@@ -370,6 +376,10 @@ export class CollectiveManager {
 
       funnelDistribution -= funnelQuota
       if (funnelDistribution <= 0) break
+    }
+
+    if (Game.flags[FlagNames.debugFunneling]) {
+        LogOps.log('Funnel Targets', `${JSON.stringify(funnelTargets)}`, { type: LogTypes.debug })
     }
 
     return funnelTargets

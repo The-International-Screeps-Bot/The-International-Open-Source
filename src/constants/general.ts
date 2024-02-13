@@ -1437,6 +1437,7 @@ export enum FlagNames {
   mapVisuals = 'mapVisuals',
   roomVisuals = 'roomVisuals',
   deactivate = 'deactiveate',
+  debugFunneling = 'debugFunneling',
 }
 
 export const IDUpdateInterval = randomIntRange(50, 100)
