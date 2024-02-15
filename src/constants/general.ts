@@ -1,5 +1,4 @@
 import { packCoord } from '../other/codec'
-import { randomIntRange } from '../utils/utils'
 
 export enum PlayerRelationships {
   ally,
@@ -1226,6 +1225,10 @@ export const quadAttackMemberOffsets = [
     y: 0,
   },
 ]
+/**
+ * @deprecated
+ * should replace this with something that doesn't create a circular dependency
+ */
 export const packedQuadAttackMemberOffsets = quadAttackMemberOffsets.map(coord => packCoord(coord))
 
 export enum Result {
@@ -1439,8 +1442,6 @@ export enum FlagNames {
   deactivate = 'deactiveate',
   debugFunneling = 'debugFunneling',
 }
-
-export const IDUpdateInterval = randomIntRange(50, 100)
 
 export const creepDamageEvents = new Set([
   EVENT_ATTACK_TYPE_MELEE,

@@ -1,8 +1,9 @@
 import { Sleepable } from 'utils/sleepable'
 import { CollectiveManager } from './collective'
-import { Utils } from 'utils/utils'
-import { IDUpdateInterval } from '../constants/general'
+import { Utils, randomIntRange } from 'utils/utils'
 import { SegmentsManager } from './segments'
+
+export const IDUpdateInterval = randomIntRange(50, 100)
 
 /**
  * Tracks and records constructionSites and thier age, deleting old sites
