@@ -1,4 +1,4 @@
-import { packCoord } from '../other/codec'
+// This file should not have any imports to avoid circular dependencies
 
 export enum PlayerRelationships {
   ally,
@@ -1225,11 +1225,6 @@ export const quadAttackMemberOffsets = [
     y: 0,
   },
 ]
-/**
- * @deprecated
- * should replace this with something that doesn't create a circular dependency
- */
-export const packedQuadAttackMemberOffsets = quadAttackMemberOffsets.map(coord => packCoord(coord))
 
 export enum Result {
   fail,
