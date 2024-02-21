@@ -51,12 +51,14 @@ export class FlagManager {
 
   private incomingTransactions(flagName: string, flagNameParts: string[]) {
     const flag = Game.flags[flagName]
-    const roomName = flagNameParts[1] || flag.pos.roomName
+    const roomName = flag.pos.roomName
     const room = Game.rooms[roomName]
     if (!room) {
       flag.setColor(COLOR_RED)
       return
     }
+
+    const resourceType = flagNameParts[1] as ResourceConstant | undefined
 
     flag.setColor(COLOR_GREEN)
 
@@ -67,6 +69,10 @@ export class FlagManager {
     for (const transaction of Game.market.incomingTransactions) {
       const roomFromMemory = Memory.rooms[transaction.from] || ({} as RoomMemory)
       const roomToMemory = Memory.rooms[transaction.to] || ({} as RoomMemory)
+
+      if (resourceType !== undefined && transaction.resourceType !== resourceType) {
+        continue
+      }
 
       data.push([
         transaction.from +
@@ -118,12 +124,14 @@ export class FlagManager {
 
   private outgoingTransactions(flagName: string, flagNameParts: string[]) {
     const flag = Game.flags[flagName]
-    const roomName = flagNameParts[1] || flag.pos.roomName
+    const roomName = flag.pos.roomName
     const room = Game.rooms[roomName]
     if (!room) {
       flag.setColor(COLOR_RED)
       return
     }
+
+    const resourceType = flagNameParts[1] as ResourceConstant | undefined
 
     flag.setColor(COLOR_GREEN)
 
@@ -134,6 +142,10 @@ export class FlagManager {
     for (const transaction of Game.market.outgoingTransactions) {
       const roomFromMemory = Memory.rooms[transaction.from] || ({} as RoomMemory)
       const roomToMemory = Memory.rooms[transaction.to] || ({} as RoomMemory)
+
+      if (resourceType !== undefined && transaction.resourceType !== resourceType) {
+        continue
+      }
 
       data.push([
         transaction.from +

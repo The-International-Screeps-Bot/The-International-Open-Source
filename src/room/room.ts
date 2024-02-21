@@ -197,7 +197,6 @@ export class RoomManager {
     const sourcePaths: RoomPosition[][] = []
 
     for (let i = 0; i < packedRemoteSourceHarvestPositions.length; i += 1) {
-
       const positions = packedRemoteSourceHarvestPositions[i]
       const origin = unpackPosAt(positions, 0)
 
@@ -264,7 +263,6 @@ export class RoomManager {
     const sourcePaths: RoomPosition[][] = []
 
     for (let i = 0; i < packedRemoteSourceHarvestPositions.length; i += 1) {
-
       const positions = packedRemoteSourceHarvestPositions[i]
       const origin = unpackPosAt(positions, 0)
 
@@ -468,20 +466,20 @@ export class RoomManager {
     if (this._remoteSources) return this._remoteSources
 
     const sourceIDs = this.room.memory[RoomMemoryKeys.remoteSources]
-    if (sourceIDs) {
-      this._remoteSources = []
-
-      for (let i = 0; i < sourceIDs.length; i++) {
-        const source = findObjectWithID(sourceIDs[i])
-
-        source.remoteIndex = i
-        this._remoteSources.push(source)
-      }
-
-      return this._remoteSources
+    if (!sourceIDs) {
+      throw Error('No remote sources ' + this.room.name)
     }
 
-    throw Error('No remote sources ' + this.room.name)
+    this._remoteSources = []
+
+    for (let i = 0; i < sourceIDs.length; i++) {
+      const source = findObjectWithID(sourceIDs[i])
+
+      source.remoteIndex = i
+      this._remoteSources.push(source)
+    }
+
+    return this._remoteSources
   }
 
   _sourceHarvestPositions: RoomPosition[][]

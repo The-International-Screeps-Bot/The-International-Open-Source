@@ -1,5 +1,4 @@
-import { packCoord } from '../other/codec'
-import { randomIntRange } from '../utils/utils'
+// This file should not have any imports to avoid circular dependencies
 
 export enum PlayerRelationships {
   ally,
@@ -1226,7 +1225,6 @@ export const quadAttackMemberOffsets = [
     y: 0,
   },
 ]
-export const packedQuadAttackMemberOffsets = quadAttackMemberOffsets.map(coord => packCoord(coord))
 
 export enum Result {
   fail,
@@ -1437,9 +1435,8 @@ export enum FlagNames {
   mapVisuals = 'mapVisuals',
   roomVisuals = 'roomVisuals',
   deactivate = 'deactiveate',
+  debugFunneling = 'debugFunneling',
 }
-
-export const IDUpdateInterval = randomIntRange(50, 100)
 
 export const creepDamageEvents = new Set([
   EVENT_ATTACK_TYPE_MELEE,

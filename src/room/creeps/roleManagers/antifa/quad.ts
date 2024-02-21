@@ -8,7 +8,6 @@ import {
   RoomTypes,
   WorkTypes,
   customColors,
-  packedQuadAttackMemberOffsets,
   quadAttackMemberOffsets,
 } from '../../../../constants/general'
 import {
@@ -31,6 +30,10 @@ import { RoomManager } from 'room/room'
 
 const rangedFleeRange = 5
 const meleeFleeRange = 3
+/**
+ * should replace this with something that doesn't create a circular dependency
+ */
+const packedQuadAttackMemberOffsets = quadAttackMemberOffsets.map(coord => packCoord(coord))
 
 interface EnemyThreatData {
   coords: Uint8Array
